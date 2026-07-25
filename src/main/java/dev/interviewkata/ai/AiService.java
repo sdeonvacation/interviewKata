@@ -145,21 +145,49 @@ public class AiService {
     }
 
     private String generateFallbackQuestion(String topic, String phase) {
-        if ("SYSTEM_DESIGN".equals(topic)) {
-            return switch (phase) {
+        return switch (topic) {
+            case "SYSTEM_DESIGN" -> switch (phase) {
                 case "INTRO" -> "Design a URL shortening service like TinyURL. It should handle 100 million new URLs per day, redirect with less than 10ms latency, and support custom short URLs. Walk me through your high-level design.";
                 case "TECHNICAL" -> "How would you handle the data storage? What database would you choose and how would you partition the data?";
                 case "DEEP_DIVE" -> "What happens if one of your servers goes down? How do you ensure high availability and handle failover?";
-                case "WRAP_UP" -> "How would you monitor this system in production? What metrics would you track?";
-                default -> "Design a notification system that can send 10 million push notifications per day with at-most-once delivery guarantee.";
+                default -> "How would you monitor this system in production? What metrics would you track?";
             };
-        }
-        return switch (phase) {
-            case "INTRO" -> "Let's start with a technical question. Can you explain how " + topic + " handles concurrency or scalability in real-world systems?";
-            case "TECHNICAL" -> "Can you explain a key concept in " + topic + " and how you've applied it in production?";
-            case "DEEP_DIVE" -> "Let's go deeper. Walk me through a complex scenario involving " + topic + " where you had to make trade-offs.";
-            case "WRAP_UP" -> "What areas of " + topic + " would you like to improve, and how would you approach that?";
-            default -> "Tell me more about your understanding of " + topic + ".";
+            case "SPRING_BOOT" -> switch (phase) {
+                case "INTRO" -> "Explain how Spring Boot auto-configuration works. How does @EnableAutoConfiguration decide which beans to create, and how can you override or exclude specific auto-configurations?";
+                case "TECHNICAL" -> "What is the difference between @Component, @Service, @Repository, and @Controller? When and why would you use @Configuration with @Bean methods instead?";
+                case "DEEP_DIVE" -> "Explain how Spring handles transaction propagation. What happens when a @Transactional method calls another @Transactional method with REQUIRES_NEW?";
+                default -> "How would you implement custom health indicators and metrics in a Spring Boot production application?";
+            };
+            case "JAVA_CORE" -> switch (phase) {
+                case "INTRO" -> "Explain how HashMap works internally in Java 8+. What happens during a put() operation when there's a hash collision, and when does the linked list convert to a tree?";
+                case "TECHNICAL" -> "What is the difference between synchronized, ReentrantLock, and volatile? Give a scenario where each is the best choice.";
+                case "DEEP_DIVE" -> "Explain the Java Memory Model. What guarantees does 'happens-before' provide, and how does it relate to volatile and synchronized?";
+                default -> "What are the trade-offs between CompletableFuture and virtual threads (Project Loom) for handling concurrent I/O?";
+            };
+            case "DATABASE" -> switch (phase) {
+                case "INTRO" -> "Explain the differences between the four SQL isolation levels. What anomalies does each prevent, and what is the performance trade-off at each level?";
+                case "TECHNICAL" -> "How do B-tree indexes work? When would you choose a composite index over multiple single-column indexes, and why does column order matter?";
+                case "DEEP_DIVE" -> "You have a query that's doing a sequential scan on a table with 100M rows despite having an index. What are the possible reasons and how would you diagnose it?";
+                default -> "Compare PostgreSQL MVCC with MySQL InnoDB locking. What are the trade-offs for write-heavy workloads?";
+            };
+            case "DSA" -> switch (phase) {
+                case "INTRO" -> "Given an unsorted array of integers, find the length of the longest consecutive sequence. For example, given [100, 4, 200, 1, 3, 2], the answer is 4 (the sequence 1,2,3,4). What is the optimal time complexity you can achieve?";
+                case "TECHNICAL" -> "Walk me through your approach step by step. What data structure would you use and why?";
+                case "DEEP_DIVE" -> "What is the space complexity of your solution? Can you solve it with O(1) extra space?";
+                default -> "If the input was a stream of numbers instead of a fixed array, how would your approach change?";
+            };
+            case "ARCHITECTURE" -> switch (phase) {
+                case "INTRO" -> "Explain the CQRS pattern with Event Sourcing. When is this architecture appropriate, what problems does it solve, and what complexity does it introduce?";
+                case "TECHNICAL" -> "How would you handle eventual consistency between the read and write models? What strategies exist and what are their trade-offs?";
+                case "DEEP_DIVE" -> "How would you implement a saga pattern across three microservices for an order-payment-shipping flow? How do you handle partial failures?";
+                default -> "Compare choreography vs orchestration for microservice coordination. When would you choose each?";
+            };
+            default -> switch (phase) {
+                case "INTRO" -> "Explain a core concept in " + topic + " that is frequently asked in senior engineering interviews.";
+                case "TECHNICAL" -> "Can you walk me through a production scenario where this concept caused a real problem?";
+                case "DEEP_DIVE" -> "What are the trade-offs of the approach you described? What alternative would you consider?";
+                default -> "How would you explain this to a junior engineer joining your team?";
+            };
         };
     }
 
