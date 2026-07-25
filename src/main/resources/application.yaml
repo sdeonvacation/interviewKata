@@ -43,7 +43,7 @@ interviewkata:
       - jdk.jshell
   ai:
     provider: ${INTERVIEWKATA_AI_PROVIDER:openai}
-    max-interviews-per-day: 3
+    max-interviews-per-day: 20
     cache-explanations: true
     fallback:
       api-key: ${JOBHUNTER_AI_FALLBACK_API_KEY:}
