@@ -4,7 +4,6 @@ import dev.interviewkata.dto.DashboardDto;
 import dev.interviewkata.dto.DtoMapper;
 import dev.interviewkata.model.DailyActivity;
 import dev.interviewkata.model.StudySession;
-import dev.interviewkata.model.enums.CardStatus;
 import dev.interviewkata.repository.CardRepository;
 import dev.interviewkata.repository.DailyActivityRepository;
 import dev.interviewkata.repository.StudySessionRepository;
@@ -35,8 +34,7 @@ public class DashboardService {
     }
 
     public DashboardDto getDashboard() {
-        long dueCardCount = cardRepository.countByNextReviewBeforeAndStatusNot(
-                LocalDateTime.now(), CardStatus.GRADUATED);
+        long dueCardCount = cardRepository.countDueCards(LocalDateTime.now());
 
         int currentStreak = progressService.getCurrentStreak();
 

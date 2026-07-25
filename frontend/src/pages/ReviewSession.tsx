@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Play, RotateCcw, Trophy } from 'lucide-react';
+import { RotateCcw, Trophy } from 'lucide-react';
 import { FlashCard } from '@/components/FlashCard';
 import { GradeButtons } from '@/components/GradeButtons';
 import { useReviewSession } from '@/hooks/useReviewSession';
@@ -12,6 +12,11 @@ export function ReviewSession() {
     useReviewSession(topicId);
 
   const [isFlipped, setIsFlipped] = useState(false);
+
+  // Auto-start session on mount (skip idle screen)
+  useEffect(() => {
+    startSession();
+  }, [startSession]);
 
   // Reset flip state when card advances
   useEffect(() => {
@@ -76,32 +81,11 @@ export function ReviewSession() {
           </div>
         )}
 
-        {/* Idle state */}
-        {state === 'idle' && (
-          <div className="card flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-14 h-14 rounded-full bg-amber-500/10 flex items-center justify-center mb-5">
-              <Play className="w-6 h-6 text-amber-400" />
-            </div>
-            <h2 className="text-lg font-semibold text-[#f0f6fc] mb-2">
-              Ready to Review
-            </h2>
-            <p className="text-[#8b949e] text-sm mb-1">
-              Reinforce your knowledge with spaced repetition.
-            </p>
-            {session && session.totalCards > 0 && (
-              <p className="text-[#484f58] text-xs mb-6">
-                {session.totalCards} cards due for review
-              </p>
-            )}
-            {!session && (
-              <p className="text-[#484f58] text-xs mb-6">
-                Cards due will be loaded when you start
-              </p>
-            )}
-            <button onClick={startSession} className="btn-primary">
-              <Play className="w-4 h-4 mr-2" />
-              Start Review
-            </button>
+        {/* Idle state — only shown if auto-start errors out */}
+        {state === 'idle' && !error && (
+          <div className="card flex flex-col items-center justify-center py-16">
+            <div className="w-8 h-8 border-2 border-amber-500/30 border-t-amber-400 rounded-full animate-spin mb-4" />
+            <p className="text-[#8b949e] text-sm">Starting review...</p>
           </div>
         )}
 
@@ -170,7 +154,7 @@ export function ReviewSession() {
         )}
 
         {/* Complete state */}
-        {state === 'complete' && (
+        {state === 'complete' && completedCards > 0 && (
           <div className="card flex flex-col items-center justify-center py-16 text-center">
             <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mb-5">
               <Trophy className="w-8 h-8 text-emerald-400" />
@@ -193,7 +177,7 @@ export function ReviewSession() {
         )}
 
         {/* Empty state (no cards due) */}
-        {state === 'idle' && session && session.totalCards === 0 && (
+        {state === 'complete' && completedCards === 0 && (
           <div className="card text-center py-10">
             <p className="text-[#8b949e] text-sm">
               No cards due for review right now. Check back later.
