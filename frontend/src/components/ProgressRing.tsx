@@ -3,6 +3,7 @@ interface ProgressRingProps {
   size?: number;
   strokeWidth?: number;
   label?: string;
+  hideValue?: boolean;
 }
 
 export function ProgressRing({
@@ -10,6 +11,7 @@ export function ProgressRing({
   size = 80,
   strokeWidth = 6,
   label,
+  hideValue = false,
 }: ProgressRingProps) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -40,14 +42,16 @@ export function ProgressRing({
           }}
         />
       </svg>
-      <div
-        className="absolute inset-0 flex items-center justify-center"
-        style={{ width: size, height: size }}
-      >
-        <span className="text-[#f0f6fc] font-bold text-sm">
-          {Math.round(progress)}%
-        </span>
-      </div>
+      {!hideValue && (
+        <div
+          className="absolute inset-0 flex items-center justify-center"
+          style={{ width: size, height: size }}
+        >
+          <span className="text-[#f0f6fc] font-bold text-sm">
+            {Math.round(progress)}%
+          </span>
+        </div>
+      )}
       {label && <span className="text-[#8b949e] text-xs">{label}</span>}
     </div>
   );

@@ -15,9 +15,9 @@ export function Timer({ timeLeft, totalTime }: TimerProps) {
 
   return (
     <div className="relative inline-flex items-center justify-center">
-      <ProgressRing progress={progress} />
+      <ProgressRing progress={progress} size={64} strokeWidth={4} hideValue />
       <span
-        className={`absolute font-mono text-2xl font-bold ${
+        className={`absolute font-mono text-lg font-bold ${
           urgent ? 'text-rose-400 animate-pulse' : 'text-amber-400'
         }`}
       >
