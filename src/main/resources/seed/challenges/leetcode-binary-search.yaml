@@ -1,0 +1,296 @@
+topic: "DSA/Arrays"
+challenges:
+  - title: "Search Insert Position"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given a sorted array of distinct integers and a target value, return the index of the
+      target if it is found. If the target is not present, return the index where it would
+      be inserted to maintain sorted order.
+
+      Your solution must run in O(log n) time complexity.
+
+      Constraints:
+      - 1 <= nums.length <= 10^4
+      - -10^4 <= nums[i] <= 10^4
+      - nums contains distinct values sorted in ascending order
+      - -10^4 <= target <= 10^4
+    starter_code: |
+      public class Solution {
+          public int searchInsert(int[] nums, int target) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "nums = [1,3,5,6], target = 5"
+        expected: "2"
+        description: "Target 5 found at index 2"
+      - input: "nums = [1,3,5,6], target = 2"
+        expected: "1"
+        description: "Target 2 not found, would be inserted at index 1"
+      - input: "nums = [1,3,5,6], target = 7"
+        expected: "4"
+        description: "Target 7 greater than all elements, inserted at end"
+      - input: "nums = [1,3,5,6], target = 0"
+        expected: "0"
+        description: "Target 0 smaller than all elements, inserted at beginning"
+    hints:
+      - "Think about binary search. What condition tells you to go left or right?"
+      - "When binary search ends without finding the target, the left pointer indicates the correct insertion position."
+      - "Maintain left and right bounds. If nums[mid] < target, search right half. Otherwise search left half. Return left when loop ends."
+
+  - title: "Search a 2D Matrix"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      You are given an m x n integer matrix with the following properties:
+      - Each row is sorted in non-decreasing order.
+      - The first integer of each row is greater than the last integer of the previous row.
+
+      Given a target integer, determine if it exists in the matrix.
+
+      Your solution must run in O(log(m * n)) time complexity.
+
+      Constraints:
+      - m == matrix.length
+      - n == matrix[i].length
+      - 1 <= m, n <= 100
+      - -10^4 <= matrix[i][j], target <= 10^4
+    starter_code: |
+      public class Solution {
+          public boolean searchMatrix(int[][] matrix, int target) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 3"
+        expected: "true"
+        description: "Target 3 exists in first row"
+      - input: "matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 13"
+        expected: "false"
+        description: "Target 13 does not exist in matrix"
+      - input: "matrix = [[1]], target = 1"
+        expected: "true"
+        description: "Single element matrix containing target"
+      - input: "matrix = [[1,3,5],[7,9,11],[13,15,17]], target = 15"
+        expected: "true"
+        description: "Target found in last row"
+    hints:
+      - "The matrix can be conceptually flattened into a single sorted array. How would you map a 1D index to 2D row and column?"
+      - "Treat the entire matrix as a sorted array of m*n elements. Use binary search with index mapping: row = mid / n, col = mid % n."
+      - "Alternatively, first binary search for the correct row, then binary search within that row."
+
+  - title: "Find Peak Element"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      A peak element is an element that is strictly greater than both its neighbors.
+
+      Given an integer array nums, find any peak element and return its index. If the array
+      contains multiple peaks, return the index of any one of them.
+
+      You may assume that nums[-1] = nums[n] = -infinity (elements outside the array are
+      treated as negative infinity).
+
+      Your solution must run in O(log n) time complexity.
+
+      Constraints:
+      - 1 <= nums.length <= 1000
+      - -2^31 <= nums[i] <= 2^31 - 1
+      - nums[i] != nums[i + 1] for all valid i (no adjacent duplicates)
+    starter_code: |
+      public class Solution {
+          public int findPeakElement(int[] nums) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "nums = [1,2,3,1]"
+        expected: "2"
+        description: "Element 3 at index 2 is greater than neighbors 2 and 1"
+      - input: "nums = [1,2,1,3,5,6,4]"
+        expected: "5"
+        description: "Peak at index 5 (value 6). Index 1 is also valid."
+      - input: "nums = [1]"
+        expected: "0"
+        description: "Single element is always a peak"
+      - input: "nums = [2,1]"
+        expected: "0"
+        description: "First element is peak since nums[-1] = -infinity and 2 > 1"
+    hints:
+      - "If an element is not a peak, which direction guarantees you will find a peak?"
+      - "If nums[mid] < nums[mid+1], a peak must exist to the right (since the sequence must eventually decrease before -infinity). Similarly for left."
+      - "Apply binary search: compare mid with mid+1. Move toward the larger neighbor. The side with the larger neighbor always contains at least one peak."
+
+  - title: "Search in Rotated Sorted Array"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      You are given a sorted array of distinct integers that has been rotated at some unknown
+      pivot index k (1 <= k < n). For example, [0,1,2,4,5,6,7] might become [4,5,6,7,0,1,2]
+      after rotation at pivot index 4.
+
+      Given the rotated array and a target value, return the index of target if it exists,
+      or -1 if it does not.
+
+      Your solution must run in O(log n) time complexity.
+
+      Constraints:
+      - 1 <= nums.length <= 5000
+      - -10^4 <= nums[i] <= 10^4
+      - All values of nums are unique
+      - nums was originally sorted in ascending order before rotation
+    starter_code: |
+      public class Solution {
+          public int search(int[] nums, int target) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "nums = [4,5,6,7,0,1,2], target = 0"
+        expected: "4"
+        description: "Target 0 found at index 4 in rotated array"
+      - input: "nums = [4,5,6,7,0,1,2], target = 3"
+        expected: "-1"
+        description: "Target 3 does not exist in array"
+      - input: "nums = [1], target = 0"
+        expected: "-1"
+        description: "Single element array, target not found"
+      - input: "nums = [3,1], target = 1"
+        expected: "1"
+        description: "Two element rotated array, target at index 1"
+    hints:
+      - "In a rotated sorted array, at least one half (left or right of mid) is always sorted. How can you determine which half is sorted?"
+      - "If the left half is sorted (nums[left] <= nums[mid]), check if target falls within that range. If yes, search left; otherwise search right."
+      - "Compare nums[left] with nums[mid] to identify the sorted half. Then check if target lies within the sorted half's range to decide direction."
+
+  - title: "Find First and Last Position of Element in Sorted Array"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given a sorted integer array in non-decreasing order, find the starting and ending
+      position (0-indexed) of a given target value.
+
+      If the target is not found in the array, return [-1, -1].
+
+      Your solution must run in O(log n) time complexity.
+
+      Constraints:
+      - 0 <= nums.length <= 10^5
+      - -10^9 <= nums[i] <= 10^9
+      - nums is sorted in non-decreasing order
+      - -10^9 <= target <= 10^9
+    starter_code: |
+      public class Solution {
+          public int[] searchRange(int[] nums, int target) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "nums = [5,7,7,8,8,10], target = 8"
+        expected: "[3,4]"
+        description: "Target 8 appears at indices 3 and 4"
+      - input: "nums = [5,7,7,8,8,10], target = 6"
+        expected: "[-1,-1]"
+        description: "Target 6 not present in array"
+      - input: "nums = [], target = 0"
+        expected: "[-1,-1]"
+        description: "Empty array returns [-1,-1]"
+      - input: "nums = [1], target = 1"
+        expected: "[0,0]"
+        description: "Single element equals target, both positions are 0"
+    hints:
+      - "Can you use binary search twice - once to find the leftmost occurrence and once for the rightmost?"
+      - "For the left boundary: when you find target, keep searching left (right = mid - 1). For right boundary: keep searching right (left = mid + 1)."
+      - "Implement two helper functions: findFirst and findLast. Both use binary search but differ in what happens when nums[mid] == target."
+
+  - title: "Find Minimum in Rotated Sorted Array"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given a sorted array of unique elements that has been rotated between 1 and n times,
+      find the minimum element.
+
+      For example, the array [3,4,5,1,2] is [1,2,3,4,5] rotated 3 times.
+
+      Your solution must run in O(log n) time complexity.
+
+      Constraints:
+      - n == nums.length
+      - 1 <= n <= 5000
+      - -5000 <= nums[i] <= 5000
+      - All integers in nums are unique
+      - nums was originally sorted in ascending order before rotation
+    starter_code: |
+      public class Solution {
+          public int findMin(int[] nums) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "nums = [3,4,5,1,2]"
+        expected: "1"
+        description: "Minimum is 1, located after the rotation point"
+      - input: "nums = [4,5,6,7,0,1,2]"
+        expected: "0"
+        description: "Minimum is 0 at the rotation boundary"
+      - input: "nums = [11,13,15,17]"
+        expected: "11"
+        description: "Array rotated n times (full rotation), minimum is first element"
+      - input: "nums = [2,1]"
+        expected: "1"
+        description: "Two element array, minimum at index 1"
+    hints:
+      - "The minimum element is the only element that is smaller than its predecessor. How can binary search help locate this inflection point?"
+      - "Compare nums[mid] with nums[right]. If nums[mid] > nums[right], the minimum lies in the right half. Otherwise it lies in the left half (including mid)."
+      - "Use left and right pointers. Narrow the search: if mid element is greater than right element, minimum is to the right of mid. Otherwise minimum is at mid or to the left."
+
+  - title: "Median of Two Sorted Arrays"
+    difficulty: HARD
+    type: DSA
+    time_limit_seconds: 900
+    problem_statement: |
+      Given two sorted arrays nums1 and nums2 of size m and n respectively, return the
+      median of the combined sorted array.
+
+      The overall run time complexity must be O(log(m + n)).
+
+      The median is the middle value when the combined elements are arranged in order. If
+      the total number of elements is even, the median is the average of the two middle values.
+
+      Constraints:
+      - nums1.length == m
+      - nums2.length == n
+      - 0 <= m <= 1000
+      - 0 <= n <= 1000
+      - 1 <= m + n <= 2000
+      - -10^6 <= nums1[i], nums2[i] <= 10^6
+    starter_code: |
+      public class Solution {
+          public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "nums1 = [1,3], nums2 = [2]"
+        expected: "2.0"
+        description: "Combined [1,2,3], median is 2.0"
+      - input: "nums1 = [1,2], nums2 = [3,4]"
+        expected: "2.5"
+        description: "Combined [1,2,3,4], median is (2+3)/2 = 2.5"
+      - input: "nums1 = [], nums2 = [1]"
+        expected: "1.0"
+        description: "One empty array, median is the single element"
+      - input: "nums1 = [1,3,8,9,15], nums2 = [7,11,18,19,21,25]"
+        expected: "11.0"
+        description: "Combined has 11 elements, median is the 6th element which is 11"
+    hints:
+      - "Instead of merging both arrays, think about partitioning them such that elements on the left side are all smaller than elements on the right side."
+      - "Binary search on the shorter array. For a partition at index i in nums1, the corresponding partition in nums2 is at (m+n+1)/2 - i. Check if the partition is valid."
+      - "A valid partition means max of left side <= min of right side for both arrays. Use binary search to find the correct partition position in the shorter array to satisfy this condition."

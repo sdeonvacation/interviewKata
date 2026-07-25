@@ -1,0 +1,153 @@
+topic: "DSA/Arrays"
+challenges:
+  - title: "Minimum Size Subarray Sum"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an array of positive integers and a positive integer target, find the minimal length
+      of a contiguous subarray whose sum is greater than or equal to target. If no such subarray
+      exists, return 0.
+
+      Constraints:
+      - 1 <= target <= 10^9
+      - 1 <= nums.length <= 10^5
+      - 1 <= nums[i] <= 10^4
+
+      Follow up: If you have figured out the O(n) solution, try coding another solution with
+      O(n log n) time complexity.
+    starter_code: |
+      public class Solution {
+          public int minSubArrayLen(int target, int[] nums) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "target = 7, nums = [2,3,1,2,4,3]"
+        expected: "2"
+        description: "Subarray [4,3] has sum >= 7 with length 2"
+      - input: "target = 4, nums = [1,4,4]"
+        expected: "1"
+        description: "Single element 4 meets the target"
+      - input: "target = 11, nums = [1,1,1,1,1,1,1,1]"
+        expected: "0"
+        description: "No subarray sums to target, return 0"
+      - input: "target = 15, nums = [5,1,3,5,10,7,4,9,2,8]"
+        expected: "2"
+        description: "Subarray [10,7] has sum >= 15 with length 2"
+    hints:
+      - "Consider a technique where you expand and shrink a window over the array."
+      - "Use two pointers to maintain a sliding window. Expand the right pointer to increase the sum, shrink the left pointer when the sum meets the target."
+      - "Keep a running sum. When sum >= target, update the minimum length and subtract nums[left] while incrementing left. Continue until right reaches the end."
+
+  - title: "Longest Substring Without Repeating Characters"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given a string s, determine the length of the longest substring that contains no
+      duplicate characters.
+
+      Constraints:
+      - 0 <= s.length <= 5 * 10^4
+      - s consists of English letters, digits, symbols, and spaces
+    starter_code: |
+      public class Solution {
+          public int lengthOfLongestSubstring(String s) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "s = \"abcabcbb\""
+        expected: "3"
+        description: "Longest substring is 'abc' with length 3"
+      - input: "s = \"bbbbb\""
+        expected: "1"
+        description: "All same characters, longest unique substring is single char"
+      - input: "s = \"pwwkew\""
+        expected: "3"
+        description: "Longest substring is 'wke' with length 3"
+      - input: "s = \"\""
+        expected: "0"
+        description: "Empty string returns 0"
+    hints:
+      - "Think about how you can efficiently track which characters are currently in your window."
+      - "Use a HashSet or HashMap to track characters in the current window. When a duplicate is found, shrink from the left until the duplicate is removed."
+      - "Optimization: store the last index of each character in a map. When a repeat is found, jump the left pointer directly past the previous occurrence instead of moving one step at a time."
+
+  - title: "Substring with Concatenation of All Words"
+    difficulty: HARD
+    type: DSA
+    time_limit_seconds: 900
+    problem_statement: |
+      You are given a string s and an array of strings words. All strings in words are the
+      same length. Find all starting indices in s where a substring is a concatenation of
+      each word in words exactly once, in any order, with no intervening characters.
+
+      Return the indices in any order.
+
+      Constraints:
+      - 1 <= s.length <= 10^4
+      - 1 <= words.length <= 5000
+      - 1 <= words[i].length <= 30
+      - s consists of lowercase English letters
+      - words[i] consists of lowercase English letters
+    starter_code: |
+      public class Solution {
+          public List<Integer> findSubstring(String s, String[] words) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "s = \"barfoothefoobarman\", words = [\"foo\",\"bar\"]"
+        expected: "[0, 9]"
+        description: "At index 0: 'barfoo', at index 9: 'foobar' are concatenations of foo and bar"
+      - input: "s = \"wordgoodgoodgoodbestword\", words = [\"word\",\"good\",\"best\",\"word\"]"
+        expected: "[]"
+        description: "No valid concatenation exists"
+      - input: "s = \"barfoofoobarthefoobarman\", words = [\"bar\",\"foo\",\"the\"]"
+        expected: "[6, 9, 12]"
+        description: "Multiple valid starting indices where all three words concatenate"
+    hints:
+      - "All words have the same length. Use this property to divide the problem into fixed-size chunks."
+      - "Use a frequency map of the words. For each possible starting offset (0 to word_length-1), slide a window of total_words * word_length over the string, checking word-by-word."
+      - "Maintain a sliding window with a word frequency counter. When adding a new word chunk to the right, if it exceeds the required count, shrink from the left. When the window contains exactly all words, record the start index."
+
+  - title: "Minimum Window Substring"
+    difficulty: HARD
+    type: DSA
+    time_limit_seconds: 900
+    problem_statement: |
+      Given two strings s and t, find the minimum window substring of s that contains every
+      character in t (including duplicates). If no such window exists, return the empty string.
+
+      The answer is guaranteed to be unique when it exists.
+
+      Constraints:
+      - 1 <= s.length, t.length <= 10^5
+      - s and t consist of uppercase and lowercase English letters
+
+      Follow up: Can you solve it in O(n) time?
+    starter_code: |
+      public class Solution {
+          public String minWindow(String s, String t) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "s = \"ADOBECODEBANC\", t = \"ABC\""
+        expected: "\"BANC\""
+        description: "BANC is the smallest window containing A, B, and C"
+      - input: "s = \"a\", t = \"a\""
+        expected: "\"a\""
+        description: "Single character match"
+      - input: "s = \"a\", t = \"aa\""
+        expected: "\"\""
+        description: "Cannot form window with two a's from single a"
+      - input: "s = \"cabwefgewcwaefgcf\", t = \"cae\""
+        expected: "\"cwae\""
+        description: "Minimum window containing c, a, and e"
+    hints:
+      - "Use two pointers to form a window. Track how many characters from t you still need to satisfy."
+      - "Build a frequency map for t. Expand right to include characters, decrement their needed count. When all characters are satisfied, try shrinking from the left to minimize the window."
+      - "Keep a 'formed' counter tracking how many unique characters in t have their required frequency met in the current window. When formed equals the number of unique chars in t, the window is valid. Shrink left while valid, updating the minimum each time."

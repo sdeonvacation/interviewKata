@@ -1,0 +1,74 @@
+topic: "System Design/Message Queues"
+cards:
+  - front: "How does Kafka achieve parallel consumption within a topic?"
+    back: |
+      Kafka partitions a topic into ordered, immutable logs. Each partition is consumed by exactly one consumer within a consumer group, enabling parallel processing. Adding partitions increases parallelism but you cannot have more active consumers than partitions in a group.
+    difficulty: EASY
+    tags: [kafka, partitions, consumer-groups]
+
+  - front: "What are the three delivery guarantees in messaging systems and how does Kafka support exactly-once?"
+    back: |
+      At-most-once: fire and forget. At-least-once: retry until ack, may duplicate. Exactly-once: each message processed once. Kafka achieves exactly-once via idempotent producers (producer ID + sequence number) and transactional APIs that atomically write to multiple partitions and commit offsets.
+    code_snippet: |
+      Properties props = new Properties();
+      props.put("enable.idempotence", "true");
+      props.put("transactional.id", "order-processor-1");
+      KafkaProducer<String, String> producer = new KafkaProducer<>(props);
+      producer.initTransactions();
+      producer.beginTransaction();
+      producer.send(new ProducerRecord<>("orders-out", key, value));
+      producer.sendOffsetsToTransaction(offsets, groupMetadata);
+      producer.commitTransaction();
+    difficulty: MEDIUM
+    tags: [delivery-guarantees, kafka, exactly-once]
+
+  - front: "When would you choose RabbitMQ over Kafka?"
+    back: |
+      RabbitMQ suits low-latency task distribution with complex routing (headers, topic exchanges, priority queues) and message-level acknowledgment. Kafka suits high-throughput event streaming, replay capability, and log-based ordering. Choose RabbitMQ for traditional work queues with varied routing; Kafka for event sourcing, stream processing, and durable ordered logs.
+    difficulty: EASY
+    tags: [rabbitmq, kafka, architecture-tradeoffs]
+
+  - front: "Explain the difference between pub/sub and point-to-point messaging with a Kafka example of each."
+    back: |
+      Point-to-point: one consumer processes each message (competing consumers). In Kafka, consumers in the same group split partitions so each record is delivered to one member. Pub/sub: all subscribers receive every message. In Kafka, consumers in different groups each get a full copy of the topic.
+    difficulty: MEDIUM
+    tags: [pub-sub, point-to-point, messaging-patterns]
+
+  - front: "What is a dead letter queue and how would you implement one in a Kafka consumer?"
+    back: |
+      A DLQ captures messages that fail processing after retry exhaustion, preventing poison pills from blocking the pipeline. In Kafka, the consumer catches processing exceptions, publishes the failed record to a dedicated DLQ topic, then commits the offset on the original topic to advance past it.
+    code_snippet: |
+      try {
+          processRecord(record);
+      } catch (Exception e) {
+          if (retryCount >= MAX_RETRIES) {
+              producer.send(new ProducerRecord<>("orders.DLQ",
+                  record.key(), record.value(),
+                  headers.add("error", e.getMessage().getBytes())));
+          } else {
+              throw new RetriableException(e);
+          }
+      }
+    difficulty: MEDIUM
+    tags: [dead-letter-queue, error-handling, reliability]
+
+  - front: "How do you handle backpressure when a Kafka consumer cannot keep up with producers?"
+    back: |
+      Strategies: increase partitions and consumer instances, tune max.poll.records and fetch.max.bytes to control batch size, pause/resume partition assignment programmatically, or add a buffered intermediate topic with lower retention. Monitor consumer lag via consumer group offset vs log-end offset. If lag grows unbounded, scale consumers or reduce processing cost.
+    code_snippet: |
+      // Pause partitions when buffer is full
+      if (inMemoryBuffer.size() > THRESHOLD) {
+          consumer.pause(consumer.assignment());
+      }
+      // Resume when drained
+      if (inMemoryBuffer.size() < LOW_WATERMARK) {
+          consumer.resume(consumer.paused());
+      }
+    difficulty: HARD
+    tags: [backpressure, kafka, scalability]
+
+  - front: "How does event sourcing work with message queues and what problem does it solve for microservices?"
+    back: |
+      Event sourcing persists state changes as an immutable sequence of events rather than current state. Kafka acts as the event store; services replay the topic to rebuild state. This gives full audit trail, temporal queries, and decoupled services that derive their own read models. The challenge is managing schema evolution and ensuring event ordering per aggregate via partition keys.
+    difficulty: HARD
+    tags: [event-sourcing, microservices, kafka]

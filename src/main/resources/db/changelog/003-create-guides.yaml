@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-guide-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: guide
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: topic_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_guide_topic
+                    references: topic(id)
+              - column:
+                  name: title
+                  type: varchar(300)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content_markdown
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sort_order
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: estimated_minutes
+                  type: int
+              - column:
+                  name: created_at
+                  type: timestamp without time zone
+                  defaultValueComputed: now()

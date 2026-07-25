@@ -1,0 +1,71 @@
+topic: "System Design/Microservices"
+cards:
+  - front: "What is service discovery and how do Eureka and Consul differ?"
+    back: "Service discovery allows services to find each other without hardcoded URLs. Eureka (Netflix OSS) is AP-focused — favors availability during network partitions, uses client-side load balancing, and is tightly integrated with Spring Cloud. Consul (HashiCorp) is CP-focused — provides strong consistency, includes built-in health checking, KV store, and multi-datacenter support out of the box."
+    difficulty: EASY
+    tags: [service-discovery, eureka, consul]
+
+  - front: "Explain the circuit breaker pattern and its states."
+    back: "Circuit breaker prevents cascading failures by wrapping remote calls. Three states: CLOSED (requests flow normally, failures counted), OPEN (requests fail-fast without calling downstream, after failure threshold breached), HALF-OPEN (after a wait duration, limited requests probe if service recovered). If probe succeeds, transition to CLOSED; if fails, back to OPEN."
+    code_snippet: |
+      @CircuitBreaker(name = "orderService", fallbackMethod = "fallback")
+      public Order getOrder(String id) {
+          return restTemplate.getForObject(url + "/" + id, Order.class);
+      }
+
+      private Order fallback(String id, Throwable t) {
+          return Order.cachedDefault(id);
+      }
+    explanation: "Resilience4j replaced Hystrix as the Spring Cloud standard. Configure failureRateThreshold, waitDurationInOpenState, and slidingWindowSize in application.yml."
+    difficulty: MEDIUM
+    tags: [circuit-breaker, resilience4j, fault-tolerance]
+
+  - front: "What are the key responsibilities of an API gateway in a microservices architecture?"
+    back: "API gateway is the single entry point for clients. Responsibilities: (1) Request routing to appropriate microservice, (2) Authentication/authorization (JWT validation, OAuth token introspection), (3) Rate limiting and throttling, (4) Response aggregation from multiple services, (5) Protocol translation (REST to gRPC), (6) SSL termination, (7) Request/response transformation, (8) Circuit breaking and load balancing."
+    difficulty: EASY
+    tags: [api-gateway, routing, cross-cutting-concerns]
+
+  - front: "Compare the saga pattern's choreography vs orchestration approaches for distributed transactions."
+    back: "Choreography: each service publishes domain events that trigger the next step. Decentralized, loosely coupled, but hard to track overall flow and debug failures. Orchestration: a central saga orchestrator directs participants by sending commands and handling replies. Easier to understand and monitor, but introduces a single point of coordination. Both require compensating transactions for rollback."
+    code_snippet: |
+      // Orchestrator-based saga (pseudo-code)
+      public class OrderSaga {
+          public void execute(OrderCommand cmd) {
+              reserveInventory(cmd);   // Step 1
+              chargePayment(cmd);      // Step 2
+              confirmOrder(cmd);       // Step 3
+          }
+          public void compensate(OrderCommand cmd, int failedStep) {
+              if (failedStep >= 2) refundPayment(cmd);
+              if (failedStep >= 1) releaseInventory(cmd);
+          }
+      }
+    difficulty: HARD
+    tags: [saga-pattern, distributed-transactions, choreography, orchestration]
+
+  - front: "What problems does a service mesh like Istio solve?"
+    back: "Service mesh handles cross-cutting infrastructure concerns at the network level via sidecar proxies (Envoy). Solves: mutual TLS between services without app code changes, fine-grained traffic management (canary deployments, A/B routing), distributed tracing and observability (metrics, logs), retry/timeout/circuit-breaker policies, and access control policies. Moves networking logic out of application code into infrastructure."
+    difficulty: MEDIUM
+    tags: [service-mesh, istio, sidecar-proxy]
+
+  - front: "How does bounded context from DDD guide microservice boundaries?"
+    back: "A bounded context defines a clear boundary within which a domain model has consistent meaning. Each microservice should align to one bounded context — owning its data, language, and rules. Shared concepts (e.g., 'Customer') may have different representations across contexts. Context mapping identifies relationships: shared kernel, customer-supplier, anticorruption layer. Wrong boundaries lead to distributed monoliths with excessive cross-service coupling."
+    difficulty: MEDIUM
+    tags: [ddd, bounded-context, service-boundaries]
+
+  - front: "When should you choose synchronous (REST/gRPC) vs asynchronous (messaging) inter-service communication?"
+    back: "Synchronous (REST/gRPC): use when client needs immediate response, operations are fast, and strong consistency required (queries, real-time validation). Drawback: temporal coupling — caller blocks until response. Asynchronous (Kafka/RabbitMQ): use for fire-and-forget commands, event-driven workflows, long-running processes, and when services should be temporally decoupled. Enables better resilience and scalability but adds eventual consistency complexity."
+    code_snippet: |
+      // Async event publishing with Spring Cloud Stream
+      @Bean
+      public Supplier<OrderEvent> orderCreated() {
+          return () -> new OrderEvent(orderId, "CREATED");
+      }
+
+      // Consumer in another service
+      @Bean
+      public Consumer<OrderEvent> processOrder() {
+          return event -> inventoryService.reserve(event.getOrderId());
+      }
+    difficulty: HARD
+    tags: [sync-async, messaging, event-driven, coupling]

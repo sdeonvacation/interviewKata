@@ -1,0 +1,97 @@
+topic: "DSA/Strings"
+cards:
+  - front: "How does the KMP (Knuth-Morris-Pratt) algorithm achieve O(n+m) pattern matching?"
+    back: "KMP preprocesses the pattern to build a failure function (LPS array) indicating the longest proper prefix that is also a suffix for each position. On mismatch, instead of resetting to the beginning, the algorithm shifts the pattern using the LPS value, avoiding redundant comparisons. This guarantees O(m) preprocessing and O(n) matching, where n is text length and m is pattern length."
+    code_snippet: |
+      // Build LPS (Longest Prefix Suffix) array
+      int[] buildLPS(String pattern) {
+          int[] lps = new int[pattern.length()];
+          int len = 0, i = 1;
+          while (i < pattern.length()) {
+              if (pattern.charAt(i) == pattern.charAt(len)) {
+                  lps[i++] = ++len;
+              } else if (len > 0) {
+                  len = lps[len - 1]; // don't increment i
+              } else {
+                  lps[i++] = 0;
+              }
+          }
+          return lps;
+      }
+    difficulty: HARD
+    tags: [pattern-matching, kmp, string-search]
+
+  - front: "Explain the Rabin-Karp algorithm and when you would prefer it over KMP."
+    back: "Rabin-Karp uses a rolling hash to compare the pattern hash against substring hashes in O(1) per position. On hash match, it verifies character-by-character to handle collisions. Average case is O(n+m) but worst case is O(nm) due to hash collisions. Prefer Rabin-Karp over KMP for multi-pattern search (checking multiple patterns simultaneously) since you can compare against multiple hashes in one pass."
+    code_snippet: |
+      // Rolling hash: remove leading char, add trailing char
+      long BASE = 31, MOD = 1_000_000_007;
+      // hash("bcd") from hash("abc") when window shifts right:
+      hash = (hash - s.charAt(left) * basePow) % MOD;
+      hash = (hash * BASE + s.charAt(right)) % MOD;
+    difficulty: MEDIUM
+    tags: [rolling-hash, rabin-karp, pattern-matching]
+
+  - front: "How does a Trie support efficient prefix matching? What are its time and space complexities?"
+    back: "A Trie stores characters along edges so that common prefixes share nodes. Searching for a prefix of length k takes O(k) time regardless of how many words are stored. Insertion is O(k) per word. Space is O(ALPHABET_SIZE * N * L) in the worst case where N is word count and L is average length. Tries excel at autocomplete, spell-checking, and IP routing (longest prefix match)."
+    code_snippet: |
+      class TrieNode {
+          TrieNode[] children = new TrieNode[26];
+          boolean isEnd;
+      }
+      void insert(String word) {
+          TrieNode node = root;
+          for (char c : word.toCharArray()) {
+              int idx = c - 'a';
+              if (node.children[idx] == null)
+                  node.children[idx] = new TrieNode();
+              node = node.children[idx];
+          }
+          node.isEnd = true;
+      }
+    difficulty: MEDIUM
+    tags: [trie, prefix-search, data-structure]
+
+  - front: "What are the common approaches to detect if a string is a palindrome?"
+    back: "Three main approaches: (1) Two-pointer from both ends moving inward, comparing characters - O(n) time, O(1) space. (2) Reverse and compare - O(n) time and space. (3) For substring palindrome problems, expand around center for each of 2n-1 centers (each char + each gap) - O(n^2) total. For longest palindromic substring, Manacher's algorithm achieves O(n) using previously computed palindrome radii."
+    code_snippet: |
+      // Expand around center - handles both odd and even length
+      String expandAroundCenter(String s, int left, int right) {
+          while (left >= 0 && right < s.length()
+                  && s.charAt(left) == s.charAt(right)) {
+              left--;
+              right++;
+          }
+          return s.substring(left + 1, right);
+      }
+    difficulty: EASY
+    tags: [palindrome, two-pointers, expand-around-center]
+
+  - front: "Compare sorting-based vs frequency-map approaches for checking anagrams."
+    back: "Sorting: sort both strings and compare. O(n log n) time, O(n) space for the sorted copies. Simple but slower. Frequency map: count character frequencies in one string, decrement for the other, check all counts are zero. O(n) time, O(1) space (fixed 26-char alphabet). Frequency map is preferred for interviews. For follow-ups like 'find all anagram substrings', combine frequency map with sliding window."
+    code_snippet: |
+      // O(n) frequency count approach
+      boolean isAnagram(String s, String t) {
+          if (s.length() != t.length()) return false;
+          int[] freq = new int[26];
+          for (int i = 0; i < s.length(); i++) {
+              freq[s.charAt(i) - 'a']++;
+              freq[t.charAt(i) - 'a']--;
+          }
+          for (int count : freq)
+              if (count != 0) return false;
+          return true;
+      }
+    difficulty: EASY
+    tags: [anagram, frequency-map, sorting]
+
+  - front: "How does polynomial string hashing work and what are its collision pitfalls?"
+    back: "Polynomial hashing maps a string to an integer: hash(s) = sum(s[i] * p^i) mod M, where p is a prime base (31 or 37 for lowercase) and M is a large prime modulus. Collisions occur when two distinct strings produce the same hash. Mitigation: use double hashing (two different base/mod pairs) reducing collision probability to ~1/M^2. Birthday paradox means collisions become likely after ~sqrt(M) strings, so M should be at least 10^9."
+    difficulty: MEDIUM
+    tags: [hashing, polynomial-hash, collision]
+
+  - front: "Explain Manacher's algorithm for finding the longest palindromic substring in O(n)."
+    back: "Manacher's transforms the string by inserting separators (e.g., '#') to unify odd/even cases, then computes a radius array P[i] representing the palindrome radius at each center. It maintains a rightmost palindrome boundary and its center. For each new position, it mirrors a previously computed radius if within bounds, then expands. Each character is visited at most twice, yielding O(n) time. The longest palindromic substring has length max(P[i]) - 1."
+    explanation: "Key insight: palindromes within a larger palindrome have mirror symmetry, so previously computed radii can be reused rather than recomputing from scratch."
+    difficulty: HARD
+    tags: [manacher, palindrome, linear-time]

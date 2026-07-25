@@ -1,0 +1,94 @@
+topic: "Java Core/Streams"
+cards:
+  - front: "What are the three stages of a Stream pipeline?"
+    back: |
+      Source (collection, array, generator), intermediate operations (lazy, return a new Stream),
+      and a terminal operation (triggers execution, produces a result or side-effect).
+      Nothing executes until a terminal operation is invoked.
+    difficulty: EASY
+    tags: [streams, pipeline, fundamentals]
+
+  - front: "How does lazy evaluation work in Java Streams?"
+    back: |
+      Intermediate operations (map, filter, flatMap) are not executed when declared.
+      They form a pipeline that only runs when a terminal operation (collect, forEach, reduce) is called.
+      The runtime fuses operations and processes elements one-by-one, enabling short-circuiting (findFirst, limit).
+    code_snippet: |
+      // filter and map are NOT executed here
+      Stream<String> lazy = list.stream().filter(s -> s.length() > 3).map(String::toUpperCase);
+      // execution starts only here
+      List<String> result = lazy.collect(Collectors.toList());
+    difficulty: EASY
+    tags: [streams, lazy-evaluation]
+
+  - front: "Explain the difference between map() and flatMap()."
+    back: |
+      map() applies a function to each element producing a 1-to-1 transformation (Stream<T> → Stream<R>).
+      flatMap() applies a function that returns a Stream per element, then flattens all resulting streams
+      into a single Stream. Use flatMap when each input maps to zero or many outputs.
+    code_snippet: |
+      // map: one-to-one
+      List<String> upper = words.stream().map(String::toUpperCase).toList();
+
+      // flatMap: one-to-many (split each line into words)
+      List<String> allWords = lines.stream()
+          .flatMap(line -> Arrays.stream(line.split(" ")))
+          .toList();
+    difficulty: MEDIUM
+    tags: [streams, flatMap, transformation]
+
+  - front: "How does reduce() work and what is the role of the identity value?"
+    back: |
+      reduce() combines stream elements into a single result using a BinaryOperator.
+      The identity is the initial accumulator value and must be a true identity for the operator
+      (e.g., 0 for addition, 1 for multiplication). If no identity is provided, reduce returns Optional
+      since the stream may be empty.
+    code_snippet: |
+      int sum = numbers.stream().reduce(0, Integer::sum);
+      Optional<Integer> max = numbers.stream().reduce(Integer::max);
+    difficulty: MEDIUM
+    tags: [streams, reduce, functional]
+
+  - front: "What are the main pitfalls of parallel streams?"
+    back: |
+      Parallel streams use the common ForkJoinPool (shared across the JVM), so blocking operations starve
+      other tasks. They add overhead for small datasets. Non-associative or stateful operations produce
+      wrong results. Shared mutable state causes race conditions. Order-dependent logic breaks unless
+      the stream is explicitly ordered. Use parallel only for CPU-bound work on large datasets.
+    difficulty: HARD
+    tags: [streams, parallel, concurrency, performance]
+
+  - front: "Name three useful Collectors beyond toList() and explain when to use them."
+    back: |
+      groupingBy() — partition elements into a Map by classifier (e.g., group employees by department).
+      joining() — concatenate String elements with delimiter/prefix/suffix.
+      toMap() — build a Map with key and value extractors; requires merge function for duplicate keys.
+      Also: partitioningBy (boolean split), summarizingInt (stats), collectingAndThen (post-processing).
+    code_snippet: |
+      Map<Department, List<Employee>> byDept =
+          employees.stream().collect(Collectors.groupingBy(Employee::getDepartment));
+
+      String csv = names.stream().collect(Collectors.joining(", "));
+
+      Map<Long, String> idToName = employees.stream()
+          .collect(Collectors.toMap(Employee::getId, Employee::getName));
+    difficulty: MEDIUM
+    tags: [streams, collectors, grouping]
+
+  - front: "How should Optional be used correctly in Java, and what are common anti-patterns?"
+    back: |
+      Use Optional as a return type for methods that may have no result — never as a field, parameter,
+      or collection element. Chain with map/flatMap/orElseGet for transformations. Anti-patterns: calling
+      get() without isPresent(), using Optional.of(null), wrapping values just to unwrap immediately,
+      and using Optional in serialization (it's not Serializable).
+    code_snippet: |
+      // Good: chained transformation
+      String city = findUser(id)
+          .flatMap(User::getAddress)
+          .map(Address::getCity)
+          .orElse("Unknown");
+
+      // Bad: isPresent + get (defeats the purpose)
+      if (opt.isPresent()) { return opt.get(); }
+    difficulty: HARD
+    tags: [optional, anti-patterns, api-design]

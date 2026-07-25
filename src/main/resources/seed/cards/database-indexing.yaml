@@ -1,0 +1,69 @@
+topic: "Database/Indexing"
+cards:
+  - front: "Describe B-tree index structure and why it provides O(log n) lookups."
+    back: "B-tree is a self-balancing tree where internal nodes store keys and child pointers, and leaf nodes store keys with row pointers (or values in InnoDB). Each node holds multiple keys (high fan-out), keeping tree height low (typically 3-4 levels for millions of rows). Lookups traverse root to leaf comparing keys at each level. Supports equality, range, and prefix queries because leaves are linked in sorted order."
+    difficulty: EASY
+    tags: [b-tree, index-structure, fundamentals]
+
+  - front: "When would you use a hash index instead of a B-tree index?"
+    back: "Hash indexes provide O(1) exact-match lookups but cannot support range queries, sorting, or prefix matching. Use them for equality-only access patterns like session lookups by token, cache key resolution, or join columns that are never range-scanned. PostgreSQL supports hash indexes; MySQL Memory engine uses them. B-tree is preferred in most cases because it handles both equality and range while hash only wins marginally on pure equality."
+    difficulty: EASY
+    tags: [hash-index, use-cases, trade-offs]
+
+  - front: "Explain the composite index leftmost prefix rule with an example."
+    back: "A composite index on (a, b, c) can satisfy queries filtering on (a), (a, b), or (a, b, c) but NOT (b), (c), or (b, c) alone. The index is sorted first by a, then by b within each a value, then by c. Skipping the leftmost column means the optimizer cannot binary-search into the tree. A query on (a, c) uses the index for column a only; column c requires a filter step after the index scan."
+    code_snippet: |
+      -- Given: CREATE INDEX idx_abc ON orders(status, customer_id, created_at);
+      -- Uses full index:
+      SELECT * FROM orders WHERE status = 'SHIPPED' AND customer_id = 42 AND created_at > '2024-01-01';
+      -- Uses prefix (status only):
+      SELECT * FROM orders WHERE status = 'PENDING';
+      -- Cannot use index (skips leftmost):
+      SELECT * FROM orders WHERE customer_id = 42;
+    difficulty: MEDIUM
+    tags: [composite-index, leftmost-prefix, query-optimization]
+
+  - front: "What is a covering index and how does it eliminate table lookups?"
+    back: "A covering index includes all columns needed by a query, so the database can satisfy the query entirely from the index without accessing the table heap (index-only scan). This eliminates random I/O to fetch rows. In PostgreSQL, EXPLAIN shows 'Index Only Scan'. In MySQL, EXPLAIN shows 'Using index' in Extra. Design covering indexes for frequent queries by INCLUDEing selected columns beyond the search keys."
+    code_snippet: |
+      // JPA native query benefiting from covering index
+      @Query(nativeQuery = true, value =
+        "SELECT customer_id, total FROM orders WHERE status = ?1 AND created_at > ?2")
+      List<Object[]> findRecentByStatus(String status, LocalDate since);
+
+      -- Covering index (PostgreSQL):
+      CREATE INDEX idx_orders_covering ON orders(status, created_at) INCLUDE (customer_id, total);
+      -- EXPLAIN shows: Index Only Scan using idx_orders_covering
+    difficulty: MEDIUM
+    tags: [covering-index, index-only-scan, performance]
+
+  - front: "What is a partial (filtered) index and when should you use one?"
+    back: "A partial index includes only rows matching a WHERE predicate, making it smaller and faster than a full index. Use when queries consistently filter on a subset: active records, non-null values, recent dates, or specific status values. Smaller index means less storage, faster inserts on excluded rows, and better cache utilization. The query's WHERE clause must match or imply the index predicate for the planner to use it."
+    code_snippet: |
+      -- Only index unprocessed orders (5% of table)
+      CREATE INDEX idx_pending_orders ON orders(created_at)
+        WHERE status = 'PENDING';
+
+      -- Query must include matching predicate:
+      SELECT * FROM orders WHERE status = 'PENDING' AND created_at < now() - interval '1 hour';
+      -- Planner uses idx_pending_orders (tiny index vs full table scan)
+    difficulty: MEDIUM
+    tags: [partial-index, filtered-index, postgresql]
+
+  - front: "When should you NOT add an index? List scenarios where indexes hurt performance."
+    back: "Avoid indexing when: 1) Table is small (<1000 rows) - sequential scan is faster than index overhead. 2) Column has very low cardinality (boolean, status with 2-3 values) - index scan reads most of the table anyway. 3) Table is write-heavy with rare reads - each INSERT/UPDATE/DELETE must maintain all indexes. 4) Column is frequently updated - causes index page splits and fragmentation. 5) Query returns >10-15% of rows - optimizer chooses seq scan regardless. Monitor with pg_stat_user_indexes: idx_scan = 0 means unused index wasting write cycles."
+    difficulty: HARD
+    tags: [anti-patterns, write-amplification, index-selection]
+
+  - front: "How do you interpret EXPLAIN ANALYZE to determine if an index is being used effectively?"
+    back: "Key indicators: 1) Index Scan vs Seq Scan - check if expected index is chosen. 2) Rows estimated vs actual - large mismatch means stale statistics (run ANALYZE). 3) Bitmap Index Scan appears for moderate selectivity (too many rows for plain index scan, too few for seq scan). 4) Filter: rows removed shows post-index filtering waste. 5) High 'loops' count in nested loop join signals missing index on inner relation. 6) Index Cond vs Filter - predicates in Index Cond are pushed to index; those in Filter are evaluated after fetch."
+    code_snippet: |
+      EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM orders WHERE customer_id = 42 AND total > 100;
+      -- Good: Index Scan using idx_orders_customer (actual rows=5)
+      --   Index Cond: (customer_id = 42)
+      --   Filter: (total > 100)        -- <- not pushed to index
+      --   Rows Removed by Filter: 45   -- <- 45 rows fetched but discarded
+      --   Buffers: shared hit=3
+      -- Fix: composite index on (customer_id, total) pushes both to Index Cond
+    difficulty: HARD
+    tags: [explain-analyze, query-plan, performance-tuning]

@@ -1,0 +1,88 @@
+topic: "Database/Query Optimization"
+cards:
+  - front: "What are the three main JOIN algorithms and when does the optimizer choose each?"
+    back: "Nested Loop Join: iterates outer table, probes inner for each row - best for small outer set with indexed inner table. Hash Join: builds hash table from smaller relation, probes with larger - best for large unsorted datasets with equality joins. Merge Join (Sort-Merge): sorts both inputs then merges - best when both sides are pre-sorted (index scan) or result is needed sorted. Optimizer chooses based on table sizes, available indexes, and sort order."
+    difficulty: MEDIUM
+    tags: [join-algorithms, query-planner, performance]
+
+  - front: "How do you read a query execution plan to identify the most expensive operation?"
+    back: "Start from innermost (most indented) node and read outward. Each node shows estimated cost (startup..total), row estimate, and actual time in ANALYZE mode. The node with highest 'actual time * loops' is the bottleneck. Look for sequential scans on large tables, high 'Rows Removed by Filter' indicating missing indexes, and large differences between estimated and actual rows indicating stale statistics."
+    code_snippet: |
+      EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT)
+      SELECT o.id, c.name FROM orders o JOIN customers c ON o.customer_id = c.id
+      WHERE o.status = 'PENDING';
+      -- Look for:
+      --   actual time=0.015..245.332 rows=50000  <- expensive node
+      --   Buffers: shared read=12000             <- heavy I/O
+      --   Rows Removed by Filter: 980000         <- missing index
+    difficulty: EASY
+    tags: [explain-analyze, execution-plan, diagnostics]
+
+  - front: "Why can a correlated subquery be orders of magnitude slower than an equivalent JOIN?"
+    back: "A correlated subquery executes once per row of the outer query (O(n*m) in worst case), while a JOIN allows the optimizer to choose hash or merge strategies that process both tables in a single pass (O(n+m)). Modern optimizers can sometimes decorrelate subqueries into joins, but complex predicates or LIMIT/EXISTS patterns may prevent this. Use EXPLAIN to verify if decorrelation occurred."
+    code_snippet: |
+      // Slow: correlated subquery executes per-row
+      @Query("SELECT e FROM Employee e WHERE e.salary > " +
+             "(SELECT AVG(e2.salary) FROM Employee e2 WHERE e2.department = e.department)")
+      List<Employee> findAboveAvgSalary();
+
+      // Fast: rewritten as JOIN against pre-aggregated subquery
+      @Query("SELECT e FROM Employee e JOIN " +
+             "(SELECT department, AVG(salary) as avgSal FROM Employee GROUP BY department) d " +
+             "ON e.department = d.department WHERE e.salary > d.avgSal")
+      List<Employee> findAboveAvgSalaryOptimized();
+    difficulty: MEDIUM
+    tags: [subquery, join-rewrite, query-optimization]
+
+  - front: "What is a cost-based optimizer and what statistics does it rely on?"
+    back: "A cost-based optimizer (CBO) evaluates multiple execution plans and picks the one with lowest estimated cost (I/O + CPU). It relies on table statistics: row count, column cardinality (n_distinct), histogram of value distribution, average row width, correlation (physical vs logical order), and null fraction. Stale statistics lead to bad plans. PostgreSQL updates via ANALYZE; MySQL via ANALYZE TABLE."
+    difficulty: EASY
+    tags: [cost-based-optimizer, statistics, query-planner]
+
+  - front: "When should you use a materialized view versus a regular view for query optimization?"
+    back: "Use materialized views when: the underlying query is expensive (aggregations, multi-table joins), data changes infrequently relative to reads, and slight staleness is acceptable. Regular views execute the query each time and add no performance benefit. Trade-offs: materialized views consume storage, require refresh strategy (periodic or on-demand), and can become stale. In PostgreSQL, REFRESH MATERIALIZED VIEW CONCURRENTLY allows reads during refresh but requires a unique index."
+    code_snippet: |
+      -- PostgreSQL materialized view for dashboard metrics
+      CREATE MATERIALIZED VIEW order_daily_stats AS
+      SELECT date_trunc('day', created_at) as day,
+             status, COUNT(*) as cnt, SUM(total) as revenue
+      FROM orders GROUP BY 1, 2
+      WITH DATA;
+
+      CREATE UNIQUE INDEX idx_ods_day_status ON order_daily_stats(day, status);
+      -- Concurrent refresh (no read lock):
+      REFRESH MATERIALIZED VIEW CONCURRENTLY order_daily_stats;
+    difficulty: MEDIUM
+    tags: [materialized-view, caching, postgresql]
+
+  - front: "How do you use query hints in JPA/Hibernate and when are they appropriate?"
+    back: "Query hints override optimizer decisions when you have knowledge the optimizer lacks. In JPA, use @QueryHints annotation or entityManager.createQuery().setHint(). Common hints: org.hibernate.fetchSize (batch fetch rows), org.hibernate.readOnly (skip dirty checking), org.hibernate.timeout (query timeout), and native hints via nativeQuery with database-specific syntax. Use sparingly - they bypass CBO intelligence and break when data distribution changes."
+    code_snippet: |
+      @Query("SELECT o FROM Order o WHERE o.status = :status")
+      @QueryHints({
+          @QueryHint(name = "org.hibernate.fetchSize", value = "500"),
+          @QueryHint(name = "org.hibernate.readOnly", value = "true"),
+          @QueryHint(name = "jakarta.persistence.query.timeout", value = "5000")
+      })
+      List<Order> findByStatus(@Param("status") String status);
+    difficulty: MEDIUM
+    tags: [query-hints, jpa, hibernate]
+
+  - front: "How do you analyze a slow query log to identify and prioritize optimization targets?"
+    back: "Enable slow query log (MySQL: long_query_time, PostgreSQL: log_min_duration_statement). Prioritize by: total time impact (frequency * avg duration) not just single-query duration. A 50ms query running 100K times/day costs more than a 5s query running 10 times. Use pt-query-digest (MySQL) or pgBadger (PostgreSQL) to aggregate. Look for: full table scans, filesorts, temp table creation, lock waits, and queries not using indexes. After fixing, verify with EXPLAIN ANALYZE and compare before/after metrics."
+    code_snippet: |
+      -- MySQL slow query log config
+      SET GLOBAL slow_query_log = 'ON';
+      SET GLOBAL long_query_time = 0.5;  -- 500ms threshold
+      SET GLOBAL log_queries_not_using_indexes = 'ON';
+
+      -- PostgreSQL: log queries over 200ms
+      ALTER SYSTEM SET log_min_duration_statement = 200;
+      SELECT pg_reload_conf();
+
+      -- Aggregate analysis (pt-query-digest output):
+      -- Rank  Response time  Calls  R/Call  Query
+      -- 1     45.2%  892s   98432  9.1ms   SELECT orders WHERE status=?
+      -- 2     22.1%  436s      18  24.2s   SELECT ... GROUP BY ... HAVING
+    difficulty: HARD
+    tags: [slow-query-log, performance-tuning, monitoring]

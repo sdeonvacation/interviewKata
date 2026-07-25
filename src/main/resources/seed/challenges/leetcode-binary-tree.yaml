@@ -1,0 +1,809 @@
+topic: "DSA/Trees"
+challenges:
+  - title: "Maximum Depth of Binary Tree"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given the root of a binary tree, return its maximum depth.
+
+      The maximum depth is defined as the number of nodes along the longest path
+      from the root node down to the farthest leaf node.
+
+      A leaf is a node with no children.
+
+      Constraints:
+      - The number of nodes in the tree is in the range [0, 10^4].
+      - -100 <= Node.val <= 100
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public int maxDepth(TreeNode root) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [3, 9, 20, null, null, 15, 7]"
+        expected: "3"
+        description: "Tree with depth 3: root -> 20 -> 15 or 7"
+      - input: "root = [1, null, 2]"
+        expected: "2"
+        description: "Right-skewed tree with depth 2"
+      - input: "root = []"
+        expected: "0"
+        description: "Empty tree has depth 0"
+      - input: "root = [1]"
+        expected: "1"
+        description: "Single node has depth 1"
+    hints:
+      - "Think recursively: the depth of a tree is related to the depth of its subtrees."
+      - "The depth of a node is 1 + the maximum depth of its children."
+      - "Base case: a null node has depth 0. Recurse on left and right children, return 1 + max(left, right)."
+
+  - title: "Same Tree"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given the roots of two binary trees p and q, write a function to determine
+      if they are structurally identical and have the same node values.
+
+      Two trees are considered the same if they have the exact same structure
+      and every corresponding node has an equal value.
+
+      Constraints:
+      - The number of nodes in both trees is in the range [0, 100].
+      - -10^4 <= Node.val <= 10^4
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public boolean isSameTree(TreeNode p, TreeNode q) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "p = [1, 2, 3], q = [1, 2, 3]"
+        expected: "true"
+        description: "Identical trees with same structure and values"
+      - input: "p = [1, 2], q = [1, null, 2]"
+        expected: "false"
+        description: "Same values but different structure (left vs right child)"
+      - input: "p = [1, 2, 1], q = [1, 1, 2]"
+        expected: "false"
+        description: "Same structure but different values at corresponding positions"
+      - input: "p = [], q = []"
+        expected: "true"
+        description: "Two empty trees are the same"
+    hints:
+      - "Consider what happens when both nodes are null, one is null, or neither is null."
+      - "If both are null, they match. If only one is null or values differ, they don't match."
+      - "Recursively check: p.val == q.val AND isSameTree(p.left, q.left) AND isSameTree(p.right, q.right)."
+
+  - title: "Invert Binary Tree"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given the root of a binary tree, invert the tree and return its root.
+
+      Inverting a binary tree means swapping the left and right children of every node,
+      effectively creating a mirror image of the original tree.
+
+      Constraints:
+      - The number of nodes in the tree is in the range [0, 100].
+      - -100 <= Node.val <= 100
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public TreeNode invertTree(TreeNode root) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [4, 2, 7, 1, 3, 6, 9]"
+        expected: "[4, 7, 2, 9, 6, 3, 1]"
+        description: "Full tree inverted: left and right subtrees swap at every level"
+      - input: "root = [2, 1, 3]"
+        expected: "[2, 3, 1]"
+        description: "Simple three-node tree with children swapped"
+      - input: "root = []"
+        expected: "[]"
+        description: "Empty tree remains empty"
+      - input: "root = [1]"
+        expected: "[1]"
+        description: "Single node tree unchanged"
+    hints:
+      - "Think about what operation you need to perform at each node."
+      - "At each node, swap its left and right children, then recurse on both subtrees."
+      - "Base case: if root is null, return null. Swap left and right, then recursively invert both children."
+
+  - title: "Symmetric Tree"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given the root of a binary tree, check whether it is a mirror of itself.
+      A tree is symmetric if the left subtree is a mirror reflection of the right subtree.
+
+      More precisely, two trees are mirrors of each other if:
+      - Their root values are equal.
+      - The left subtree of one is a mirror of the right subtree of the other.
+
+      Constraints:
+      - The number of nodes in the tree is in the range [1, 1000].
+      - -100 <= Node.val <= 100
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public boolean isSymmetric(TreeNode root) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [1, 2, 2, 3, 4, 4, 3]"
+        expected: "true"
+        description: "Perfectly symmetric tree"
+      - input: "root = [1, 2, 2, null, 3, null, 3]"
+        expected: "false"
+        description: "Not symmetric: both right children are 3 instead of mirrored"
+      - input: "root = [1]"
+        expected: "true"
+        description: "Single node is always symmetric"
+      - input: "root = [1, 2, 2, 3, null, null, 3]"
+        expected: "true"
+        description: "Symmetric with some null children in mirrored positions"
+    hints:
+      - "This is similar to checking if two trees are the same, but with a twist in how you compare."
+      - "Create a helper that takes two nodes and checks if they are mirrors: compare left.left with right.right, and left.right with right.left."
+      - "Helper function isMirror(t1, t2): both null -> true, one null -> false, values differ -> false, else check isMirror(t1.left, t2.right) && isMirror(t1.right, t2.left)."
+
+  - title: "Construct Binary Tree from Preorder and Inorder Traversal"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given two integer arrays preorder and inorder where:
+      - preorder is the preorder traversal of a binary tree
+      - inorder is the inorder traversal of the same tree
+
+      Construct and return the binary tree.
+
+      You may assume that the tree has no duplicate values.
+
+      Constraints:
+      - 1 <= preorder.length <= 3000
+      - inorder.length == preorder.length
+      - -3000 <= preorder[i], inorder[i] <= 3000
+      - preorder and inorder consist of unique values.
+      - Each value of inorder also appears in preorder.
+      - preorder is guaranteed to be a valid preorder traversal of the tree.
+      - inorder is guaranteed to be a valid inorder traversal of the tree.
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public TreeNode buildTree(int[] preorder, int[] inorder) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "preorder = [3,9,20,15,7], inorder = [9,3,15,20,7]"
+        expected: "[3, 9, 20, null, null, 15, 7]"
+        description: "Standard tree reconstruction from both traversals"
+      - input: "preorder = [1], inorder = [1]"
+        expected: "[1]"
+        description: "Single node tree"
+      - input: "preorder = [1,2,3], inorder = [3,2,1]"
+        expected: "[1, 2, null, 3]"
+        description: "Left-skewed tree"
+      - input: "preorder = [1,2,4,5,3,6], inorder = [4,2,5,1,3,6]"
+        expected: "[1, 2, 3, 4, 5, null, 6]"
+        description: "Larger tree with both subtrees populated"
+    hints:
+      - "The first element of preorder is always the root. The inorder array tells you which elements are in the left vs right subtree."
+      - "Find the root in inorder. Everything to its left belongs in the left subtree, everything to its right belongs in the right subtree. Use a HashMap for O(1) lookups."
+      - "Recursively build: root = preorder[preIndex++], find root in inorder, recurse on left portion (inStart to rootIndex-1), then right portion (rootIndex+1 to inEnd)."
+
+  - title: "Flatten Binary Tree to Linked List"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given the root of a binary tree, flatten it into a linked list in-place.
+
+      The linked list should use the same TreeNode class where the right child pointer
+      points to the next node in the list, and the left child pointer is always null.
+      The list should be in the same order as a preorder traversal of the tree.
+
+      Do this in-place without creating a new tree.
+
+      Constraints:
+      - The number of nodes in the tree is in the range [0, 2000].
+      - -100 <= Node.val <= 100
+
+      Follow up: Can you do it in O(1) extra space?
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public void flatten(TreeNode root) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [1, 2, 5, 3, 4, null, 6]"
+        expected: "[1, null, 2, null, 3, null, 4, null, 5, null, 6]"
+        description: "Tree flattened to right-skewed list in preorder"
+      - input: "root = []"
+        expected: "[]"
+        description: "Empty tree stays empty"
+      - input: "root = [1]"
+        expected: "[1]"
+        description: "Single node unchanged"
+      - input: "root = [1, 2, null, 3]"
+        expected: "[1, null, 2, null, 3]"
+        description: "Left-only tree flattened to right chain"
+    hints:
+      - "Think about where the right subtree should end up after flattening the left subtree."
+      - "For each node: flatten left subtree, flatten right subtree, then attach left subtree to right, and append original right subtree at the end of the flattened left."
+      - "Morris traversal approach: for each node with a left child, find the rightmost node of the left subtree, connect it to the current right child, then move left subtree to right and set left to null."
+
+  - title: "Path Sum"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given the root of a binary tree and an integer targetSum, determine if the tree
+      has a root-to-leaf path such that adding up all the values along the path equals targetSum.
+
+      A leaf is a node with no children.
+
+      Constraints:
+      - The number of nodes in the tree is in the range [0, 5000].
+      - -1000 <= Node.val <= 1000
+      - -1000 <= targetSum <= 1000
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public boolean hasPathSum(TreeNode root, int targetSum) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [5, 4, 8, 11, null, 13, 4, 7, 2, null, null, null, 1], targetSum = 22"
+        expected: "true"
+        description: "Path 5->4->11->2 sums to 22"
+      - input: "root = [1, 2, 3], targetSum = 5"
+        expected: "false"
+        description: "No root-to-leaf path sums to 5"
+      - input: "root = [], targetSum = 0"
+        expected: "false"
+        description: "Empty tree has no paths"
+      - input: "root = [1, 2], targetSum = 1"
+        expected: "false"
+        description: "Must reach a leaf: path 1->2 sums to 3, node 1 alone is not a leaf"
+    hints:
+      - "Think about subtracting the current node's value from targetSum as you recurse down."
+      - "At each node, the new target becomes targetSum - node.val. Check if a leaf node has remaining sum equal to its value."
+      - "Base cases: null returns false. At a leaf (no children), return node.val == targetSum. Otherwise recurse on both children with targetSum - node.val."
+
+  - title: "Sum Root to Leaf Numbers"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      You are given the root of a binary tree containing digits from 0 to 9 only.
+      Each root-to-leaf path in the tree represents a number formed by concatenating
+      the node values along the path.
+
+      For example, the root-to-leaf path 1 -> 2 -> 3 represents the number 123.
+
+      Return the total sum of all root-to-leaf numbers.
+
+      Constraints:
+      - The number of nodes in the tree is in the range [1, 1000].
+      - 0 <= Node.val <= 9
+      - The depth of the tree will not exceed 10.
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public int sumNumbers(TreeNode root) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [1, 2, 3]"
+        expected: "25"
+        description: "Paths: 1->2 = 12, 1->3 = 13, sum = 25"
+      - input: "root = [4, 9, 0, 5, 1]"
+        expected: "1026"
+        description: "Paths: 4->9->5 = 495, 4->9->1 = 491, 4->0 = 40, sum = 1026"
+      - input: "root = [1]"
+        expected: "1"
+        description: "Single node is both root and leaf, number is 1"
+      - input: "root = [9, 9, 9]"
+        expected: "198"
+        description: "Paths: 9->9 = 99, 9->9 = 99, sum = 198"
+    hints:
+      - "As you traverse from root to leaf, you're building a number digit by digit."
+      - "Pass the current number formed so far as a parameter. At each node: currentNum = currentNum * 10 + node.val."
+      - "Use DFS with a running sum parameter. At a leaf, return currentNum * 10 + node.val. For internal nodes, return the sum of left and right recursive calls."
+
+  - title: "Binary Tree Maximum Path Sum"
+    difficulty: HARD
+    type: DSA
+    time_limit_seconds: 900
+    problem_statement: |
+      A path in a binary tree is a sequence of nodes where each pair of adjacent nodes
+      has an edge connecting them. A node can only appear in the path at most once.
+      The path does not need to pass through the root.
+
+      Given the root of a binary tree, return the maximum path sum of any non-empty path.
+
+      The path sum is the sum of all node values in the path.
+
+      Note: The path can start and end at any node in the tree, not necessarily a leaf.
+      Node values can be negative.
+
+      Constraints:
+      - The number of nodes in the tree is in the range [1, 3 * 10^4].
+      - -1000 <= Node.val <= 1000
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public int maxPathSum(TreeNode root) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [1, 2, 3]"
+        expected: "6"
+        description: "Path 2->1->3 gives maximum sum of 6"
+      - input: "root = [-10, 9, 20, null, null, 15, 7]"
+        expected: "42"
+        description: "Path 15->20->7 gives maximum sum of 42"
+      - input: "root = [-3]"
+        expected: "-3"
+        description: "Single negative node: must include at least one node"
+      - input: "root = [2, -1, -2]"
+        expected: "2"
+        description: "Best path is just the root node alone"
+    hints:
+      - "At each node, you have a choice: include the left branch, the right branch, both, or neither (just the node itself)."
+      - "Distinguish between the path that passes through a node (left + node + right) and the path that can be extended upward (node + max(left, right)). Track a global maximum."
+      - "DFS returns the max gain from one side: max(0, left) or max(0, right) + node.val. Update global max with node.val + max(0, left) + max(0, right) at each node."
+
+  - title: "Count Complete Tree Nodes"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given the root of a complete binary tree, return the number of nodes in the tree.
+
+      A complete binary tree is one where every level except possibly the last is completely filled,
+      and all nodes in the last level are as far left as possible.
+
+      Design an algorithm that runs in less than O(n) time complexity.
+
+      Constraints:
+      - The number of nodes in the tree is in the range [0, 5 * 10^4].
+      - 0 <= Node.val <= 5 * 10^4
+      - The tree is guaranteed to be complete.
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public int countNodes(TreeNode root) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [1, 2, 3, 4, 5, 6]"
+        expected: "6"
+        description: "Complete tree with 6 nodes"
+      - input: "root = []"
+        expected: "0"
+        description: "Empty tree has 0 nodes"
+      - input: "root = [1]"
+        expected: "1"
+        description: "Single node"
+      - input: "root = [1, 2, 3, 4, 5, 6, 7]"
+        expected: "7"
+        description: "Perfect binary tree (all levels full)"
+    hints:
+      - "A naive O(n) traversal works but doesn't exploit the complete tree property. Think about comparing heights."
+      - "If left height equals right height, the tree is perfect and has 2^h - 1 nodes. Otherwise, recurse on subtrees."
+      - "Compute left depth (go all left) and right depth (go all right). If equal, return (1 << depth) - 1. Otherwise return 1 + countNodes(left) + countNodes(right). This gives O(log^2 n)."
+
+  - title: "Lowest Common Ancestor of a Binary Tree"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
+
+      The lowest common ancestor is defined as the lowest (deepest) node that has both
+      p and q as descendants. A node is allowed to be a descendant of itself.
+
+      All node values are unique, and p and q are guaranteed to exist in the tree.
+
+      Constraints:
+      - The number of nodes in the tree is in the range [2, 10^5].
+      - -10^9 <= Node.val <= 10^9
+      - All Node.val are unique.
+      - p != q
+      - p and q will exist in the tree.
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [3, 5, 1, 6, 2, 0, 8, null, null, 7, 4], p = 5, q = 1"
+        expected: "3"
+        description: "LCA of nodes 5 and 1 is root node 3"
+      - input: "root = [3, 5, 1, 6, 2, 0, 8, null, null, 7, 4], p = 5, q = 4"
+        expected: "5"
+        description: "LCA of 5 and 4 is 5 (a node can be ancestor of itself)"
+      - input: "root = [1, 2], p = 1, q = 2"
+        expected: "1"
+        description: "Root is LCA when one node is the root"
+      - input: "root = [3, 5, 1, 6, 2, 0, 8, null, null, 7, 4], p = 6, q = 4"
+        expected: "5"
+        description: "LCA of 6 and 4 is their common ancestor 5"
+    hints:
+      - "Think recursively: if a node is p or q, it could be the LCA. What if p and q are in different subtrees?"
+      - "Recurse left and right. If both return non-null, current node is the LCA. If only one returns non-null, propagate it up."
+      - "Base cases: null returns null, node == p or node == q returns that node. If left and right both non-null, return current node. Otherwise return whichever is non-null."
+
+  - title: "Binary Tree Right Side View"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given the root of a binary tree, imagine yourself standing on the right side of it.
+      Return the values of the nodes you can see ordered from top to bottom.
+
+      In other words, return the last node visible at each level when looking from the right.
+
+      Constraints:
+      - The number of nodes in the tree is in the range [0, 100].
+      - -100 <= Node.val <= 100
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public List<Integer> rightSideView(TreeNode root) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [1, 2, 3, null, 5, null, 4]"
+        expected: "[1, 3, 4]"
+        description: "Right side visible: root 1, right child 3, rightmost at level 3 is 4"
+      - input: "root = [1, null, 3]"
+        expected: "[1, 3]"
+        description: "Right-only tree: both nodes visible"
+      - input: "root = []"
+        expected: "[]"
+        description: "Empty tree returns empty list"
+      - input: "root = [1, 2, 3, 4]"
+        expected: "[1, 3, 4]"
+        description: "Node 4 (left child of 2) is visible because level 3 has no right-side node"
+    hints:
+      - "Think about level order traversal. Which node at each level is visible from the right?"
+      - "BFS level by level: the last node in each level is the one visible from the right side."
+      - "Alternatively, use DFS visiting right child first. Track the current depth; if depth equals result size, this is the first (rightmost) node seen at this level."
+
+  - title: "Average of Levels in Binary Tree"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given the root of a binary tree, return the average value of the nodes on each level
+      in the form of a list.
+
+      Answers within 10^-5 of the actual answer will be accepted.
+
+      Constraints:
+      - The number of nodes in the tree is in the range [1, 10^4].
+      - -2^31 <= Node.val <= 2^31 - 1
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public List<Double> averageOfLevels(TreeNode root) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [3, 9, 20, null, null, 15, 7]"
+        expected: "[3.0, 14.5, 11.0]"
+        description: "Level 0: 3, Level 1: (9+20)/2=14.5, Level 2: (15+7)/2=11.0"
+      - input: "root = [3, 9, 20, 15, 7]"
+        expected: "[3.0, 14.5, 11.0]"
+        description: "Same averages with different tree structure"
+      - input: "root = [1]"
+        expected: "[1.0]"
+        description: "Single node: average is itself"
+      - input: "root = [2147483647, 2147483647, 2147483647]"
+        expected: "[2147483647.0, 2147483647.0]"
+        description: "Large values: use long/double to avoid overflow"
+    hints:
+      - "This is a standard level order traversal problem where you compute an aggregate per level."
+      - "Use BFS with a queue. Process all nodes at the current level, compute their average, then move to the next level."
+      - "For each level: sum all values (use double to avoid overflow), divide by count of nodes at that level, add to result list."
+
+  - title: "Binary Tree Level Order Traversal"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given the root of a binary tree, return the level order traversal of its nodes' values.
+      The result should be a list of lists, where each inner list contains the values of nodes
+      at that level, from left to right.
+
+      Constraints:
+      - The number of nodes in the tree is in the range [0, 2000].
+      - -1000 <= Node.val <= 1000
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public List<List<Integer>> levelOrder(TreeNode root) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [3, 9, 20, null, null, 15, 7]"
+        expected: "[[3], [9, 20], [15, 7]]"
+        description: "Three levels: root, two children, two grandchildren"
+      - input: "root = [1]"
+        expected: "[[1]]"
+        description: "Single node produces one level"
+      - input: "root = []"
+        expected: "[]"
+        description: "Empty tree returns empty list"
+      - input: "root = [1, 2, 3, 4, 5, 6, 7]"
+        expected: "[[1], [2, 3], [4, 5, 6, 7]]"
+        description: "Perfect binary tree with 3 levels"
+    hints:
+      - "BFS naturally visits nodes level by level using a queue."
+      - "Process all nodes at the current level (use queue size to know how many), collect their values, then enqueue their children for the next level."
+      - "Initialize queue with root. While queue not empty: levelSize = queue.size(), iterate levelSize times polling nodes and adding children. Each iteration produces one level list."
+
+  - title: "Binary Tree Zigzag Level Order Traversal"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given the root of a binary tree, return the zigzag level order traversal of its nodes' values.
+
+      Zigzag means the first level is traversed left to right, the second level right to left,
+      the third level left to right again, and so on, alternating direction at each level.
+
+      Constraints:
+      - The number of nodes in the tree is in the range [0, 2000].
+      - -100 <= Node.val <= 100
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [3, 9, 20, null, null, 15, 7]"
+        expected: "[[3], [20, 9], [15, 7]]"
+        description: "Level 0 L->R: [3], Level 1 R->L: [20,9], Level 2 L->R: [15,7]"
+      - input: "root = [1]"
+        expected: "[[1]]"
+        description: "Single node"
+      - input: "root = []"
+        expected: "[]"
+        description: "Empty tree"
+      - input: "root = [1, 2, 3, 4, 5, 6, 7]"
+        expected: "[[1], [3, 2], [4, 5, 6, 7]]"
+        description: "Three levels with zigzag pattern"
+    hints:
+      - "This is level order traversal with alternating direction. How can you reverse every other level?"
+      - "Do normal BFS but use a flag to decide whether to add values left-to-right or right-to-left for each level."
+      - "Use a LinkedList as a deque for each level. If left-to-right, addLast. If right-to-left, addFirst. Toggle the flag after each level."
+
+  - title: "Populating Next Right Pointers in Each Node II"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given a binary tree (not necessarily perfect), populate each node's next pointer to
+      point to its next right node at the same level. If there is no next right node,
+      the next pointer should be set to null.
+
+      Initially, all next pointers are set to null.
+
+      You may only use constant extra space. The recursive approach with implicit stack
+      space does not count.
+
+      Constraints:
+      - The number of nodes in the tree is in the range [0, 6000].
+      - -100 <= Node.val <= 100
+    starter_code: |
+      // Definition for a Node:
+      // class Node {
+      //     int val;
+      //     Node left;
+      //     Node right;
+      //     Node next;
+      //     Node(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public Node connect(Node root) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [1, 2, 3, 4, 5, null, 7]"
+        expected: "[1, #, 2, 3, #, 4, 5, 7, #]"
+        description: "Connect: 2->3, 4->5, 5->7 (# denotes end of level)"
+      - input: "root = []"
+        expected: "[]"
+        description: "Empty tree"
+      - input: "root = [1, 2, 3, 4, null, null, 5]"
+        expected: "[1, #, 2, 3, #, 4, 5, #]"
+        description: "Sparse tree: 4->5 despite being in different subtrees"
+      - input: "root = [1]"
+        expected: "[1, #]"
+        description: "Single node with no next"
+    hints:
+      - "You can solve this level by level. Use the next pointers of the current level to traverse and connect the next level."
+      - "Use a dummy node to track the start of the next level. Traverse current level using next pointers, linking children to the dummy's chain."
+      - "For each node at current level: if it has a left child, link it to the chain. If it has a right child, link it. Use a tail pointer to build the next level's linked list. After processing current level, move to dummy.next."
+
+  - title: "Kth Smallest Element in a BST"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given the root of a binary search tree and an integer k, return the kth smallest
+      value (1-indexed) among all the node values in the BST.
+
+      Constraints:
+      - The number of nodes in the tree is n.
+      - 1 <= k <= n <= 10^4
+      - 0 <= Node.val <= 10^4
+
+      Follow up: If the BST is modified often (insert/delete operations) and you need
+      to find the kth smallest frequently, how would you optimize?
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public int kthSmallest(TreeNode root, int k) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [3, 1, 4, null, 2], k = 1"
+        expected: "1"
+        description: "Smallest element in BST is 1"
+      - input: "root = [5, 3, 6, 2, 4, null, null, 1], k = 3"
+        expected: "3"
+        description: "Sorted order is [1,2,3,4,5,6], 3rd smallest is 3"
+      - input: "root = [1], k = 1"
+        expected: "1"
+        description: "Single node, k=1 returns that node"
+      - input: "root = [3, 1, 4, null, 2], k = 4"
+        expected: "4"
+        description: "4th smallest in [1,2,3,4] is 4"
+    hints:
+      - "What traversal of a BST visits nodes in sorted (ascending) order?"
+      - "Inorder traversal of a BST gives values in sorted order. Count nodes visited until you reach the kth one."
+      - "Iterative inorder using a stack: push all left children, pop and decrement k. When k reaches 0, that node's value is the answer. O(H + k) time."

@@ -1,0 +1,94 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007-create-mock-interview-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: mock_interview
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: topic_area
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: difficulty
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: state
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+                  defaultValue: ASKING
+              - column:
+                  name: overall_score
+                  type: double
+              - column:
+                  name: category_scores
+                  type: jsonb
+              - column:
+                  name: started_at
+                  type: timestamp without time zone
+                  defaultValueComputed: now()
+              - column:
+                  name: completed_at
+                  type: timestamp without time zone
+
+  - changeSet:
+      id: 007-create-interview-turn-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: interview_turn
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: interview_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_interview_turn_interview
+                    references: mock_interview(id)
+              - column:
+                  name: turn_number
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ai_question
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_answer
+                  type: text
+              - column:
+                  name: evaluation
+                  type: jsonb
+              - column:
+                  name: phase
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: asked_at
+                  type: timestamp without time zone
+                  defaultValueComputed: now()
+              - column:
+                  name: answered_at
+                  type: timestamp without time zone

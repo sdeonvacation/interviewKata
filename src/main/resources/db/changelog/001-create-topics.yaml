@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-topic-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: topic
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: area
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: parent_id
+                  type: uuid
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_topic_parent
+                    references: topic(id)
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: sort_order
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: created_at
+                  type: timestamp without time zone
+                  defaultValueComputed: now()
+
+  - changeSet:
+      id: 001-add-topic-unique-constraint
+      author: interviewkata
+      changes:
+        - addUniqueConstraint:
+            tableName: topic
+            columnNames: name, parent_id
+            constraintName: uq_topic_name_parent

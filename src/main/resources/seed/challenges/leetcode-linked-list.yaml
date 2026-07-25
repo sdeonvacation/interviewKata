@@ -1,0 +1,441 @@
+topic: "DSA/LinkedLists"
+challenges:
+  - title: "Linked List Cycle"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given the `head` of a singly linked list, determine whether the list contains a cycle.
+
+      A cycle exists if some node in the list can be reached again by continuously following the `next` pointer. Internally, a cycle is formed when a node's `next` pointer connects back to a previously visited node.
+
+      Return `true` if there is a cycle in the linked list, otherwise return `false`.
+
+      **Constraints:**
+      - The number of nodes in the list is in the range [0, 10^4].
+      - -10^5 <= Node.val <= 10^5
+      - The solution should use O(1) extra memory.
+    starter_code: |
+      public class Solution {
+          public boolean hasCycle(ListNode head) {
+              // Your solution here
+              return false;
+          }
+      }
+    test_cases:
+      - input: "head = [3,2,0,-4], cycle at index 1"
+        expected: "true"
+        description: "Tail connects back to second node forming a cycle"
+      - input: "head = [1,2], cycle at index 0"
+        expected: "true"
+        description: "Tail connects back to head"
+      - input: "head = [1], no cycle"
+        expected: "false"
+        description: "Single node with no cycle"
+      - input: "head = [], no cycle"
+        expected: "false"
+        description: "Empty list has no cycle"
+    hints:
+      - "Think about what happens if two people walk at different speeds on a circular track."
+      - "Use two pointers moving at different speeds. If there is a cycle, the fast pointer will eventually meet the slow pointer."
+      - "Initialize slow and fast to head. Move slow by 1 step and fast by 2 steps each iteration. If they meet, a cycle exists. If fast reaches null, no cycle."
+
+  - title: "Add Two Numbers"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, meaning the ones digit is at the head of the list. Each node contains a single digit.
+
+      Add the two numbers and return the sum as a linked list in the same reversed format.
+
+      You may assume the two numbers do not contain any leading zeros, except the number 0 itself.
+
+      **Constraints:**
+      - The number of nodes in each linked list is in the range [1, 100].
+      - 0 <= Node.val <= 9
+      - The numbers represented by the lists do not have leading zeros.
+    starter_code: |
+      public class Solution {
+          public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+              // Your solution here
+              return null;
+          }
+      }
+    test_cases:
+      - input: "l1 = [2,4,3], l2 = [5,6,4]"
+        expected: "[7,0,8]"
+        description: "342 + 465 = 807"
+      - input: "l1 = [0], l2 = [0]"
+        expected: "[0]"
+        description: "0 + 0 = 0"
+      - input: "l1 = [9,9,9,9,9,9,9], l2 = [9,9,9,9]"
+        expected: "[8,9,9,9,0,0,0,1]"
+        description: "Lists of different lengths with carry propagation"
+      - input: "l1 = [5], l2 = [5]"
+        expected: "[0,1]"
+        description: "Single digits that produce a carry"
+    hints:
+      - "Simulate the addition process digit by digit, just like you would on paper."
+      - "Traverse both lists simultaneously, summing corresponding digits along with any carry from the previous step."
+      - "Use a dummy head node to simplify list construction. At each step compute sum = l1.val + l2.val + carry, create a node with sum % 10, and update carry = sum / 10. Don't forget a final node if carry remains."
+
+  - title: "Merge Two Sorted Lists"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given the heads of two sorted linked lists `list1` and `list2`, merge them into a single sorted linked list.
+
+      The merged list should be constructed by splicing together the nodes from the two input lists. Return the head of the merged linked list.
+
+      **Constraints:**
+      - The number of nodes in both lists is in the range [0, 50].
+      - -100 <= Node.val <= 100
+      - Both `list1` and `list2` are sorted in non-decreasing order.
+    starter_code: |
+      public class Solution {
+          public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
+              // Your solution here
+              return null;
+          }
+      }
+    test_cases:
+      - input: "list1 = [1,2,4], list2 = [1,3,4]"
+        expected: "[1,1,2,3,4,4]"
+        description: "Two lists of equal length merged in order"
+      - input: "list1 = [], list2 = []"
+        expected: "[]"
+        description: "Both lists empty"
+      - input: "list1 = [], list2 = [0]"
+        expected: "[0]"
+        description: "One empty list and one non-empty"
+      - input: "list1 = [1,3,5,7], list2 = [2,4,6]"
+        expected: "[1,2,3,4,5,6,7]"
+        description: "Interleaving elements from both lists"
+    hints:
+      - "Compare the heads of both lists and pick the smaller one each time."
+      - "Use a dummy node to simplify the construction. Maintain a current pointer and always attach the smaller of the two current heads."
+      - "Iterate while both lists are non-null, appending the smaller node. When one list is exhausted, append the remainder of the other list directly."
+
+  - title: "Copy List with Random Pointer"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      A linked list of length `n` is given where each node contains an additional `random` pointer that can point to any node in the list or `null`.
+
+      Construct a deep copy of the list. The deep copy should consist of exactly `n` brand new nodes, where each new node has its value set to the value of its corresponding original node. Both the `next` and `random` pointers of the new nodes should point to new nodes in the copied list such that the pointers in the original and copied lists represent the same list state.
+
+      Return the head of the copied linked list.
+
+      **Constraints:**
+      - 0 <= n <= 1000
+      - -10^4 <= Node.val <= 10^4
+      - `random` is null or points to some node in the linked list.
+    starter_code: |
+      public class Solution {
+          public Node copyRandomList(Node head) {
+              // Your solution here
+              return null;
+          }
+      }
+    test_cases:
+      - input: "head = [[7,null],[13,0],[11,4],[10,2],[1,0]]"
+        expected: "[[7,null],[13,0],[11,4],[10,2],[1,0]]"
+        description: "List with various random pointers including null"
+      - input: "head = [[1,1],[2,1]]"
+        expected: "[[1,1],[2,1]]"
+        description: "Random pointers forming a small pattern"
+      - input: "head = [[3,null],[3,0],[3,null]]"
+        expected: "[[3,null],[3,0],[3,null]]"
+        description: "Duplicate values with different random pointers"
+      - input: "head = []"
+        expected: "[]"
+        description: "Empty list"
+    hints:
+      - "The challenge is mapping original nodes to their copies so that random pointers can be set correctly."
+      - "Use a HashMap to map each original node to its newly created copy. Then iterate again to set next and random pointers on the copies."
+      - "Alternative O(1) space approach: interleave copied nodes into the original list (A -> A' -> B -> B' -> ...), set random pointers using original.random.next, then separate the two lists."
+
+  - title: "Reverse Linked List II"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given the `head` of a singly linked list and two integers `left` and `right` where `left <= right`, reverse the nodes of the list from position `left` to position `right` (1-indexed), and return the reversed list.
+
+      **Constraints:**
+      - The number of nodes in the list is n.
+      - 1 <= n <= 500
+      - -500 <= Node.val <= 500
+      - 1 <= left <= right <= n
+    starter_code: |
+      public class Solution {
+          public ListNode reverseBetween(ListNode head, int left, int right) {
+              // Your solution here
+              return null;
+          }
+      }
+    test_cases:
+      - input: "head = [1,2,3,4,5], left = 2, right = 4"
+        expected: "[1,4,3,2,5]"
+        description: "Reverse middle portion of the list"
+      - input: "head = [5], left = 1, right = 1"
+        expected: "[5]"
+        description: "Single element, nothing to reverse"
+      - input: "head = [1,2,3,4,5], left = 1, right = 5"
+        expected: "[5,4,3,2,1]"
+        description: "Reverse entire list"
+      - input: "head = [1,2,3,4,5], left = 3, right = 5"
+        expected: "[1,2,5,4,3]"
+        description: "Reverse suffix of the list"
+    hints:
+      - "Navigate to the node just before position `left` first, then reverse the sublist."
+      - "Use a dummy node before head to handle edge cases where left = 1. Keep track of the node before the reversed section and the first node of the reversed section."
+      - "After reaching position left, repeatedly move the next node of current to just after the connection point. This inserts nodes in reverse order without needing to reconnect afterward."
+
+  - title: "Reverse Nodes in k-Group"
+    difficulty: HARD
+    type: DSA
+    time_limit_seconds: 900
+    problem_statement: |
+      Given the `head` of a linked list, reverse the nodes of the list `k` at a time, and return the modified list.
+
+      `k` is a positive integer and is less than or equal to the length of the linked list. If the number of nodes remaining is fewer than `k`, leave them as-is.
+
+      You may not alter the values in the list's nodes; only the nodes themselves may be rearranged.
+
+      **Constraints:**
+      - The number of nodes in the list is n.
+      - 1 <= k <= n <= 5000
+      - 0 <= Node.val <= 1000
+    starter_code: |
+      public class Solution {
+          public ListNode reverseKGroup(ListNode head, int k) {
+              // Your solution here
+              return null;
+          }
+      }
+    test_cases:
+      - input: "head = [1,2,3,4,5], k = 2"
+        expected: "[2,1,4,3,5]"
+        description: "Groups of 2 reversed, last single node remains"
+      - input: "head = [1,2,3,4,5], k = 3"
+        expected: "[3,2,1,4,5]"
+        description: "First group of 3 reversed, remaining 2 stay"
+      - input: "head = [1,2,3,4,5,6], k = 3"
+        expected: "[3,2,1,6,5,4]"
+        description: "Two full groups of 3 both reversed"
+      - input: "head = [1,2,3,4,5], k = 1"
+        expected: "[1,2,3,4,5]"
+        description: "k=1 means no reversal needed"
+    hints:
+      - "Break the problem into subproblems: first check if there are k nodes remaining, then reverse those k nodes."
+      - "Count k nodes ahead. If fewer than k remain, stop. Otherwise reverse the next k nodes and recursively process the rest."
+      - "Iterative approach: use a dummy head, maintain a pointer to the group start. For each group, reverse k nodes in place, then connect the previous group's tail to the new head. Track the tail of the reversed group for connecting the next segment."
+
+  - title: "Remove Nth Node From End of List"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given the `head` of a linked list, remove the nth node from the end of the list and return its head.
+
+      **Constraints:**
+      - The number of nodes in the list is sz.
+      - 1 <= sz <= 30
+      - 0 <= Node.val <= 100
+      - 1 <= n <= sz
+    starter_code: |
+      public class Solution {
+          public ListNode removeNthFromEnd(ListNode head, int n) {
+              // Your solution here
+              return null;
+          }
+      }
+    test_cases:
+      - input: "head = [1,2,3,4,5], n = 2"
+        expected: "[1,2,3,5]"
+        description: "Remove second node from end"
+      - input: "head = [1], n = 1"
+        expected: "[]"
+        description: "Remove only node in the list"
+      - input: "head = [1,2], n = 1"
+        expected: "[1]"
+        description: "Remove last node"
+      - input: "head = [1,2], n = 2"
+        expected: "[2]"
+        description: "Remove first node (head)"
+    hints:
+      - "Can you do this in one pass through the list?"
+      - "Use two pointers separated by exactly n nodes. When the ahead pointer reaches the end, the behind pointer is at the node before the one to remove."
+      - "Use a dummy node before head. Advance the fast pointer n+1 steps, then move both fast and slow together. When fast is null, slow.next is the node to remove. Set slow.next = slow.next.next."
+
+  - title: "Remove Duplicates from Sorted List II"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given the `head` of a sorted linked list, delete all nodes that have duplicate numbers, leaving only distinct numbers from the original list. Return the linked list sorted as well.
+
+      Note: this removes ALL occurrences of duplicated values, not just the extras.
+
+      **Constraints:**
+      - The number of nodes in the list is in the range [0, 300].
+      - -100 <= Node.val <= 100
+      - The list is guaranteed to be sorted in ascending order.
+    starter_code: |
+      public class Solution {
+          public ListNode deleteDuplicates(ListNode head) {
+              // Your solution here
+              return null;
+          }
+      }
+    test_cases:
+      - input: "head = [1,2,3,3,4,4,5]"
+        expected: "[1,2,5]"
+        description: "Remove nodes with values 3 and 4 entirely"
+      - input: "head = [1,1,1,2,3]"
+        expected: "[2,3]"
+        description: "Remove duplicates at the beginning"
+      - input: "head = [1,1,2,2,3,3]"
+        expected: "[]"
+        description: "All nodes are duplicates, empty result"
+      - input: "head = [1,2,3,4,5]"
+        expected: "[1,2,3,4,5]"
+        description: "No duplicates, list unchanged"
+    hints:
+      - "Since the list is sorted, duplicates are always adjacent. How can you skip over all nodes with the same value?"
+      - "Use a dummy node and a predecessor pointer. When you detect duplicates, skip all nodes with that value. Otherwise, advance the predecessor."
+      - "Set pred.next to point past all duplicate nodes. While current and current.next have the same value, advance current. Then set pred.next = current.next to skip all copies. If no duplicate was found, simply advance pred."
+
+  - title: "Rotate List"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given the `head` of a linked list, rotate the list to the right by `k` places.
+
+      Rotating by one place means moving the last element to the front of the list.
+
+      **Constraints:**
+      - The number of nodes in the list is in the range [0, 500].
+      - -100 <= Node.val <= 100
+      - 0 <= k <= 2 * 10^9
+    starter_code: |
+      public class Solution {
+          public ListNode rotateRight(ListNode head, int k) {
+              // Your solution here
+              return null;
+          }
+      }
+    test_cases:
+      - input: "head = [1,2,3,4,5], k = 2"
+        expected: "[4,5,1,2,3]"
+        description: "Rotate right by 2 positions"
+      - input: "head = [0,1,2], k = 4"
+        expected: "[2,0,1]"
+        description: "k larger than list length, use modulo"
+      - input: "head = [1], k = 99"
+        expected: "[1]"
+        description: "Single node, rotation has no effect"
+      - input: "head = [1,2,3], k = 3"
+        expected: "[1,2,3]"
+        description: "k equals list length, list unchanged"
+    hints:
+      - "If k is larger than the list length, the effective rotation is k % length."
+      - "Find the length and connect the tail to head forming a circle. Then find the new tail position and break the circle there."
+      - "Compute length n, set k = k % n. If k is 0, return head. Connect tail.next = head (circular). Move (n - k) steps from the old tail to find the new tail. New head is newTail.next. Set newTail.next = null."
+
+  - title: "Partition List"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given the `head` of a linked list and a value `x`, partition it such that all nodes with values less than `x` come before nodes with values greater than or equal to `x`.
+
+      You should preserve the original relative order of the nodes in each of the two partitions.
+
+      **Constraints:**
+      - The number of nodes in the list is in the range [0, 200].
+      - -100 <= Node.val <= 100
+      - -200 <= x <= 200
+    starter_code: |
+      public class Solution {
+          public ListNode partition(ListNode head, int x) {
+              // Your solution here
+              return null;
+          }
+      }
+    test_cases:
+      - input: "head = [1,4,3,2,5,2], x = 3"
+        expected: "[1,2,2,4,3,5]"
+        description: "Nodes less than 3 moved before nodes >= 3"
+      - input: "head = [2,1], x = 2"
+        expected: "[1,2]"
+        description: "Simple two-element partition"
+      - input: "head = [1,2,3], x = 4"
+        expected: "[1,2,3]"
+        description: "All elements less than x, no change"
+      - input: "head = [3,2,1], x = 1"
+        expected: "[3,2,1]"
+        description: "No elements less than x, no change"
+    hints:
+      - "Think about maintaining two separate lists: one for nodes less than x and one for nodes greater than or equal to x."
+      - "Create two dummy heads for the 'less' and 'greater-or-equal' partitions. Traverse the original list and append each node to the appropriate partition."
+      - "After traversal, connect the tail of the 'less' list to the head of the 'greater-or-equal' list. Set the tail of the greater list to null to avoid cycles. Return the merged result starting from less.next."
+
+  - title: "LRU Cache"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Design a data structure that implements a Least Recently Used (LRU) cache.
+
+      Implement the `LRUCache` class:
+      - `LRUCache(int capacity)` - Initialize the cache with a positive capacity.
+      - `int get(int key)` - Return the value associated with the key if it exists, otherwise return -1. This operation marks the key as recently used.
+      - `void put(int key, int value)` - Update the value of the key if it exists, or insert the key-value pair. If inserting causes the cache to exceed its capacity, evict the least recently used key before inserting the new one.
+
+      Both `get` and `put` must run in O(1) average time complexity.
+
+      **Constraints:**
+      - 1 <= capacity <= 3000
+      - 0 <= key <= 10^4
+      - 0 <= value <= 10^5
+      - At most 2 * 10^5 calls will be made to get and put.
+    starter_code: |
+      public class Solution {
+          class LRUCache {
+              public LRUCache(int capacity) {
+                  // Initialize your data structure here
+              }
+
+              public int get(int key) {
+                  // Your solution here
+                  return -1;
+              }
+
+              public void put(int key, int value) {
+                  // Your solution here
+              }
+          }
+      }
+    test_cases:
+      - input: "LRUCache(2), put(1,1), put(2,2), get(1), put(3,3), get(2), put(4,4), get(1), get(3), get(4)"
+        expected: "get(1)=1, get(2)=-1, get(1)=-1, get(3)=3, get(4)=4"
+        description: "Standard LRU eviction sequence"
+      - input: "LRUCache(1), put(2,1), get(2), put(3,2), get(2), get(3)"
+        expected: "get(2)=1, get(2)=-1, get(3)=2"
+        description: "Capacity 1 evicts on every new put"
+      - input: "LRUCache(2), put(1,1), put(2,2), put(1,10), get(1), get(2)"
+        expected: "get(1)=10, get(2)=2"
+        description: "Update existing key does not evict"
+      - input: "LRUCache(2), put(1,1), put(2,2), get(1), put(3,3), get(2)"
+        expected: "get(1)=1, get(2)=-1"
+        description: "get refreshes usage order, so key 2 is evicted instead of 1"
+    hints:
+      - "What combination of data structures gives you O(1) lookup AND O(1) insertion/removal by position?"
+      - "Use a HashMap for O(1) key lookup and a doubly linked list to maintain access order. Most recently used goes to the front, least recently used is at the back."
+      - "On get: look up node in map, move it to the front of the list. On put: if key exists, update value and move to front. If new, add to front and map. If over capacity, remove the tail node from both the list and the map."

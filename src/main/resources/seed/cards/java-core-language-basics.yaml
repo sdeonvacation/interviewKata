@@ -1,0 +1,96 @@
+topic: "Java Core/Language Basics"
+cards:
+  - front: "What are the pitfalls of autoboxing between Integer and int?"
+    back: "Autoboxing can cause NullPointerException when unboxing a null Integer. It also causes subtle bugs with == comparison: Integer caches values -128 to 127, so == works for small values but fails for larger ones. Autoboxing in tight loops creates unnecessary object allocations and GC pressure."
+    code_snippet: |
+      Integer a = 127, b = 127;
+      System.out.println(a == b);  // true (cached)
+
+      Integer c = 128, d = 128;
+      System.out.println(c == d);  // false (new objects)
+
+      Integer x = null;
+      int y = x; // NullPointerException at runtime
+    difficulty: MEDIUM
+    tags: [autoboxing, wrapper-types, equality]
+
+  - front: "How does the String pool work and why are Strings immutable in Java?"
+    back: "The String pool (intern pool) is a special memory area in the heap where Java stores unique String literals. When you create a literal, JVM checks the pool first and reuses existing instances. Immutability enables safe sharing without defensive copying, allows caching of hashCode, and makes Strings inherently thread-safe. Strings created with new keyword bypass the pool unless intern() is called."
+    code_snippet: |
+      String s1 = "hello";       // pool
+      String s2 = "hello";       // same reference from pool
+      String s3 = new String("hello"); // heap, not pool
+
+      System.out.println(s1 == s2);       // true
+      System.out.println(s1 == s3);       // false
+      System.out.println(s1 == s3.intern()); // true
+    difficulty: EASY
+    tags: [string-pool, immutability, memory]
+
+  - front: "Explain all uses of the final keyword in Java."
+    back: "Final variable: value cannot be reassigned once initialized (for references, the reference is fixed but object state can still change). Final method: cannot be overridden by subclasses. Final class: cannot be extended. Final parameters: prevents reassignment within the method body. Effectively final: a variable not declared final but never reassigned, required for lambda captures."
+    code_snippet: |
+      final List<String> list = new ArrayList<>();
+      list.add("item");    // OK - mutating object state
+      // list = new ArrayList<>(); // compile error - reassigning reference
+
+      final class Immutable {} // cannot extend
+      // class Sub extends Immutable {} // compile error
+    difficulty: EASY
+    tags: [final, immutability, inheritance]
+
+  - front: "Prove that Java is pass-by-value, not pass-by-reference."
+    back: "Java always passes a copy of the value. For primitives, it copies the value itself. For objects, it copies the reference (pointer), not the object. You can mutate the object through the copied reference, but you cannot make the caller's variable point to a different object. Swapping two object references inside a method has no effect on the caller."
+    code_snippet: |
+      void swap(String a, String b) {
+          String temp = a;
+          a = b;
+          b = temp;
+      }
+
+      String x = "hello", y = "world";
+      swap(x, y);
+      // x is still "hello", y is still "world"
+      // Only the local copies of references were swapped
+    difficulty: MEDIUM
+    tags: [pass-by-value, references, method-parameters]
+
+  - front: "What is type erasure in Java generics and what problems does it cause?"
+    back: "Type erasure removes generic type information at compile time, replacing type parameters with their bounds (or Object if unbounded). This means you cannot use instanceof with generics, cannot create generic arrays, cannot call new T(), and cannot overload methods differing only in generic type. Bridge methods are generated to preserve polymorphism."
+    code_snippet: |
+      // At runtime, both are just List (raw type)
+      List<String> strings = new ArrayList<>();
+      List<Integer> ints = new ArrayList<>();
+      // strings.getClass() == ints.getClass() -> true
+
+      // Cannot do:
+      // if (obj instanceof List<String>) {}  // compile error
+      // T[] arr = new T[10];                 // compile error
+
+      // These are the same erasure - won't compile together:
+      // void process(List<String> list) {}
+      // void process(List<Integer> list) {}
+    difficulty: HARD
+    tags: [generics, type-erasure, compile-time]
+
+  - front: "What does the static keyword mean in different contexts?"
+    back: "Static field: shared across all instances, belongs to the class. Static method: callable without an instance, cannot access instance members or use 'this'. Static block: runs once when the class is loaded, used for complex static initialization. Static inner class: does not hold a reference to the enclosing instance, preventing memory leaks. Static import: allows using static members without class qualification."
+    code_snippet: |
+      class Counter {
+          static int count = 0;       // shared across instances
+          static { count = loadFromDB(); } // class-load init
+
+          static int getCount() { return count; }
+
+          // Non-static inner holds reference to outer (memory leak risk)
+          class Inner {}
+          // Static nested does not
+          static class Nested {}
+      }
+    difficulty: MEDIUM
+    tags: [static, class-loading, memory]
+
+  - front: "What is the difference between primitives and wrapper types regarding memory, nullability, and usage in collections?"
+    back: "Primitives (int, long, double, etc.) live on the stack, cannot be null, and have no methods. Wrappers (Integer, Long, Double) are heap-allocated objects, can be null, and provide utility methods like parseInt(). Collections require wrappers since generics don't support primitives. A wrapper uses 16+ bytes of heap vs 4 bytes for an int. In performance-critical code, prefer primitives or specialized collections (e.g., IntStream, Eclipse Collections IntList)."
+    difficulty: HARD
+    tags: [primitives, wrappers, memory-layout, performance]

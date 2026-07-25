@@ -1,0 +1,113 @@
+topic: "Architecture/Event-Driven"
+cards:
+  - front: "What is event sourcing and how does it differ from traditional state persistence?"
+    back: |
+      Event sourcing persists every state change as an immutable event rather than storing current state.
+      Current state is derived by replaying events from the event store. This provides a complete audit
+      trail, enables temporal queries, and allows rebuilding state at any point in time.
+    difficulty: EASY
+    tags: [event-sourcing, persistence, audit]
+
+  - front: "What is CQRS and why is it often paired with event sourcing?"
+    back: |
+      CQRS separates the write model (commands) from the read model (queries) into distinct services
+      or data stores. Paired with event sourcing, events from the write side project into optimized
+      read models (denormalized views), allowing each side to scale and evolve independently.
+    code_snippet: |
+      // Command side - handles business logic, emits events
+      public class OrderCommandHandler {
+          public void handle(PlaceOrderCommand cmd) {
+              OrderAggregate order = repository.load(cmd.getOrderId());
+              order.place(cmd.getItems()); // validates and applies event
+              repository.save(order);      // persists OrderPlacedEvent
+          }
+      }
+      // Query side - subscribes to events, builds read model
+      public class OrderProjection {
+          @EventHandler
+          public void on(OrderPlacedEvent e) {
+              orderViewRepo.save(new OrderView(e.getOrderId(), e.getTotal(), "PLACED"));
+          }
+      }
+    difficulty: MEDIUM
+    tags: [cqrs, read-write-separation, scalability]
+
+  - front: "How do you handle eventual consistency in an event-driven system?"
+    back: |
+      Accept that read models lag behind writes. Use idempotent event handlers with deduplication
+      (event ID tracking). Provide UI patterns like optimistic updates or polling. For critical
+      consistency, use process managers or return confirmation only after projection catches up.
+    difficulty: MEDIUM
+    tags: [eventual-consistency, idempotency, distributed-systems]
+
+  - front: "Explain the Saga pattern and the difference between choreography and orchestration."
+    back: |
+      Sagas coordinate distributed transactions through a sequence of local transactions with
+      compensating actions on failure. Choreography uses events where each service reacts
+      independently (decentralized, harder to trace). Orchestration uses a central coordinator
+      that directs participants (easier to reason about, single point of failure risk).
+    code_snippet: |
+      // Orchestration-based saga
+      public class OrderSaga {
+          @SagaStart
+          public void handle(OrderPlacedEvent event) {
+              commandGateway.send(new ReserveInventoryCommand(event.getItems()));
+          }
+          @SagaEventHandler
+          public void on(InventoryReservedEvent event) {
+              commandGateway.send(new ProcessPaymentCommand(event.getOrderId()));
+          }
+          @SagaEventHandler
+          public void on(PaymentFailedEvent event) {
+              commandGateway.send(new ReleaseInventoryCommand(event.getOrderId()));
+              end(); // compensating action triggered
+          }
+      }
+    difficulty: MEDIUM
+    tags: [saga, distributed-transactions, compensation]
+
+  - front: "How do you design an event store and what are the key considerations?"
+    back: |
+      An event store is an append-only log partitioned by aggregate ID. Key considerations:
+      optimistic concurrency via expected version numbers, snapshotting for aggregates with many
+      events, global ordering for projections, and retention/archival policies. Events are immutable
+      once written.
+    code_snippet: |
+      CREATE TABLE event_store (
+          event_id       UUID PRIMARY KEY,
+          aggregate_id   UUID NOT NULL,
+          aggregate_type VARCHAR(255) NOT NULL,
+          version        BIGINT NOT NULL,
+          event_type     VARCHAR(255) NOT NULL,
+          payload        JSONB NOT NULL,
+          metadata       JSONB,
+          created_at     TIMESTAMP NOT NULL DEFAULT NOW(),
+          UNIQUE (aggregate_id, version)  -- optimistic concurrency
+      );
+    difficulty: EASY
+    tags: [event-store, append-only, concurrency]
+
+  - front: "How do you handle event schema evolution and versioning in a production system?"
+    back: |
+      Use an event registry with explicit version numbers per event type. Support upcasting
+      (transforming old events to new schema on read) rather than migrating stored events.
+      Apply weak schema (add fields with defaults, never remove/rename). For breaking changes,
+      introduce a new event type and deprecate the old one. Schema registries (like Avro with
+      compatibility checks) prevent incompatible changes at publish time.
+    code_snippet: |
+      // Upcaster transforms v1 events to v2 on replay
+      public class OrderPlacedUpcaster implements EventUpcaster {
+          @Override
+          public boolean canUpcast(String eventType, int version) {
+              return "OrderPlaced".equals(eventType) && version == 1;
+          }
+          @Override
+          public JsonNode upcast(JsonNode event) {
+              ObjectNode node = (ObjectNode) event;
+              node.put("currency", "USD"); // field added in v2
+              node.put("schemaVersion", 2);
+              return node;
+          }
+      }
+    difficulty: HARD
+    tags: [schema-evolution, upcasting, backward-compatibility]

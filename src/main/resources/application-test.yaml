@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5436/interviewkata_test
+    username: interviewkata
+    password: interviewkata
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+  ai:
+    anthropic:
+      api-key: test-key
+
+interviewkata:
+  auth:
+    token: test-token
+  seed:
+    enabled: false

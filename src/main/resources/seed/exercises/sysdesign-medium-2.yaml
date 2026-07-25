@@ -1,0 +1,251 @@
+topic: "System Design/Caching"
+exercises:
+  - title: "Design an API Rate Limiter"
+    difficulty: MEDIUM
+    estimated_minutes: 40
+    prompt: |
+      Design a distributed rate limiting service that protects APIs from abuse by enforcing request quotas per client across multiple server instances.
+
+      ## Requirements
+
+      ### Functional
+      - Enforce rate limits per API key, user, or IP address
+      - Support multiple rate limit rules (e.g., 100/min AND 5000/hour)
+      - Return appropriate headers (X-RateLimit-Remaining, Retry-After)
+      - Allow different limits per subscription tier (free, pro, enterprise)
+      - Provide a dashboard showing usage and throttled requests
+
+      ### Non-Functional
+      - Decision latency under 1ms (inline with request path)
+      - Consistent enforcement across distributed servers
+      - Graceful handling of Redis/store failures (fail-open vs fail-closed configurable)
+      - Minimal memory footprint per client
+
+      ## Topics to Cover
+      - Rate limiting algorithms (token bucket, sliding window, leaky bucket)
+      - Distributed counter synchronization
+      - Race condition handling in concurrent environments
+      - Failure modes and degradation strategies
+    constraints: |
+      - 100K API clients, 1M requests/second total
+      - Decision latency: under 1ms added to request
+      - Rules: up to 5 rate limit rules per client
+      - Distributed: 50 API gateway instances sharing state
+      - Memory: under 1KB per client for rate limit state
+    evaluation_rubric:
+      algorithm_choice: 25
+      distributed_consistency: 25
+      api_design: 20
+      failure_handling: 15
+      performance: 15
+    reference_approach: |
+      - Algorithm: Sliding window log for accuracy; token bucket for simplicity and memory efficiency
+      - Storage: Redis with atomic Lua scripts for check-and-decrement in single round-trip
+      - Distributed sync: Redis as central counter; local cache with sync for ultra-low latency
+      - Race conditions: Redis MULTI/EXEC or Lua script ensures atomic read-check-update
+      - Multiple rules: Evaluate all rules; reject if ANY rule exceeded
+      - Headers: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, Retry-After
+      - Failure mode: Configurable — fail-open (allow) for non-critical APIs; fail-closed for payment APIs
+      - Tiers: Load tier config on first request; cache locally with TTL refresh
+
+  - title: "Design a Web Cache"
+    difficulty: MEDIUM
+    estimated_minutes: 40
+    prompt: |
+      Design a distributed caching layer (like a CDN edge cache or application cache) that sits between clients and origin servers to reduce latency and backend load.
+
+      ## Requirements
+
+      ### Functional
+      - Cache HTTP responses based on URL, headers, and query parameters
+      - Support cache invalidation (purge by URL, pattern, or tag)
+      - Honor Cache-Control headers (max-age, no-cache, private)
+      - Serve stale content while revalidating in background (stale-while-revalidate)
+      - Cache warming for predictable traffic spikes
+
+      ### Non-Functional
+      - Cache hit latency under 5ms
+      - Support 1M cached objects per node
+      - Cache hit ratio above 90% for cacheable content
+      - Consistent hashing for cache distribution
+      - Graceful origin failover on cache miss storms
+
+      ## Topics to Cover
+      - Eviction policies (LRU, LFU, TTL-based)
+      - Cache consistency and invalidation strategies
+      - Thundering herd / cache stampede prevention
+      - Distributed cache topology (replicated vs partitioned)
+    constraints: |
+      - 100 cache nodes, 64GB memory each
+      - 1M objects per node, average object size 50KB
+      - 500K requests/second across cluster
+      - Cache hit ratio target: 90%+
+      - Invalidation propagation: under 5 seconds cluster-wide
+    evaluation_rubric:
+      eviction_strategy: 25
+      consistency_model: 25
+      scalability: 20
+      stampede_prevention: 15
+      api_design: 15
+    reference_approach: |
+      - Topology: Consistent hashing to distribute keys across nodes; virtual nodes for balance
+      - Eviction: LRU with frequency boost (LFU-hybrid) — recently AND frequently accessed items survive
+      - Stampede prevention: Request coalescing — first miss fetches from origin; concurrent requests wait
+      - Stale-while-revalidate: Serve expired content immediately; async background refresh
+      - Invalidation: Pub/sub broadcast to all nodes; tag-based purge for grouped content
+      - Cache-Control: Parse response headers; respect max-age, private, no-store directives
+      - Warming: Pre-fetch popular URLs before traffic spike based on schedule or prediction
+      - Failure: Circuit breaker on origin; serve stale on origin timeout; shed load gracefully
+
+  - title: "Design Typeahead Suggestion"
+    difficulty: MEDIUM
+    estimated_minutes: 45
+    prompt: |
+      Design a typeahead/autocomplete system that provides real-time search suggestions as users type, similar to Google Search suggestions.
+
+      ## Requirements
+
+      ### Functional
+      - Return top 10 suggestions as user types each character
+      - Rank suggestions by popularity, recency, and personalization
+      - Support multi-language queries
+      - Update suggestion corpus as new queries trend
+      - Filter inappropriate or banned suggestions
+
+      ### Non-Functional
+      - Response time under 50ms per keystroke
+      - Handle 100K concurrent users typing simultaneously
+      - Suggestions reflect trending queries within 15 minutes
+      - Graceful degradation — return cached results if real-time ranking unavailable
+
+      ## Topics to Cover
+      - Trie data structure and its distributed variants
+      - Prefix matching at scale
+      - Ranking and personalization of suggestions
+      - Real-time corpus updates without downtime
+    constraints: |
+      - 5B queries per day, 60K queries/second
+      - Suggestion corpus: 100M unique query phrases
+      - Response latency: under 50ms at p99
+      - Update freshness: trending queries appear within 15 minutes
+      - Storage per trie node: ~100 bytes average
+    evaluation_rubric:
+      data_structure: 25
+      ranking_algorithm: 25
+      scalability: 20
+      freshness: 15
+      api_design: 15
+    reference_approach: |
+      - Data structure: Trie with top-K suggestions precomputed at each node
+      - Storage: Trie partitioned by first 2 characters across nodes; replicated for read throughput
+      - Ranking: Weighted score = 0.6*popularity + 0.2*recency + 0.2*personalization
+      - Updates: Streaming pipeline aggregates query counts; periodic trie rebuild (every 15 min)
+      - Serving: Client sends prefix after 2+ chars; server traverses trie to matching node; return top-10
+      - Personalization: Blend global suggestions with user's recent search history
+      - Filtering: Bloom filter of banned phrases checked before returning suggestions
+      - Optimization: Cache top suggestions for common 2-3 char prefixes in Redis
+      - API: GET /suggestions?prefix=des&user_id=123 → [{text, score}]
+
+  - title: "Design a Notification System"
+    difficulty: MEDIUM
+    estimated_minutes: 45
+    prompt: |
+      Design a multi-channel notification system that delivers messages via push notifications, SMS, email, and in-app channels with user preferences and rate limiting.
+
+      ## Requirements
+
+      ### Functional
+      - Send notifications via push (iOS/Android), SMS, email, and in-app
+      - User preference management (opt-in/out per channel and category)
+      - Template-based notification content with variable substitution
+      - Priority levels (critical, high, normal, low) with different delivery guarantees
+      - Notification history and read/unread status
+
+      ### Non-Functional
+      - Critical notifications delivered within 30 seconds
+      - Handle 10M notifications per hour
+      - At-least-once delivery guarantee
+      - Rate limiting to prevent notification fatigue
+      - Retry with exponential backoff on delivery failure
+
+      ## Topics to Cover
+      - Multi-channel delivery orchestration
+      - Priority queue and scheduling
+      - Deduplication and rate limiting per user
+      - Template rendering and personalization
+      - Delivery tracking and analytics
+    constraints: |
+      - 500M registered users, 10M notifications/hour
+      - Channels: Push (60%), Email (25%), SMS (10%), In-app (5%)
+      - Critical delivery SLA: 30 seconds
+      - Rate limit: max 5 push notifications per hour per user
+      - Template library: 1000 templates with i18n support
+      - Retry policy: 3 attempts with exponential backoff
+    evaluation_rubric:
+      architecture: 25
+      delivery_guarantees: 25
+      scalability: 20
+      preference_handling: 15
+      rate_limiting: 15
+    reference_approach: |
+      - Architecture: API → Validation → Priority Queue → Channel Router → Delivery Adapters
+      - Queue: Priority queue (Redis sorted set or Kafka with priority topics) — critical first
+      - Channel routing: Check user preferences; select channels; fan-out to channel-specific queues
+      - Delivery adapters: Push (APNS/FCM), Email (SES/SendGrid), SMS (Twilio), In-app (WebSocket)
+      - Templates: Mustache/Handlebars templates stored in DB; render with user context variables
+      - Deduplication: Hash(user_id + template_id + params) checked in Redis with TTL window
+      - Rate limiting: Per-user sliding window counter; defer low-priority if limit approaching
+      - Retry: Exponential backoff (1s, 4s, 16s); dead-letter queue after max retries
+      - Tracking: Log delivery status per notification; aggregate for analytics dashboard
+
+  - title: "Design a Task Scheduler"
+    difficulty: MEDIUM
+    estimated_minutes: 40
+    prompt: |
+      Design a distributed task scheduling system that executes jobs at specified times or intervals, similar to cron but scalable and fault-tolerant.
+
+      ## Requirements
+
+      ### Functional
+      - Schedule one-time tasks at a future timestamp
+      - Schedule recurring tasks with cron expressions
+      - Cancel or modify scheduled tasks
+      - Retry failed tasks with configurable policy
+      - Task execution history and status tracking
+      - Support task dependencies (run B after A completes)
+
+      ### Non-Functional
+      - Execute tasks within 1 second of scheduled time
+      - Handle 1M scheduled tasks with 10K executing per minute
+      - No duplicate execution (exactly-once semantics)
+      - Survive node failures without losing scheduled tasks
+      - Horizontal scaling of execution capacity
+
+      ## Topics to Cover
+      - Distributed scheduling without single point of failure
+      - Exactly-once execution guarantees
+      - Time-based partitioning and polling strategies
+      - Worker pool management and task routing
+    constraints: |
+      - 1M active scheduled tasks
+      - 10K task executions per minute at peak
+      - Timing accuracy: within 1 second of scheduled time
+      - Task payload: up to 10KB
+      - Execution timeout: configurable, default 5 minutes
+      - Retention: 30 days of execution history
+    evaluation_rubric:
+      scheduling_design: 25
+      exactly_once: 25
+      scalability: 20
+      fault_tolerance: 15
+      api_design: 15
+    reference_approach: |
+      - Storage: Tasks in DB with (id, schedule, next_run_at, status, payload, retry_policy)
+      - Polling: Workers poll for tasks WHERE next_run_at <= now() AND status = PENDING; claim via CAS
+      - Exactly-once: Distributed lock per task (Redis SETNX with TTL); release on completion or timeout
+      - Recurring: After execution, compute next_run_at from cron expression; update record
+      - Partitioning: Shard tasks by next_run_at time bucket; assign buckets to scheduler nodes
+      - Failure handling: Heartbeat from worker; if missed, mark task as failed; apply retry policy
+      - Dependencies: DAG of task IDs; parent marks children as READY on completion
+      - Scaling: Add worker nodes; rebalance time-bucket assignments via consistent hashing
+      - API: POST /tasks {schedule, payload, retry}; DELETE /tasks/{id}; GET /tasks/{id}/history

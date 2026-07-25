@@ -1,0 +1,64 @@
+topic: "DSA/Sorting"
+cards:
+  - front: "Why is merge sort preferred over quicksort for linked lists and external sorting?"
+    back: "Merge sort is stable and guarantees O(n log n) worst-case. For linked lists, merge is O(1) extra space since nodes are re-linked without copying. For external sorting (data exceeding RAM), merge sort naturally splits data into sorted runs on disk and merges them sequentially, minimizing random I/O. Quicksort's random-access partitioning is impractical when data doesn't fit in memory."
+    difficulty: MEDIUM
+    tags: [merge-sort, external-sorting, stability]
+
+  - front: "What pivot selection strategies exist for quicksort, and how do they affect worst-case performance?"
+    back: "Common strategies: (1) First/last element — O(n²) on sorted input. (2) Random pivot — expected O(n log n), worst-case still O(n²) but extremely unlikely. (3) Median-of-three (first, middle, last) — avoids worst-case on sorted/reverse-sorted input. (4) Introselect/median-of-medians — guarantees O(n log n) but high constant factor. Java's dual-pivot quicksort uses two pivots with insertion sort for small subarrays, achieving excellent cache performance."
+    code_snippet: |
+      // Median-of-three pivot selection
+      int mid = low + (high - low) / 2;
+      if (arr[mid] < arr[low]) swap(arr, low, mid);
+      if (arr[high] < arr[low]) swap(arr, low, high);
+      if (arr[high] < arr[mid]) swap(arr, mid, high);
+      int pivot = arr[mid]; // median is now at mid
+    difficulty: MEDIUM
+    tags: [quicksort, pivot-selection, time-complexity]
+
+  - front: "What sorting algorithm does Java's Arrays.sort() use and why?"
+    back: "For primitives, Arrays.sort() uses dual-pivot quicksort (Yaroslavskiy's algorithm) — not stable but fast with excellent cache locality. For objects, it uses TimSort (a hybrid merge sort + insertion sort) which is stable, preserving equal-element ordering required by the Comparable/Comparator contract. TimSort exploits existing runs (partially sorted sequences) in real-world data, achieving O(n) best-case."
+    difficulty: EASY
+    tags: [java-internals, timsort, arrays-sort]
+
+  - front: "Explain counting sort and when it outperforms comparison-based sorts."
+    back: "Counting sort counts occurrences of each value, then computes prefix sums to place elements in output. Runs in O(n + k) time where k is the value range. Outperforms comparison-based O(n log n) sorts when k = O(n). Ideal for: sorting integers in a known small range, character frequency problems, and as a subroutine of radix sort. Limitation: impractical when k >> n (sparse value ranges waste memory)."
+    code_snippet: |
+      int[] count = new int[k + 1];
+      for (int x : arr) count[x]++;
+      // prefix sum for stable placement
+      for (int i = 1; i <= k; i++) count[i] += count[i - 1];
+      int[] output = new int[arr.length];
+      for (int i = arr.length - 1; i >= 0; i--) {
+          output[--count[arr[i]]] = arr[i];
+      }
+    difficulty: MEDIUM
+    tags: [counting-sort, non-comparison, linear-time]
+
+  - front: "What does sorting stability mean and when does it matter in practice?"
+    back: "A stable sort preserves the relative order of elements with equal keys. It matters when: (1) sorting objects by one field while preserving prior sort order on another field (multi-key sorting). (2) Database result ordering where ties must remain in insertion order. (3) Contractual correctness — Java's Comparator contract expects stable sorting for objects. Stable sorts: merge sort, TimSort, counting sort, insertion sort. Unstable: quicksort, heapsort, selection sort."
+    difficulty: EASY
+    tags: [stability, sorting-properties, java-contracts]
+
+  - front: "How does heapsort work and what are its trade-offs compared to merge sort and quicksort?"
+    back: "Heapsort builds a max-heap in O(n), then repeatedly extracts the maximum and sifts down. Guarantees O(n log n) worst-case with O(1) auxiliary space — the only comparison sort with both optimal time and constant space. Trade-offs: poor cache locality (jumps across array during sift), unstable, and roughly 2-3x slower than quicksort in practice. Used when guaranteed worst-case matters and extra memory is unavailable."
+    code_snippet: |
+      // Heapify subtree rooted at index i
+      void siftDown(int[] arr, int i, int n) {
+          int largest = i;
+          int left = 2 * i + 1, right = 2 * i + 2;
+          if (left < n && arr[left] > arr[largest]) largest = left;
+          if (right < n && arr[right] > arr[largest]) largest = right;
+          if (largest != i) {
+              swap(arr, i, largest);
+              siftDown(arr, largest, n);
+          }
+      }
+    difficulty: MEDIUM
+    tags: [heapsort, heap, space-complexity]
+
+  - front: "How does radix sort achieve linear time, and what is the relationship between its digit width and performance?"
+    back: "Radix sort processes digits from least-significant to most-significant (LSD) or vice versa (MSD), using a stable sub-sort (counting sort) per digit. For n integers with d digits in base b, time is O(d(n + b)). Choosing b = n gives O(d * n); for w-bit integers with d = w/log(n), total is O(n * w/log(n)) — sublinear in n*w. Trade-off: larger base reduces passes but increases counting array size. Optimal for fixed-width keys (IP addresses, strings of uniform length)."
+    difficulty: HARD
+    tags: [radix-sort, non-comparison, complexity-analysis]

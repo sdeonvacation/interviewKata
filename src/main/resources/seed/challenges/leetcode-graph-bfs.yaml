@@ -1,0 +1,173 @@
+topic: "DSA/Graphs"
+challenges:
+  - title: "Word Ladder"
+    difficulty: HARD
+    type: DSA
+    time_limit_seconds: 900
+    problem_statement: |
+      You are given two words, beginWord and endWord, along with a dictionary of valid words called wordList. Your goal is to find the length of the shortest transformation sequence from beginWord to endWord, following these rules:
+
+      - Each step in the sequence transforms exactly one letter of the current word.
+      - Every intermediate word in the sequence must exist in the wordList.
+      - The beginWord does not need to be in the wordList.
+
+      Return the number of words in the shortest transformation sequence (including both beginWord and endWord). If no such sequence exists, return 0.
+
+      **Constraints:**
+      - 1 <= beginWord.length <= 10
+      - endWord.length == beginWord.length
+      - 1 <= wordList.length <= 5000
+      - wordList[i].length == beginWord.length
+      - beginWord, endWord, and wordList[i] consist of lowercase English letters
+      - beginWord != endWord
+      - All words in wordList are unique
+    starter_code: |
+      public class Solution {
+          public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "beginWord = \"hit\", endWord = \"cog\", wordList = [\"hot\",\"dot\",\"dog\",\"lot\",\"log\",\"cog\"]"
+        expected: "5"
+        description: "Shortest path: hit -> hot -> dot -> dog -> cog"
+      - input: "beginWord = \"hit\", endWord = \"cog\", wordList = [\"hot\",\"dot\",\"dog\",\"lot\",\"log\"]"
+        expected: "0"
+        description: "endWord not in wordList - no transformation possible"
+      - input: "beginWord = \"a\", endWord = \"c\", wordList = [\"a\",\"b\",\"c\"]"
+        expected: "2"
+        description: "Single character words - direct transformation a -> c"
+      - input: "beginWord = \"hot\", endWord = \"dog\", wordList = [\"hot\",\"dog\",\"dot\"]"
+        expected: "3"
+        description: "Path: hot -> dot -> dog"
+    hints:
+      - "Model this as a graph problem where each word is a node, and an edge exists between two words that differ by exactly one letter. You need to find the shortest path from beginWord to endWord."
+      - "Use BFS (Breadth-First Search) starting from beginWord. BFS guarantees the shortest path in an unweighted graph. At each level, try changing every character position to all 26 letters."
+      - "Optimize neighbor finding: instead of comparing every pair of words (O(n^2)), for each word generate all possible one-letter variations and check if they exist in a HashSet built from wordList."
+
+  - title: "Open the Lock"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      You have a combination lock with 4 circular wheels, each displaying a digit from 0 to 9. The wheels can rotate freely: turning '9' forward gives '0', and turning '0' backward gives '9'. Each move consists of rotating exactly one wheel by one slot.
+
+      The lock starts at the combination "0000". You are given a list of deadend combinations - if the lock lands on any of these, the wheels jam and cannot be turned further.
+
+      Given the target combination, return the minimum number of moves required to reach it from "0000". If it is impossible to reach the target (due to deadends blocking all paths), return -1.
+
+      **Constraints:**
+      - 1 <= deadends.length <= 500
+      - deadends[i].length == 4
+      - target.length == 4
+      - target will not be in deadends
+      - target and deadends[i] consist of digits only
+    starter_code: |
+      public class Solution {
+          public int openLock(String[] deadends, String target) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "deadends = [\"0201\",\"0101\",\"0102\",\"1212\",\"2002\"], target = \"0202\""
+        expected: "6"
+        description: "Navigate around deadends: 0000->1000->1100->1200->1201->1202->0202"
+      - input: "deadends = [\"8888\"], target = \"0009\""
+        expected: "1"
+        description: "Single move from 0000 to 0009 by rotating last wheel"
+      - input: "deadends = [\"8887\",\"8889\",\"8878\",\"8898\",\"8788\",\"8988\",\"7888\",\"9888\"], target = \"8888\""
+        expected: "-1"
+        description: "All neighbors of target are deadends - impossible to reach"
+      - input: "deadends = [\"0000\"], target = \"8888\""
+        expected: "-1"
+        description: "Starting position is a deadend - cannot make any move"
+    hints:
+      - "Think of each 4-digit combination as a node in a graph. Two nodes are connected if they differ by exactly one digit rotated by one position (up or down)."
+      - "Use BFS from \"0000\" to find the shortest path to target. Each state has exactly 8 neighbors (4 wheels x 2 directions). Skip any state that is a deadend or already visited."
+      - "Store deadends in a HashSet for O(1) lookup. Also use the same set (or a separate visited set) to avoid revisiting states. Check if \"0000\" itself is a deadend as an edge case."
+
+  - title: "Pacific Atlantic Water Flow"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      You are given an m x n rectangular island where each cell contains a non-negative integer representing the elevation at that point. Rain water can flow from a cell to any adjacent cell (up, down, left, right) whose elevation is less than or equal to the current cell's elevation.
+
+      The Pacific Ocean borders the island's left and top edges, while the Atlantic Ocean borders the right and bottom edges. Water reaching either border flows into the corresponding ocean.
+
+      Find all cells from which rain water can reach both the Pacific and Atlantic oceans. Return the result as a list of coordinate pairs [row, col].
+
+      **Constraints:**
+      - m == heights.length
+      - n == heights[r].length
+      - 1 <= m, n <= 200
+      - 0 <= heights[r][c] <= 100000
+    starter_code: |
+      public class Solution {
+          public List<List<Integer>> pacificAtlantic(int[][] heights) {
+              // Your solution here
+              return new ArrayList<>();
+          }
+      }
+    test_cases:
+      - input: "heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]"
+        expected: "[[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]"
+        description: "5x5 island - cells that can flow to both oceans"
+      - input: "heights = [[1]]"
+        expected: "[[0,0]]"
+        description: "Single cell touches both oceans"
+      - input: "heights = [[1,1],[1,1]]"
+        expected: "[[0,0],[0,1],[1,0],[1,1]]"
+        description: "Flat 2x2 grid - all cells reach both oceans"
+      - input: "heights = [[10,10,10],[10,1,10],[10,10,10]]"
+        expected: "[[0,0],[0,1],[0,2],[1,0],[1,2],[2,0],[2,1],[2,2]]"
+        description: "Center is a valley - border cells flow to both, center only reaches both because border cells are equal height"
+    hints:
+      - "Instead of checking whether water from each cell can reach both oceans (expensive), think in reverse: which cells can be reached FROM each ocean by flowing uphill?"
+      - "Use BFS or DFS starting from all Pacific border cells and mark reachable cells. Do the same for Atlantic border cells. The answer is the intersection of both sets."
+      - "Start multi-source BFS from all cells on the Pacific border (top row + left column) flowing to cells with equal or greater height. Repeat for Atlantic border (bottom row + right column). Return cells marked by both."
+
+  - title: "Shortest Path in Binary Matrix"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an n x n binary matrix where 0 represents an open cell and 1 represents a blocked cell, find the length of the shortest clear path from the top-left corner (0,0) to the bottom-right corner (n-1, n-1).
+
+      A clear path is one that:
+      - Only visits cells with value 0.
+      - Moves in any of the 8 directions (horizontal, vertical, and diagonal).
+      - The path length is the number of cells visited (including start and end).
+
+      Return the length of the shortest clear path, or -1 if no such path exists.
+
+      **Constraints:**
+      - n == grid.length == grid[i].length
+      - 1 <= n <= 100
+      - grid[i][j] is 0 or 1
+    starter_code: |
+      public class Solution {
+          public int shortestPathBinaryMatrix(int[][] grid) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "grid = [[0,1],[1,0]]"
+        expected: "2"
+        description: "Diagonal path from (0,0) to (1,1)"
+      - input: "grid = [[0,0,0],[1,1,0],[1,1,0]]"
+        expected: "4"
+        description: "Path: (0,0)->(0,1)->(0,2)->(1,2)->(2,2) but shorter is (0,0)->(0,1)->(1,2)->(2,2) = 4"
+      - input: "grid = [[1,0,0],[1,1,0],[1,1,0]]"
+        expected: "-1"
+        description: "Starting cell is blocked - no path possible"
+      - input: "grid = [[0]]"
+        expected: "1"
+        description: "Single open cell - already at destination"
+    hints:
+      - "BFS is ideal for finding shortest paths in unweighted graphs. Treat each open cell as a node with edges to all 8 adjacent open cells."
+      - "Start BFS from (0,0) if it is open. Use a queue storing (row, col, distance). For each cell, explore all 8 neighbors. The first time you reach (n-1, n-1) gives the shortest path."
+      - "Mark cells as visited immediately when adding to the queue (not when processing) to avoid adding duplicates. Check edge cases: start or end cell is blocked."

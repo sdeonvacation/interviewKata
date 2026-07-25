@@ -1,0 +1,236 @@
+topic: "DSA/Arrays"
+challenges:
+  - title: "Palindrome Number"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given an integer x, determine whether it is a palindrome. An integer is a palindrome
+      when it reads the same forward and backward.
+
+      Solve this without converting the integer to a string.
+
+      Constraints:
+      - -2^31 <= x <= 2^31 - 1
+
+      Note: Negative numbers are never palindromes (e.g., -121 reads as 121- backward).
+    starter_code: |
+      public class Solution {
+          public boolean isPalindrome(int x) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "x = 121"
+        expected: "true"
+        description: "121 reads as 121 from left to right and right to left"
+      - input: "x = -121"
+        expected: "false"
+        description: "Negative numbers are not palindromes"
+      - input: "x = 10"
+        expected: "false"
+        description: "Reads 01 from right to left, not a palindrome"
+      - input: "x = 0"
+        expected: "true"
+        description: "Single digit zero is a palindrome"
+    hints:
+      - "Negative numbers and numbers ending in 0 (except 0 itself) cannot be palindromes."
+      - "Try reversing only half of the number. How do you know you've reached the halfway point?"
+      - "Repeatedly extract the last digit and build the reversed half. Stop when the reversed half is greater than or equal to the remaining number."
+
+  - title: "Plus One"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      You are given a large integer represented as an array of digits, where each element
+      digits[i] is the ith digit of the number. The digits are ordered from most significant
+      to least significant (left to right). The number does not contain any leading zeroes.
+
+      Increment the large integer by one and return the resulting array of digits.
+
+      Constraints:
+      - 1 <= digits.length <= 100
+      - 0 <= digits[i] <= 9
+      - The array does not represent a number with leading zeros
+    starter_code: |
+      public class Solution {
+          public int[] plusOne(int[] digits) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "digits = [1,2,3]"
+        expected: "[1,2,4]"
+        description: "123 + 1 = 124, no carry needed"
+      - input: "digits = [4,3,2,1]"
+        expected: "[4,3,2,2]"
+        description: "4321 + 1 = 4322, no carry needed"
+      - input: "digits = [9,9,9]"
+        expected: "[1,0,0,0]"
+        description: "999 + 1 = 1000, carry propagates through all digits"
+      - input: "digits = [1,9,9]"
+        expected: "[2,0,0]"
+        description: "199 + 1 = 200, carry propagates partially"
+    hints:
+      - "Start from the rightmost digit and work leftward. When does a carry occur?"
+      - "If a digit is less than 9, increment it and return immediately. If it's 9, set it to 0 and continue left."
+      - "If you exit the loop without returning, all digits were 9. Create a new array of size n+1 with 1 at index 0."
+
+  - title: "Factorial Trailing Zeroes"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an integer n, return the number of trailing zeroes in n! (n factorial).
+
+      A trailing zero is produced by a factor of 10, which is the product of 2 and 5.
+      Since there are always more factors of 2 than 5 in a factorial, the number of
+      trailing zeroes is determined by the count of factor 5.
+
+      Your solution should run in O(log n) time complexity.
+
+      Constraints:
+      - 0 <= n <= 10^4
+    starter_code: |
+      public class Solution {
+          public int trailingZeroes(int n) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "n = 3"
+        expected: "0"
+        description: "3! = 6, no trailing zeroes"
+      - input: "n = 5"
+        expected: "1"
+        description: "5! = 120, one trailing zero"
+      - input: "n = 25"
+        expected: "6"
+        description: "25 contributes two factors of 5 (floor(25/5)=5, floor(25/25)=1, total=6)"
+      - input: "n = 100"
+        expected: "24"
+        description: "floor(100/5)=20, floor(100/25)=4, total=24"
+    hints:
+      - "Trailing zeroes come from pairs of factors 2 and 5. Which factor is less abundant in n!?"
+      - "Count multiples of 5, then multiples of 25 (which contribute an extra 5), then 125, and so on."
+      - "Repeatedly divide n by 5 and sum the quotients: n/5 + n/25 + n/125 + ... until the quotient is 0."
+
+  - title: "Integer Square Root"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given a non-negative integer x, compute and return the square root of x, rounded
+      down to the nearest integer (the floor value).
+
+      You must not use any built-in exponent function or operator (e.g., Math.sqrt or
+      the ** operator).
+
+      Constraints:
+      - 0 <= x <= 2^31 - 1
+    starter_code: |
+      public class Solution {
+          public int mySqrt(int x) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "x = 4"
+        expected: "2"
+        description: "Square root of 4 is exactly 2"
+      - input: "x = 8"
+        expected: "2"
+        description: "Square root of 8 is 2.828..., floor is 2"
+      - input: "x = 0"
+        expected: "0"
+        description: "Square root of 0 is 0"
+      - input: "x = 2147395600"
+        expected: "46340"
+        description: "Large input near integer max, 46340^2 = 2147395600"
+    hints:
+      - "Binary search works well here. What range should you search within?"
+      - "Search between 0 and x. For each mid value, check if mid*mid <= x. Be careful of integer overflow when computing mid*mid."
+      - "Use long type for the multiplication to avoid overflow, or compare mid <= x/mid instead."
+
+  - title: "Power Function"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Implement a function that calculates x raised to the power n (i.e., x^n).
+
+      Handle the following cases:
+      - n can be negative (x^(-n) = 1 / x^n)
+      - n can be zero (any non-zero number to power 0 is 1)
+      - n can be Integer.MIN_VALUE (-2^31)
+
+      Constraints:
+      - -100.0 < x < 100.0
+      - -2^31 <= n <= 2^31 - 1
+      - n is an integer
+      - Either x is not zero or n > 0
+      - -10^4 <= x^n <= 10^4
+    starter_code: |
+      public class Solution {
+          public double myPow(double x, int n) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "x = 2.00000, n = 10"
+        expected: "1024.00000"
+        description: "2^10 = 1024"
+      - input: "x = 2.10000, n = 3"
+        expected: "9.26100"
+        description: "2.1^3 = 9.261"
+      - input: "x = 2.00000, n = -2"
+        expected: "0.25000"
+        description: "2^(-2) = 1/4 = 0.25"
+      - input: "x = 1.00000, n = -2147483648"
+        expected: "1.00000"
+        description: "1 raised to any power is 1, handles Integer.MIN_VALUE"
+    hints:
+      - "Naive approach of multiplying x n times is O(n). Can you do it in O(log n)?"
+      - "Use fast exponentiation: x^n = (x^2)^(n/2) if n is even, or x * x^(n-1) if n is odd."
+      - "Convert n to long to handle Integer.MIN_VALUE (negating it overflows int). If n is negative, compute 1/x raised to the absolute value of n."
+
+  - title: "Max Points on a Line"
+    difficulty: HARD
+    type: DSA
+    time_limit_seconds: 900
+    problem_statement: |
+      Given an array of points where points[i] = [xi, yi] represents a point on the X-Y
+      plane, return the maximum number of points that lie on the same straight line.
+
+      Two points always form a line, so if there are fewer than 3 points, return the
+      total number of points.
+
+      Constraints:
+      - 1 <= points.length <= 300
+      - points[i].length == 2
+      - -10^4 <= xi, yi <= 10^4
+      - All points are unique
+    starter_code: |
+      public class Solution {
+          public int maxPoints(int[][] points) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "points = [[1,1],[2,2],[3,3]]"
+        expected: "3"
+        description: "All three points lie on y = x"
+      - input: "points = [[1,1],[3,2],[5,3],[4,1],[2,3],[1,4]]"
+        expected: "4"
+        description: "Points (1,1),(3,2),(5,3) and one more are collinear"
+      - input: "points = [[0,0]]"
+        expected: "1"
+        description: "Single point, answer is 1"
+      - input: "points = [[0,0],[1,0],[0,1]]"
+        expected: "2"
+        description: "No three points are collinear, max is 2"
+    hints:
+      - "For each point, compute the slope it forms with every other point. Points with the same slope relative to a fixed point are collinear."
+      - "Represent slope as a reduced fraction (dy/gcd, dx/gcd) to avoid floating point issues. Handle vertical lines (dx=0) and horizontal lines (dy=0) as special cases."
+      - "For each anchor point, use a HashMap to count how many other points share each slope. The answer for that anchor is the maximum count + 1 (for the anchor itself). Take the global maximum."

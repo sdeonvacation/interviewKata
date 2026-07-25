@@ -1,0 +1,66 @@
+topic: "Java Core/Exception Handling"
+cards:
+  - front: "What is the difference between checked and unchecked exceptions in Java?"
+    back: |
+      Checked exceptions extend Exception (not RuntimeException) and must be declared in throws clause or caught at compile time. Unchecked exceptions extend RuntimeException and have no compile-time enforcement. Checked exceptions represent recoverable conditions (IOException, SQLException); unchecked represent programming errors (NullPointerException, IllegalArgumentException).
+    difficulty: EASY
+    tags: [checked-exceptions, unchecked-exceptions, exception-hierarchy]
+
+  - front: "Explain the exception class hierarchy starting from Throwable."
+    back: |
+      Throwable is the root with two direct subclasses: Error and Exception. Error represents unrecoverable JVM problems (OutOfMemoryError, StackOverflowError) and should not be caught. Exception splits into checked exceptions (IOException, SQLException) and RuntimeException which is the parent of all unchecked exceptions. Only Throwable and its subclasses can be thrown or caught.
+    difficulty: EASY
+    tags: [exception-hierarchy, throwable, error-vs-exception]
+
+  - front: "How does try-with-resources work and what interface must a resource implement?"
+    back: |
+      Resources declared in the try parentheses must implement AutoCloseable (or its parent Closeable). They are closed automatically in reverse declaration order after the try block completes, whether normally or via exception. This eliminates manual finally-block cleanup and guarantees close is called even if the try body throws.
+    code_snippet: |
+      try (var conn = dataSource.getConnection();
+           var stmt = conn.prepareStatement(sql)) {
+          return stmt.executeQuery();
+      } // stmt closed first, then conn
+    difficulty: MEDIUM
+    tags: [try-with-resources, autocloseable, resource-management]
+
+  - front: "What are suppressed exceptions and when do they occur?"
+    back: |
+      Suppressed exceptions occur when a secondary exception is thrown during resource cleanup in try-with-resources while a primary exception is already propagating. The close() exception is attached to the primary via addSuppressed() rather than replacing it. You retrieve them with getSuppressed(). This preserves the original failure context which would be lost in traditional finally blocks where the close exception overwrites the original.
+    code_snippet: |
+      try {
+          Throwable primary = ex;
+          for (Throwable suppressed : primary.getSuppressed()) {
+              log.warn("Suppressed during close", suppressed);
+          }
+      }
+    difficulty: HARD
+    tags: [suppressed-exceptions, try-with-resources, exception-chaining]
+
+  - front: "What happens if both the try block and finally block throw exceptions?"
+    back: |
+      The exception from the finally block propagates and the try block exception is silently lost. This is a key design flaw in pre-Java-7 resource handling. The caller only sees the finally exception with no reference to the original cause. Try-with-resources solves this via the suppressed exception mechanism, preserving both exceptions.
+    code_snippet: |
+      try {
+          throw new IOException("original"); // LOST
+      } finally {
+          throw new IllegalStateException("from finally"); // this propagates
+      }
+    difficulty: MEDIUM
+    tags: [finally-block, exception-loss, control-flow]
+
+  - front: "What are best practices for designing custom exception classes?"
+    back: |
+      Extend Exception for recoverable conditions clients should handle, RuntimeException for programming errors. Provide constructors matching Throwable conventions: no-arg, message, message+cause, and cause-only. Make exceptions immutable and include contextual fields (error codes, failed entity IDs) as final fields. Prefer specific exception types over generic ones to enable precise catch blocks. Always chain the original cause via initCause or constructor parameter.
+    code_snippet: |
+      public class OrderNotFoundException extends RuntimeException {
+          private final String orderId;
+
+          public OrderNotFoundException(String orderId, Throwable cause) {
+              super("Order not found: " + orderId, cause);
+              this.orderId = orderId;
+          }
+
+          public String getOrderId() { return orderId; }
+      }
+    difficulty: MEDIUM
+    tags: [custom-exceptions, exception-design, best-practices]

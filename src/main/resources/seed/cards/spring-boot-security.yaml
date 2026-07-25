@@ -1,0 +1,109 @@
+topic: "Spring Boot/Security"
+cards:
+  - front: "How do you configure a SecurityFilterChain in Spring Boot 3.x and why was WebSecurityConfigurerAdapter removed?"
+    back: "Spring Boot 3.x uses component-based configuration where you define a SecurityFilterChain @Bean directly. WebSecurityConfigurerAdapter was removed because it forced single-inheritance and made multiple security configurations awkward. The new approach uses HttpSecurity as a builder parameter, supports multiple SecurityFilterChain beans with @Order, and aligns with Spring's general move toward functional bean definitions."
+    code_snippet: |
+      @Configuration
+      @EnableWebSecurity
+      public class SecurityConfig {
+          @Bean
+          public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+              return http
+                  .authorizeHttpRequests(auth -> auth
+                      .requestMatchers("/api/public/**").permitAll()
+                      .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                      .anyRequest().authenticated())
+                  .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+                  .build();
+          }
+      }
+    difficulty: EASY
+    tags: [security-filter-chain, configuration, spring-boot-3]
+
+  - front: "Explain the difference between authentication and authorization in Spring Security and where each is handled in the filter chain."
+    back: "Authentication verifies identity (who are you?) and is handled by filters early in the chain like UsernamePasswordAuthenticationFilter or BearerTokenAuthenticationFilter. Authorization verifies permissions (what can you do?) and is handled by AuthorizationFilter at the end of the chain. Authentication produces an Authentication object stored in SecurityContextHolder; authorization reads its GrantedAuthority collection to make access decisions."
+    difficulty: EASY
+    tags: [authentication, authorization, filter-chain]
+
+  - front: "Describe the JWT token validation flow in a Spring Boot OAuth2 resource server."
+    back: "When a request arrives with a Bearer token: 1) BearerTokenAuthenticationFilter extracts the token from the Authorization header. 2) JwtAuthenticationProvider delegates to JwtDecoder (typically NimbusJwtDecoder). 3) JwtDecoder fetches the JWK Set from the authorization server's JWKS endpoint (cached), verifies the signature, checks expiration/issuer/audience claims. 4) A JwtAuthenticationConverter maps claims to GrantedAuthority objects. 5) The resulting JwtAuthenticationToken is stored in SecurityContext."
+    code_snippet: |
+      @Bean
+      public JwtDecoder jwtDecoder() {
+          NimbusJwtDecoder decoder = NimbusJwtDecoder
+              .withJwkSetUri("https://auth-server/.well-known/jwks.json")
+              .build();
+          decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
+              JwtValidators.createDefaultWithIssuer("https://auth-server"),
+              new JwtClaimValidator<>("aud", aud -> aud.contains("my-api"))
+          ));
+          return decoder;
+      }
+    difficulty: MEDIUM
+    tags: [jwt, oauth2-resource-server, token-validation]
+
+  - front: "When should you disable CSRF protection in Spring Security and why is it safe to do so for REST APIs?"
+    back: "Disable CSRF for stateless REST APIs that use token-based auth (JWT/OAuth2). CSRF attacks exploit browser-stored session cookies to forge requests. If authentication relies on an Authorization header (not cookies), the browser never auto-attaches credentials to cross-origin requests, making CSRF impossible. Keep CSRF enabled for traditional server-rendered apps with session cookies or login forms."
+    code_snippet: |
+      http.csrf(csrf -> csrf.disable()) // stateless JWT API
+
+      // Or selectively disable for API paths only:
+      http.csrf(csrf -> csrf
+          .ignoringRequestMatchers("/api/**")
+      )
+    difficulty: MEDIUM
+    tags: [csrf, stateless, rest-api]
+
+  - front: "How does @PreAuthorize work and what is required to enable it? Give an example using SpEL."
+    back: "Method-level security with @PreAuthorize evaluates a SpEL expression before method execution. Requires @EnableMethodSecurity on a configuration class (replaces @EnableGlobalMethodSecurity). Expressions access the Authentication object, method parameters, and custom beans. Fails with AccessDeniedException (403) if expression returns false."
+    code_snippet: |
+      @EnableMethodSecurity
+      @Configuration
+      public class MethodSecurityConfig {}
+
+      @Service
+      public class DocumentService {
+          @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
+          public Document getDocument(Long userId, Long docId) { ... }
+
+          @PreAuthorize("@accessChecker.canEdit(#doc, authentication)")
+          public void updateDocument(Document doc) { ... }
+      }
+    difficulty: MEDIUM
+    tags: [method-security, preauthorize, spel]
+
+  - front: "Why does Spring Security use BCryptPasswordEncoder by default and how does it prevent rainbow table attacks?"
+    back: "BCrypt is an adaptive hashing function that incorporates a random salt (stored in the hash output) and a configurable cost factor. Each hash includes a unique 16-byte salt, so identical passwords produce different hashes, defeating rainbow tables. The cost factor (default 10, meaning 2^10 rounds) makes brute-force expensive. DelegatingPasswordEncoder wraps BCrypt and supports migration from older schemes by prefixing hashes with {bcrypt}, {scrypt}, etc."
+    code_snippet: |
+      @Bean
+      public PasswordEncoder passwordEncoder() {
+          return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+          // Encodes as: {bcrypt}$2a$10$salt...hash
+      }
+
+      // Or explicit BCrypt with strength 12:
+      @Bean
+      public PasswordEncoder passwordEncoder() {
+          return new BCryptPasswordEncoder(12);
+      }
+    difficulty: MEDIUM
+    tags: [bcrypt, password-encoder, hashing]
+
+  - front: "How would you configure a custom OAuth2 resource server that validates tokens from multiple issuers with different JWKS endpoints?"
+    back: "Use a custom JwtDecoder that delegates to issuer-specific decoders based on the token's 'iss' claim. Parse the JWT header without verifying to extract the issuer, then route to the matching NimbusJwtDecoder. Each decoder caches its own JWK Set. Alternatively, use Spring's JwtIssuerAuthenticationManagerResolver which maps issuer URIs to AuthenticationManagers lazily, each with its own JwtDecoder and validator."
+    code_snippet: |
+      @Bean
+      public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+          JwtIssuerAuthenticationManagerResolver resolver =
+              JwtIssuerAuthenticationManagerResolver.fromTrustedIssuers(
+                  "https://auth-server-a.com",
+                  "https://auth-server-b.com"
+              );
+          return http
+              .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+              .oauth2ResourceServer(oauth2 -> oauth2
+                  .authenticationManagerResolver(resolver))
+              .build();
+      }
+    difficulty: HARD
+    tags: [multi-tenant, oauth2, jwt-issuer-resolver]

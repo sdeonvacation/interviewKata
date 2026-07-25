@@ -1,0 +1,222 @@
+topic: "DSA/Arrays"
+challenges:
+  - title: "Kth Largest Element in an Array"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an integer array nums and an integer k, return the kth largest element
+      in the array.
+
+      Note that you need to find the kth largest element in sorted order,
+      not the kth distinct element. For example, in [3,2,3,1,2,4,5,5,6] the
+      1st largest is 6, 2nd largest is 5, 3rd largest is 5, and so on.
+
+      Constraints:
+      - 1 <= k <= nums.length <= 10^5
+      - -10^4 <= nums[i] <= 10^4
+    starter_code: |
+      public class Solution {
+          public int findKthLargest(int[] nums, int k) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "nums = [3,2,1,5,6,4], k = 2"
+        expected: "5"
+        description: "Second largest in unsorted array"
+      - input: "nums = [3,2,3,1,2,4,5,5,6], k = 4"
+        expected: "4"
+        description: "Fourth largest with duplicate elements"
+      - input: "nums = [1], k = 1"
+        expected: "1"
+        description: "Single element array"
+      - input: "nums = [7,7,7,7], k = 2"
+        expected: "7"
+        description: "All elements identical"
+    hints:
+      - "Consider using a min-heap of size k. What would the top of such a heap represent?"
+      - "Maintain a min-heap of size k. For each element, add it to the heap. If heap size exceeds k, remove the smallest. The heap top is your answer."
+      - "Alternative approach: use QuickSelect (partition-based) for average O(n) time complexity."
+
+  - title: "IPO"
+    difficulty: HARD
+    type: DSA
+    time_limit_seconds: 900
+    problem_statement: |
+      You are given n projects. Each project i has a pure profit profits[i] and a
+      minimum capital requirement capital[i] needed to start it. You initially have
+      w capital. When you complete a project, its profit is added to your total capital.
+
+      You can complete at most k projects. Choose projects to maximize your final
+      accumulated capital.
+
+      Return the final maximized capital after completing at most k projects.
+
+      Constraints:
+      - 1 <= k <= 10^5
+      - 0 <= w <= 10^9
+      - n == profits.length == capital.length
+      - 1 <= n <= 10^5
+      - 0 <= profits[i] <= 10^4
+      - 0 <= capital[i] <= 10^9
+    starter_code: |
+      public class Solution {
+          public int findMaximizedCapital(int k, int w, int[] profits, int[] capital) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "k = 2, w = 0, profits = [1,2,3], capital = [0,1,1]"
+        expected: "4"
+        description: "Start with 0 capital, do project 0 (profit 1), then project 2 (profit 3)"
+      - input: "k = 3, w = 0, profits = [1,2,3], capital = [0,1,2]"
+        expected: "6"
+        description: "Can complete all projects sequentially"
+      - input: "k = 1, w = 0, profits = [1,2,3], capital = [1,1,2]"
+        expected: "0"
+        description: "No project affordable with initial capital"
+      - input: "k = 2, w = 1, profits = [4,1,3], capital = [0,0,1]"
+        expected: "8"
+        description: "Pick highest profit among affordable projects each round"
+    hints:
+      - "At each step, you want the most profitable project among those you can currently afford. What data structure efficiently gives you the maximum?"
+      - "Use a max-heap for profits of affordable projects. Sort projects by capital requirement. As your capital grows, unlock more projects into the heap."
+      - "Greedy approach: sort by capital, use a pointer to track unlocked projects. Each round, push all newly affordable projects into a max-heap, then pop the top."
+
+  - title: "Find K Pairs with Smallest Sums"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      You are given two integer arrays nums1 and nums2, both sorted in non-decreasing
+      order, and an integer k.
+
+      Find k pairs (u, v) where u comes from nums1 and v comes from nums2 such that
+      the sum u + v is among the k smallest possible pair sums.
+
+      Return the result as a list of lists, where each inner list is [u, v].
+      The result may be returned in any order.
+
+      Constraints:
+      - 1 <= nums1.length, nums2.length <= 10^5
+      - -10^9 <= nums1[i], nums2[i] <= 10^9
+      - nums1 and nums2 are sorted in non-decreasing order
+      - 1 <= k <= min(10^4, nums1.length * nums2.length)
+    starter_code: |
+      public class Solution {
+          public List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "nums1 = [1,7,11], nums2 = [2,4,6], k = 3"
+        expected: "[[1,2],[1,4],[1,6]]"
+        description: "First array element pairs with first three of second array"
+      - input: "nums1 = [1,1,2], nums2 = [1,2,3], k = 2"
+        expected: "[[1,1],[1,1]]"
+        description: "Duplicate values in first array produce tied sums"
+      - input: "nums1 = [1,2], nums2 = [3], k = 3"
+        expected: "[[1,3],[2,3]]"
+        description: "k larger than total pairs returns all pairs"
+      - input: "nums1 = [1,2,4], nums2 = [1,3,5], k = 4"
+        expected: "[[1,1],[1,3],[2,1],[2,3]]"
+        description: "Mixed indices produce smallest sums"
+    hints:
+      - "The smallest sum is always nums1[0] + nums2[0]. After picking a pair (i, j), what pairs could be the next smallest?"
+      - "Use a min-heap storing (sum, i, j). Start with pairs (nums1[i], nums2[0]) for each i. When you pop (i, j), push (i, j+1) if valid."
+      - "Optimization: only seed the heap with min(k, nums1.length) initial pairs to avoid unnecessary memory usage."
+
+  - title: "Find Median from Data Stream"
+    difficulty: HARD
+    type: DSA
+    time_limit_seconds: 900
+    problem_statement: |
+      Design a data structure that supports the following two operations on a stream
+      of integers:
+
+      - addNum(int num): Adds an integer from the data stream to the data structure.
+      - findMedian(): Returns the median of all elements added so far.
+
+      The median is the middle value in an ordered list. If the list size is even,
+      the median is the average of the two middle values.
+
+      For example, for [2,3,4] the median is 3. For [2,3] the median is (2+3)/2 = 2.5.
+
+      Constraints:
+      - -10^5 <= num <= 10^5
+      - There will be at least one element before findMedian is called
+      - At most 5 * 10^4 calls total to addNum and findMedian
+    starter_code: |
+      public class Solution {
+          // Implement the MedianFinder class
+          static class MedianFinder {
+              public MedianFinder() {
+                  // Initialize your data structure here
+              }
+
+              public void addNum(int num) {
+                  // Your solution here
+              }
+
+              public double findMedian() {
+                  // Your solution here
+              }
+          }
+      }
+    test_cases:
+      - input: "addNum(1), addNum(2), findMedian()"
+        expected: "1.5"
+        description: "Even count returns average of two middle elements"
+      - input: "addNum(1), addNum(2), addNum(3), findMedian()"
+        expected: "2.0"
+        description: "Odd count returns the exact middle element"
+      - input: "addNum(6), addNum(10), addNum(2), addNum(6), findMedian()"
+        expected: "6.0"
+        description: "Unsorted insertions, even count: median of [2,6,6,10] is (6+6)/2"
+      - input: "addNum(-1), addNum(-2), addNum(-3), findMedian()"
+        expected: "-2.0"
+        description: "Negative numbers, median of [-3,-2,-1] is -2"
+    hints:
+      - "How can you efficiently track the middle element(s) as numbers arrive? Think about splitting the data into two halves."
+      - "Use two heaps: a max-heap for the lower half and a min-heap for the upper half. Balance them so their sizes differ by at most 1."
+      - "When adding a number, decide which heap it belongs to based on the current max of the lower half. Rebalance if sizes differ by more than 1."
+
+  - title: "Top K Frequent Elements"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an integer array nums and an integer k, return the k most frequently
+      occurring elements. You may return the answer in any order.
+
+      It is guaranteed that the answer is unique (no ties at the kth position).
+
+      Constraints:
+      - 1 <= nums.length <= 10^5
+      - -10^4 <= nums[i] <= 10^4
+      - k is in the range [1, number of distinct elements]
+      - The answer is guaranteed to be unique
+    starter_code: |
+      public class Solution {
+          public int[] topKFrequent(int[] nums, int k) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "nums = [1,1,1,2,2,3], k = 2"
+        expected: "[1,2]"
+        description: "Element 1 appears 3 times, element 2 appears 2 times"
+      - input: "nums = [1], k = 1"
+        expected: "[1]"
+        description: "Single element array"
+      - input: "nums = [4,4,4,3,3,2,2,1], k = 3"
+        expected: "[4,3,2]"
+        description: "Top 3 frequent from four distinct elements"
+      - input: "nums = [5,5,5,5,3,3,3,2,2,1], k = 1"
+        expected: "[5]"
+        description: "Only the single most frequent element"
+    hints:
+      - "First, count the frequency of each element using a HashMap. Then how do you efficiently find the top k?"
+      - "Use a min-heap of size k based on frequency. Iterate through the frequency map, maintaining only the k highest-frequency elements in the heap."
+      - "Alternative O(n) approach: use bucket sort where index represents frequency and each bucket holds elements with that frequency."

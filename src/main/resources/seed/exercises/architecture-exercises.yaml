@@ -1,0 +1,214 @@
+topic: "Architecture/Design Patterns"
+exercises:
+  - title: "Migrate Monolith to Microservices"
+    difficulty: HARD
+    estimated_minutes: 60
+    prompt: |
+      You have a monolithic e-commerce application handling orders, inventory, payments, user management, and notifications. The application is experiencing scaling issues and deployment bottlenecks.
+
+      Design a migration strategy to decompose this monolith into microservices.
+
+      Requirements:
+      - Identify service boundaries using Domain-Driven Design (bounded contexts)
+      - Design the communication patterns between services (sync vs async)
+      - Handle distributed transactions (e.g., order placement involves inventory, payment, notification)
+      - Plan the migration path (strangler fig pattern, incremental decomposition)
+      - Design shared data decomposition strategy
+
+      Current State:
+      - Single PostgreSQL database with 50+ tables
+      - Monolithic Spring Boot application (200K+ lines)
+      - 20 developers, 2-week release cycles
+      - Peak load: 10K orders per hour
+
+      Deliverables:
+      - Service boundary diagram
+      - Communication pattern for each service interaction
+      - Data migration strategy
+      - Migration timeline and phases
+      - Rollback strategy for each phase
+    constraints: |
+      - Zero downtime during migration
+      - No data loss or inconsistency during transition
+      - Each phase must be independently deployable and rollback-able
+      - Must support running monolith and microservices in parallel during transition
+      - Complete migration within 12 months
+      - Team can dedicate 40% capacity to migration work
+    evaluation_rubric:
+      categories:
+        - name: "Service Decomposition"
+          weight: 0.25
+          criteria: ["Bounded context identification", "Service granularity", "API contract design"]
+        - name: "Data Strategy"
+          weight: 0.25
+          criteria: ["Database per service approach", "Data synchronization", "Eventual consistency handling"]
+        - name: "Communication Patterns"
+          weight: 0.20
+          criteria: ["Sync vs async decisions", "Event-driven architecture", "Saga pattern for distributed transactions"]
+        - name: "Migration Plan"
+          weight: 0.20
+          criteria: ["Strangler fig application", "Phased approach", "Risk mitigation"]
+        - name: "Operational Readiness"
+          weight: 0.10
+          criteria: ["Observability", "Service mesh", "CI/CD pipeline changes"]
+
+  - title: "Design Event-Driven Order System"
+    difficulty: MEDIUM
+    estimated_minutes: 45
+    prompt: |
+      Design an event-driven architecture for an order processing system.
+
+      The system must handle the complete order lifecycle:
+      1. Order placed → validate inventory → reserve stock
+      2. Payment processed → confirm order → update inventory
+      3. Order fulfilled → ship → notify customer
+      4. Handle failures at any step (compensation/rollback)
+
+      Requirements:
+      - Use event sourcing for the order aggregate
+      - Implement the Saga pattern for distributed transactions
+      - Design event schemas with versioning
+      - Handle idempotency for event consumers
+      - Support event replay for debugging and recovery
+
+      Services Involved:
+      - Order Service (owns order lifecycle)
+      - Inventory Service (stock management)
+      - Payment Service (payment processing)
+      - Shipping Service (fulfillment)
+      - Notification Service (customer communications)
+
+      Deliverables:
+      - Event flow diagram for happy path and failure scenarios
+      - Event schema definitions
+      - Saga orchestration or choreography design
+      - Dead letter queue handling
+      - Event store schema
+    constraints: |
+      - Process 5000 orders per minute at peak
+      - End-to-end order processing < 30 seconds (happy path)
+      - No lost events (at-least-once delivery)
+      - Event replay must not cause duplicate side effects
+      - Support schema evolution without breaking consumers
+      - Compensating transactions must complete within 60 seconds
+    evaluation_rubric:
+      categories:
+        - name: "Event Design"
+          weight: 0.25
+          criteria: ["Event schema quality", "Versioning strategy", "Event granularity"]
+        - name: "Saga Implementation"
+          weight: 0.30
+          criteria: ["Orchestration vs choreography choice", "Compensation logic", "Failure handling"]
+        - name: "Reliability"
+          weight: 0.25
+          criteria: ["Idempotency", "Dead letter handling", "Event ordering guarantees"]
+        - name: "Operational"
+          weight: 0.20
+          criteria: ["Event replay capability", "Monitoring", "Debugging support"]
+
+  - title: "Design Plugin Architecture"
+    difficulty: MEDIUM
+    estimated_minutes: 30
+    prompt: |
+      Design a plugin architecture for a document processing application that allows third-party developers to extend functionality.
+
+      The application processes documents through a pipeline: ingest → parse → transform → validate → export.
+
+      Requirements:
+      - Plugins can hook into any pipeline stage
+      - Plugins are loaded dynamically at runtime (no application restart)
+      - Plugin isolation (a failing plugin doesn't crash the host)
+      - Plugin lifecycle management (install, enable, disable, uninstall)
+      - Plugin configuration and dependency management
+      - Plugin marketplace/registry for discovery
+
+      Plugin Capabilities:
+      - Add new document format parsers (e.g., custom XML schema)
+      - Add transformation steps (e.g., PII redaction, translation)
+      - Add validation rules (e.g., compliance checks)
+      - Add export targets (e.g., custom cloud storage)
+      - Add UI extensions (settings panels, preview renderers)
+
+      Deliverables:
+      - Plugin API/SPI design
+      - Plugin loading and isolation mechanism
+      - Extension point definitions
+      - Security model (sandboxing, permissions)
+      - Plugin communication protocol
+    constraints: |
+      - Plugin load time < 500ms
+      - Plugin failure must not affect host or other plugins
+      - Support 50+ simultaneously loaded plugins
+      - Plugin API must be backward compatible across major versions
+      - Memory overhead per plugin < 50MB
+      - Hot-reload without processing pipeline interruption
+    evaluation_rubric:
+      categories:
+        - name: "API Design"
+          weight: 0.30
+          criteria: ["Extension point clarity", "Backward compatibility", "Ease of plugin development"]
+        - name: "Isolation & Security"
+          weight: 0.25
+          criteria: ["Failure isolation", "Sandboxing approach", "Permission model"]
+        - name: "Lifecycle Management"
+          weight: 0.25
+          criteria: ["Dynamic loading", "Hot-reload", "Dependency resolution"]
+        - name: "Architecture"
+          weight: 0.20
+          criteria: ["Pipeline integration", "Event/hook system", "Plugin communication"]
+
+  - title: "Apply CQRS to Banking System"
+    difficulty: HARD
+    estimated_minutes: 45
+    prompt: |
+      Design a banking system using CQRS (Command Query Responsibility Segregation) pattern.
+
+      The system handles:
+      - Account management (open, close, freeze accounts)
+      - Transactions (deposits, withdrawals, transfers)
+      - Balance inquiries and statement generation
+      - Fraud detection and alerts
+      - Regulatory reporting
+
+      Requirements:
+      - Separate command (write) and query (read) models
+      - Event sourcing for the command side (complete audit trail)
+      - Optimized read models for different query patterns
+      - Strong consistency for balance updates
+      - Eventually consistent read models acceptable for reporting
+      - Support for temporal queries ("what was the balance at time T?")
+
+      Read Model Projections Needed:
+      - Current balance (real-time, strongly consistent)
+      - Transaction history (paginated, filterable)
+      - Monthly statements (pre-computed)
+      - Fraud detection aggregates (sliding window)
+      - Regulatory reports (daily/monthly snapshots)
+
+      Deliverables:
+      - Command and event definitions
+      - Read model schemas for each projection
+      - Consistency boundary design
+      - Event store implementation approach
+      - Projection rebuild strategy
+    constraints: |
+      - Balance queries must reflect all committed transactions (strong consistency)
+      - Transaction processing: 50K transactions per second
+      - Statement generation: < 5 seconds for any account
+      - Event store must retain all events indefinitely (regulatory requirement)
+      - Read model rebuild from events must complete within 4 hours for 1 year of data
+      - Zero tolerance for balance inconsistency (financial accuracy)
+    evaluation_rubric:
+      categories:
+        - name: "CQRS Design"
+          weight: 0.25
+          criteria: ["Command/query separation clarity", "Model optimization", "Consistency boundaries"]
+        - name: "Event Sourcing"
+          weight: 0.25
+          criteria: ["Event design", "Aggregate boundaries", "Snapshot strategy"]
+        - name: "Read Model Projections"
+          weight: 0.25
+          criteria: ["Projection design per use case", "Rebuild strategy", "Staleness handling"]
+        - name: "Consistency & Correctness"
+          weight: 0.25
+          criteria: ["Strong consistency for balances", "Eventual consistency trade-offs", "Idempotency"]

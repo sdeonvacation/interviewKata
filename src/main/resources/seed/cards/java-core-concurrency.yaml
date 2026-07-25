@@ -1,0 +1,170 @@
+topic: "Java Core/Concurrency"
+cards:
+  - front: "What does the synchronized keyword do and what are its forms?"
+    back: "synchronized provides mutual exclusion and happens-before guarantees. Three forms: 1) synchronized method - locks 'this' (instance) or Class object (static). 2) synchronized block - locks specified object. 3) Only one thread can hold a given monitor at a time. It's reentrant: a thread can re-acquire a lock it already holds. Also establishes memory visibility - changes made in a synchronized block are visible to subsequent synchronized blocks on the same monitor."
+    code_snippet: |
+      // Instance method lock (locks 'this')
+      public synchronized void increment() { count++; }
+      
+      // Block with explicit lock object
+      public void update() {
+          synchronized (this.lock) {
+              // critical section
+          }
+      }
+      
+      // Static method lock (locks Class object)
+      public static synchronized void staticMethod() { }
+    difficulty: EASY
+    tags: [synchronized, monitor, locking]
+
+  - front: "What does volatile guarantee and what doesn't it guarantee?"
+    back: "volatile guarantees: 1) Visibility - writes are immediately visible to all threads (no CPU cache staleness). 2) Ordering - prevents reordering of reads/writes around the volatile access (memory barrier). Does NOT guarantee: atomicity of compound operations (e.g., volatile int count; count++ is still not atomic because it's read-modify-write). Use AtomicInteger or synchronized for compound operations."
+    code_snippet: |
+      // Correct: single read/write visibility
+      private volatile boolean running = true;
+      
+      // WRONG: volatile doesn't make this atomic
+      private volatile int count = 0;
+      public void increment() {
+          count++; // read + modify + write = not atomic!
+      }
+      
+      // Correct for compound ops:
+      private AtomicInteger atomicCount = new AtomicInteger(0);
+    difficulty: MEDIUM
+    tags: [volatile, visibility, memory-model]
+
+  - front: "How does ReentrantLock differ from synchronized?"
+    back: "ReentrantLock advantages: 1) tryLock() with timeout - non-blocking attempt. 2) lockInterruptibly() - can be interrupted while waiting. 3) Fairness policy (FIFO ordering of waiting threads). 4) Multiple Condition objects for fine-grained wait/notify. 5) Can be unlocked in a different scope than locked. Disadvantages: must manually unlock in finally block (error-prone), slightly more verbose. Both are reentrant."
+    code_snippet: |
+      ReentrantLock lock = new ReentrantLock(true); // fair lock
+      
+      public void doWork() {
+          lock.lock();
+          try {
+              // critical section
+          } finally {
+              lock.unlock(); // MUST be in finally
+          }
+      }
+      
+      // Non-blocking attempt
+      if (lock.tryLock(1, TimeUnit.SECONDS)) {
+          try { /* work */ } finally { lock.unlock(); }
+      }
+    difficulty: MEDIUM
+    tags: [reentrantlock, lock, synchronized-comparison]
+
+  - front: "What is ExecutorService and what are the common thread pool types?"
+    back: "ExecutorService manages a pool of threads for async task execution. Common factories: 1) newFixedThreadPool(n) - fixed number of threads, unbounded queue. 2) newCachedThreadPool() - creates threads on demand, reuses idle threads (60s timeout). 3) newSingleThreadExecutor() - single thread, tasks execute sequentially. 4) newScheduledThreadPool(n) - for delayed/periodic tasks. Submit returns Future<T>. Always shutdown() when done to prevent resource leaks."
+    code_snippet: |
+      ExecutorService exec = Executors.newFixedThreadPool(4);
+      
+      Future<String> future = exec.submit(() -> {
+          return computeResult();
+      });
+      
+      String result = future.get(5, TimeUnit.SECONDS);
+      
+      exec.shutdown();
+      exec.awaitTermination(10, TimeUnit.SECONDS);
+    difficulty: EASY
+    tags: [executorservice, thread-pool, executors]
+
+  - front: "How does CompletableFuture improve over plain Future?"
+    back: "CompletableFuture adds: 1) Non-blocking chaining with thenApply/thenCompose/thenAccept. 2) Combining multiple futures (allOf, anyOf, thenCombine). 3) Exception handling (exceptionally, handle, whenComplete). 4) Can be completed manually (complete(), completeExceptionally()). 5) Runs on ForkJoinPool.commonPool() by default, or custom executor via *Async variants. Plain Future only offers blocking get()."
+    code_snippet: |
+      CompletableFuture.supplyAsync(() -> fetchUser(id))
+          .thenApply(user -> enrichProfile(user))
+          .thenCompose(profile -> saveAsync(profile))
+          .exceptionally(ex -> {
+              log.error("Failed", ex);
+              return fallbackProfile();
+          })
+          .thenAccept(result -> notifyUser(result));
+      
+      // Combine two futures
+      CompletableFuture<String> combined = future1
+          .thenCombine(future2, (a, b) -> a + b);
+    difficulty: MEDIUM
+    tags: [completablefuture, async, functional]
+
+  - front: "What is ThreadLocal and when should you use it?"
+    back: "ThreadLocal provides thread-confined storage - each thread gets its own independent copy of the variable. Common uses: per-thread context (user session, transaction), SimpleDateFormat (not thread-safe), database connections. Pitfall: memory leaks in thread pools - threads are reused so ThreadLocal values persist. Always call remove() in a finally block or after use. InheritableThreadLocal passes values to child threads."
+    code_snippet: |
+      private static final ThreadLocal<SimpleDateFormat> dateFormat =
+          ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
+      
+      public String formatDate(Date date) {
+          return dateFormat.get().format(date);
+      }
+      
+      // CRITICAL: clean up in thread pools
+      try {
+          context.set(userData);
+          processRequest();
+      } finally {
+          context.remove(); // prevent memory leak
+      }
+    difficulty: MEDIUM
+    tags: [threadlocal, thread-safety, memory-leak]
+
+  - front: "What is CountDownLatch and how does it differ from CyclicBarrier?"
+    back: "CountDownLatch: one-shot synchronizer. Threads call await() to block until count reaches zero via countDown() calls. Cannot be reused. Use case: wait for N initialization tasks to complete. CyclicBarrier: reusable synchronizer. N threads call await() and ALL block until all N arrive, then all proceed together. Can be reused for repeated phases. CyclicBarrier also supports a barrier action (Runnable) executed when all parties arrive."
+    code_snippet: |
+      // CountDownLatch: main waits for workers
+      CountDownLatch latch = new CountDownLatch(3);
+      for (int i = 0; i < 3; i++) {
+          executor.submit(() -> {
+              doWork();
+              latch.countDown();
+          });
+      }
+      latch.await(); // blocks until count = 0
+      
+      // CyclicBarrier: threads synchronize at a point
+      CyclicBarrier barrier = new CyclicBarrier(3, () -> merge());
+      // Each thread calls barrier.await() when ready
+    difficulty: MEDIUM
+    tags: [countdownlatch, cyclicbarrier, synchronizers]
+
+  - front: "How does ConcurrentHashMap's compute operations help avoid race conditions?"
+    back: "compute(), computeIfAbsent(), computeIfPresent(), and merge() are atomic operations that lock only the relevant bucket. They eliminate check-then-act races that occur with separate get() + put() calls. computeIfAbsent() is ideal for caches: it only computes the value if key is absent, atomically. The mapping function should be short and not update other entries of the same map (risk of deadlock)."
+    code_snippet: |
+      ConcurrentHashMap<String, List<String>> map = new ConcurrentHashMap<>();
+      
+      // Atomic: create list if absent, then add
+      map.computeIfAbsent("key", k -> new CopyOnWriteArrayList<>())
+         .add("value");
+      
+      // Atomic increment
+      map.merge("counter", 1L, Long::sum);
+      
+      // WRONG: race condition with separate calls
+      if (!map.containsKey("k")) { // another thread may insert here
+          map.put("k", newValue);
+      }
+    difficulty: HARD
+    tags: [concurrenthashmap, atomic-operations, race-condition]
+
+  - front: "What is AtomicInteger and how does CAS (Compare-And-Swap) work?"
+    back: "AtomicInteger provides lock-free thread-safe integer operations using CAS. CAS atomically: reads current value, compares to expected, sets new value only if current == expected, otherwise retries. Operations: incrementAndGet(), getAndAdd(), compareAndSet(). Implemented via sun.misc.Unsafe / VarHandle. Advantages over synchronized: no context switching, no deadlock possibility. Disadvantage: busy-spinning under high contention (LongAdder is better for counters)."
+    code_snippet: |
+      AtomicInteger counter = new AtomicInteger(0);
+      
+      counter.incrementAndGet(); // atomic i++
+      counter.compareAndSet(1, 2); // set to 2 only if currently 1
+      counter.updateAndGet(x -> x * 2); // atomic transform
+      
+      // For high-contention counters, prefer:
+      LongAdder adder = new LongAdder();
+      adder.increment(); // striped, less contention
+      adder.sum(); // read current total
+    difficulty: HARD
+    tags: [atomic, cas, lock-free]
+
+  - front: "What is the difference between deadlock and livelock?"
+    back: "Deadlock: two+ threads permanently blocked, each waiting for a lock held by the other. No progress ever. Example: T1 holds lock A, waits for B; T2 holds lock B, waits for A. Livelock: threads are not blocked but make no progress because they keep responding to each other's actions. Example: two people in a corridor repeatedly stepping aside in the same direction. Starvation: a thread never gets CPU/lock due to priority or unfairness. Prevention: lock ordering (deadlock), backoff with jitter (livelock)."
+    difficulty: EASY
+    tags: [deadlock, livelock, starvation, concurrency-problems]

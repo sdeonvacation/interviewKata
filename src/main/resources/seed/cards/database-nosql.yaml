@@ -1,0 +1,66 @@
+topic: "Database/NoSQL"
+cards:
+  - front: "What are the four main categories of NoSQL databases? Give an example of each."
+    back: |
+      Document stores (MongoDB) - flexible JSON-like documents. Key-value (Redis) - simple key-to-value mappings with sub-ms latency. Wide-column (Cassandra) - rows with dynamic columns, optimized for writes. Graph (Neo4j) - nodes and edges for relationship-heavy data.
+    difficulty: EASY
+    tags: [nosql, classification]
+
+  - front: "Explain the CAP theorem and which trade-off MongoDB, Cassandra, and Redis each make."
+    back: |
+      CAP states a distributed system can guarantee only two of Consistency, Availability, and Partition tolerance. MongoDB defaults to CP - during a partition the minority shard becomes unavailable. Cassandra is AP - remains available but may serve stale reads. Redis Cluster is CP - partitioned nodes reject writes until quorum restored.
+    difficulty: MEDIUM
+    tags: [cap-theorem, distributed-systems, consistency]
+
+  - front: "When would you choose a document store over a relational database?"
+    back: |
+      Choose document stores when schema evolves frequently, data is naturally hierarchical/nested, you need horizontal scaling for read-heavy workloads, or joins are rare. Avoid when you need ACID transactions across multiple documents, complex relational queries, or strong referential integrity.
+    difficulty: EASY
+    tags: [nosql, sql-vs-nosql, schema-design]
+
+  - front: "How does eventual consistency work in Cassandra and how do you tune it?"
+    back: |
+      Cassandra replicates writes to N nodes asynchronously. Consistency level (CL) controls how many replicas must acknowledge before returning. CL=ONE gives fastest writes but stale reads. CL=QUORUM (majority) on both read and write guarantees strong consistency. Read-repair and anti-entropy repair reconcile divergent replicas in the background.
+    code_snippet: |
+      // Java driver consistency tuning
+      SimpleStatement stmt = SimpleStatement.newInstance(
+          "SELECT * FROM orders WHERE user_id = ?", userId)
+          .setConsistencyLevel(DefaultConsistencyLevel.QUORUM);
+      session.execute(stmt);
+    difficulty: MEDIUM
+    tags: [cassandra, eventual-consistency, tunable-consistency]
+
+  - front: "How would you model a social network's friend relationships in Neo4j vs MongoDB?"
+    back: |
+      Neo4j stores users as nodes and friendships as edges - traversing N-depth relationships is O(1) per hop via index-free adjacency. MongoDB requires either embedding friend IDs in user documents (fast direct lookup, expensive multi-hop) or a separate edges collection with application-level graph traversal. For queries like 'friends of friends who like X', Neo4j is orders of magnitude faster.
+    code_snippet: |
+      // Neo4j Cypher - friends of friends who work at Google
+      MATCH (me:User {id: $userId})-[:FRIEND*2]-(fof:User)
+      WHERE fof.company = 'Google' AND fof <> me
+      RETURN DISTINCT fof.name LIMIT 10
+    difficulty: MEDIUM
+    tags: [graph-database, neo4j, data-modeling]
+
+  - front: "What Redis data structures beyond simple strings would you use in a Java application, and for what?"
+    back: |
+      Sorted Sets for leaderboards and rate limiting (ZADD/ZRANGEBYSCORE). Hashes for object caching without serialization overhead. Streams for event sourcing and message queues with consumer groups. HyperLogLog for approximate unique counts at constant memory. Pub/Sub for real-time notifications between services.
+    code_snippet: |
+      // Jedis - sliding window rate limiter with sorted set
+      String key = "rate:" + userId;
+      long now = System.currentTimeMillis();
+      Pipeline p = jedis.pipelined();
+      p.zremrangeByScore(key, 0, now - windowMs);
+      p.zadd(key, now, UUID.randomUUID().toString());
+      p.zcard(key);
+      p.expire(key, (int)(windowMs / 1000));
+      List<Object> results = p.syncAndReturnAll();
+      long count = (Long) results.get(2);
+      if (count > maxRequests) throw new RateLimitException();
+    difficulty: HARD
+    tags: [redis, data-structures, rate-limiting]
+
+  - front: "How does Cassandra's write path achieve high throughput, and what are the failure implications?"
+    back: |
+      Writes go to commit log (sequential disk append) then memtable (in-memory sorted structure). No read-before-write, no locking - all writes are appends. Memtables flush to immutable SSTables periodically. This gives O(1) write performance regardless of dataset size. Trade-off: reads may check multiple SSTables (mitigated by bloom filters and compaction), and deletes require tombstones that accumulate until compaction.
+    difficulty: HARD
+    tags: [cassandra, write-path, storage-engine]

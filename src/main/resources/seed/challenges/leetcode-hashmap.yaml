@@ -1,0 +1,242 @@
+topic: "DSA/HashMaps"
+challenges:
+  - title: "Ransom Note"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given two strings `ransomNote` and `magazine`, determine if `ransomNote` can be constructed by using the letters from `magazine`.
+
+      Each letter in `magazine` can only be used once in `ransomNote`.
+
+      Return `true` if the ransom note can be built, otherwise return `false`.
+
+      **Constraints:**
+      - 1 <= ransomNote.length, magazine.length <= 10^5
+      - Both strings consist of lowercase English letters only.
+    starter_code: |
+      public class Solution {
+          public boolean canConstruct(String ransomNote, String magazine) {
+              // Your solution here
+              return false;
+          }
+      }
+    test_cases:
+      - input: "ransomNote = \"a\", magazine = \"b\""
+        expected: "false"
+        description: "Character not available in magazine"
+      - input: "ransomNote = \"aa\", magazine = \"ab\""
+        expected: "false"
+        description: "Not enough occurrences of required character"
+      - input: "ransomNote = \"aa\", magazine = \"aab\""
+        expected: "true"
+        description: "Sufficient characters available"
+      - input: "ransomNote = \"hello\", magazine = \"aehllowor\""
+        expected: "true"
+        description: "Longer magazine with all needed characters"
+    hints:
+      - "Think about what data structure lets you efficiently count occurrences of each character."
+      - "Build a frequency map of all characters in the magazine. Then check if the ransom note's character counts are all satisfied."
+      - "Use an int array of size 26 for character counts. Increment for magazine chars, decrement for ransomNote chars. If any count goes negative, return false."
+
+  - title: "Isomorphic Strings"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given two strings `s` and `t`, determine if they are isomorphic.
+
+      Two strings are isomorphic if there exists a one-to-one mapping from each character in `s` to a character in `t` such that all occurrences of a character in `s` are replaced by the same character in `t`, while preserving the order of characters.
+
+      No two different characters in `s` may map to the same character in `t` (the mapping must be bijective).
+
+      **Constraints:**
+      - 1 <= s.length <= 5 * 10^4
+      - t.length == s.length
+      - Both strings consist of any valid ASCII character.
+    starter_code: |
+      public class Solution {
+          public boolean isIsomorphic(String s, String t) {
+              // Your solution here
+              return false;
+          }
+      }
+    test_cases:
+      - input: "s = \"egg\", t = \"add\""
+        expected: "true"
+        description: "e->a, g->d is a valid bijection"
+      - input: "s = \"foo\", t = \"bar\""
+        expected: "false"
+        description: "o maps to both a and r - invalid"
+      - input: "s = \"paper\", t = \"title\""
+        expected: "true"
+        description: "p->t, a->i, e->l, r->e is valid"
+      - input: "s = \"badc\", t = \"baba\""
+        expected: "false"
+        description: "d and c both try to map to same char - invalid"
+    hints:
+      - "Consider what happens when you try to map characters from s to t. What property must this mapping satisfy?"
+      - "You need two maps: one from s->t and one from t->s. Both directions must be consistent for a valid isomorphism."
+      - "Iterate through both strings simultaneously. For each pair (s[i], t[i]), verify neither character has been previously mapped to a different counterpart."
+
+  - title: "Word Pattern"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given a `pattern` string and a `s` string, determine if `s` follows the same pattern.
+
+      "Follows" means there is a bijection (one-to-one correspondence) between each letter in `pattern` and each non-empty word in `s`. Specifically:
+      - Each letter in `pattern` maps to exactly one unique word.
+      - Each unique word maps back to exactly one letter.
+      - No two letters map to the same word, and no two words map to the same letter.
+
+      **Constraints:**
+      - 1 <= pattern.length <= 300
+      - 1 <= s.length <= 3000
+      - `pattern` contains only lowercase English letters.
+      - `s` contains only lowercase English letters and spaces.
+      - `s` has no leading or trailing spaces.
+      - Words in `s` are separated by a single space.
+    starter_code: |
+      public class Solution {
+          public boolean wordPattern(String pattern, String s) {
+              // Your solution here
+              return false;
+          }
+      }
+    test_cases:
+      - input: "pattern = \"abba\", s = \"dog cat cat dog\""
+        expected: "true"
+        description: "a->dog, b->cat forms a valid bijection"
+      - input: "pattern = \"abba\", s = \"dog cat cat fish\""
+        expected: "false"
+        description: "a maps to dog first then fish - inconsistent"
+      - input: "pattern = \"aaaa\", s = \"dog cat cat dog\""
+        expected: "false"
+        description: "a cannot map to both dog and cat"
+      - input: "pattern = \"abba\", s = \"dog dog dog dog\""
+        expected: "false"
+        description: "a and b both map to dog - not bijective"
+    hints:
+      - "This problem is very similar to Isomorphic Strings, but with characters mapping to words instead of other characters."
+      - "Split the string by spaces and verify the word count matches the pattern length. Then use two HashMaps to enforce the bijection."
+      - "Map each pattern character to its corresponding word, and each word back to its character. If any conflict arises in either direction, return false."
+
+  - title: "Valid Anagram"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given two strings `s` and `t`, return `true` if `t` is an anagram of `s`, and `false` otherwise.
+
+      An anagram is a word formed by rearranging the letters of a different word, using all the original letters exactly once.
+
+      **Constraints:**
+      - 1 <= s.length, t.length <= 5 * 10^4
+      - Both strings consist of lowercase English letters.
+
+      **Follow up:** What if the inputs contain Unicode characters? How would you adapt your solution?
+    starter_code: |
+      public class Solution {
+          public boolean isAnagram(String s, String t) {
+              // Your solution here
+              return false;
+          }
+      }
+    test_cases:
+      - input: "s = \"anagram\", t = \"nagaram\""
+        expected: "true"
+        description: "Same characters rearranged"
+      - input: "s = \"rat\", t = \"car\""
+        expected: "false"
+        description: "Different characters present"
+      - input: "s = \"listen\", t = \"silent\""
+        expected: "true"
+        description: "Classic anagram pair"
+      - input: "s = \"a\", t = \"ab\""
+        expected: "false"
+        description: "Different lengths cannot be anagrams"
+    hints:
+      - "What is the simplest property that two anagrams share?"
+      - "Count character frequencies for both strings and compare. If all counts match, the strings are anagrams."
+      - "Optimization: use a single int[26] array. Increment for chars in s, decrement for chars in t. All counts should be zero at the end."
+
+  - title: "Group Anagrams"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an array of strings `strs`, group the anagrams together. You can return the answer in any order.
+
+      Two strings are anagrams if they contain the same characters with the same frequencies, regardless of order.
+
+      **Constraints:**
+      - 1 <= strs.length <= 10^4
+      - 0 <= strs[i].length <= 100
+      - strs[i] consists of lowercase English letters.
+    starter_code: |
+      public class Solution {
+          public List<List<String>> groupAnagrams(String[] strs) {
+              // Your solution here
+              return new ArrayList<>();
+          }
+      }
+    test_cases:
+      - input: "strs = [\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"]"
+        expected: "[[\"bat\"],[\"nat\",\"tan\"],[\"ate\",\"eat\",\"tea\"]]"
+        description: "Three groups: eat/tea/ate, tan/nat, bat"
+      - input: "strs = [\"\"]"
+        expected: "[[\"\"]]"
+        description: "Single empty string forms its own group"
+      - input: "strs = [\"a\"]"
+        expected: "[[\"a\"]]"
+        description: "Single element array"
+      - input: "strs = [\"abc\",\"bca\",\"xyz\",\"zyx\",\"cab\"]"
+        expected: "[[\"abc\",\"bca\",\"cab\"],[\"xyz\",\"zyx\"]]"
+        description: "Two groups of three-letter anagrams"
+    hints:
+      - "How can you create a canonical representation of a word that is the same for all its anagrams?"
+      - "Sort each string's characters alphabetically and use the sorted version as a HashMap key. All anagrams will produce the same key."
+      - "Alternative O(n*k) approach: instead of sorting, use a character count array as the key (e.g., \"#1#0#0...#0\" encoding letter frequencies)."
+
+  - title: "Two Sum"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given an array of integers `nums` and an integer `target`, find two numbers in the array that add up to `target` and return their indices.
+
+      You may assume each input has exactly one valid solution. The same element cannot be used twice.
+
+      The answer can be returned in any order.
+
+      **Constraints:**
+      - 2 <= nums.length <= 10^4
+      - -10^9 <= nums[i] <= 10^9
+      - -10^9 <= target <= 10^9
+      - Exactly one valid answer exists.
+    starter_code: |
+      public class Solution {
+          public int[] twoSum(int[] nums, int target) {
+              // Your solution here
+              return new int[]{};
+          }
+      }
+    test_cases:
+      - input: "nums = [2,7,11,15], target = 9"
+        expected: "[0,1]"
+        description: "First two elements sum to target: 2 + 7 = 9"
+      - input: "nums = [3,2,4], target = 6"
+        expected: "[1,2]"
+        description: "Non-adjacent pair: 2 + 4 = 6"
+      - input: "nums = [3,3], target = 6"
+        expected: "[0,1]"
+        description: "Duplicate values both used: 3 + 3 = 6"
+      - input: "nums = [-3,4,3,90], target = 0"
+        expected: "[0,2]"
+        description: "Negative and positive: -3 + 3 = 0"
+    hints:
+      - "The brute force approach checks all pairs in O(n^2). Can you leverage a data structure to reduce lookups?"
+      - "For each number, you need to know if its complement (target - num) has already been seen. What structure gives O(1) lookups?"
+      - "Use a HashMap mapping each value to its index. In one pass, check if the complement exists in the map before inserting the current number."

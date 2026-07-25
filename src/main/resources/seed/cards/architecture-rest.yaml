@@ -1,0 +1,87 @@
+topic: "Architecture/REST"
+cards:
+  - front: "What are the four levels of the Richardson Maturity Model?"
+    back: |
+      Level 0 — single URI, single HTTP method (RPC tunnel, e.g. SOAP over POST).
+      Level 1 — individual resources with distinct URIs but only POST.
+      Level 2 — proper use of HTTP verbs (GET, PUT, DELETE) and status codes.
+      Level 3 — HATEOAS: responses include hypermedia links guiding the client
+      to available state transitions. Each level builds on the previous one.
+    difficulty: MEDIUM
+    tags: [rest, richardson-maturity-model, api-design]
+
+  - front: "What is HATEOAS and why is it considered the highest REST maturity level?"
+    back: |
+      HATEOAS (Hypermedia as the Engine of Application State) means the server
+      embeds hyperlinks in responses that tell the client what actions are available
+      next. Clients need no out-of-band knowledge of the API structure — they
+      discover transitions at runtime. This decouples client from server URL
+      structure and enables independent API evolution.
+    code_snippet: |
+      // Spring HATEOAS example
+      @GetMapping("/orders/{id}")
+      public EntityModel<Order> getOrder(@PathVariable Long id) {
+          Order order = service.findById(id);
+          return EntityModel.of(order,
+              linkTo(methodOn(OrderController.class).getOrder(id)).withSelfRel(),
+              linkTo(methodOn(OrderController.class).cancel(id)).withRel("cancel"));
+      }
+    difficulty: HARD
+    tags: [hateoas, hypermedia, rest-maturity]
+
+  - front: "Why must a RESTful service be stateless?"
+    back: |
+      Each request must contain all information needed to process it — the server
+      stores no client session between requests. This enables horizontal scaling
+      (any server can handle any request), simplifies failover, improves cacheability,
+      and makes the system more reliable since no session state can be lost.
+    difficulty: EASY
+    tags: [rest, statelessness, scalability]
+
+  - front: "What are best practices for REST resource naming?"
+    back: |
+      Use plural nouns for collections (/orders, /users), not verbs. Nest
+      sub-resources to show hierarchy (/users/{id}/orders). Use hyphens for
+      readability in multi-word names (/line-items). Avoid file extensions —
+      use Accept headers for content negotiation. Keep URIs lowercase and
+      never expose implementation details (no /getOrder or /api/v1/OrderService).
+    code_snippet: |
+      // Good
+      GET  /api/v1/customers/{id}/orders
+      POST /api/v1/orders
+
+      // Bad
+      GET  /api/v1/getCustomerOrders?customerId=5
+      POST /api/v1/orderService/createOrder
+    difficulty: EASY
+    tags: [rest, uri-design, naming-conventions]
+
+  - front: "Which HTTP methods are idempotent and what does idempotency mean for API design?"
+    back: |
+      Idempotent means multiple identical requests produce the same server state
+      as a single request. GET, PUT, DELETE, HEAD, OPTIONS are idempotent. POST
+      and PATCH are not. PUT replaces the entire resource so repeating it is safe.
+      DELETE on an already-deleted resource returns 404 but state remains the same.
+      Idempotency enables safe retries on network failures without side effects.
+    difficulty: MEDIUM
+    tags: [http-methods, idempotency, rest]
+
+  - front: "Explain HTTP content negotiation via the Accept header."
+    back: |
+      The client sends an Accept header specifying preferred response formats
+      (e.g. application/json, application/xml) with optional quality factors.
+      The server inspects Accept and returns the best matching representation
+      with the appropriate Content-Type. If no match exists, the server responds
+      with 406 Not Acceptable.
+    code_snippet: |
+      // Spring MVC content negotiation
+      @GetMapping(value = "/products/{id}",
+                  produces = {MediaType.APPLICATION_JSON_VALUE,
+                              MediaType.APPLICATION_XML_VALUE})
+      public Product getProduct(@PathVariable Long id) {
+          return productService.findById(id);
+      }
+      // Client: Accept: application/xml;q=0.9, application/json;q=1.0
+      // Server responds with JSON (higher quality factor)
+    difficulty: MEDIUM
+    tags: [content-negotiation, http-headers, rest]

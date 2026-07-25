@@ -1,0 +1,104 @@
+topic: "Java Core/Collections"
+guides:
+  - title: "Java Collections Framework Overview"
+    estimated_minutes: 12
+    content: |
+      # Java Collections Framework Overview
+
+      The Java Collections Framework provides a unified architecture for storing and manipulating groups of objects. Understanding the hierarchy and choosing the right implementation is critical for writing performant code.
+
+      ## Interface Hierarchy
+
+      ```
+      Iterable
+       └── Collection
+            ├── List (ordered, allows duplicates)
+            ├── Set (no duplicates)
+            │    └── SortedSet → NavigableSet
+            └── Queue (FIFO or priority ordering)
+                 └── Deque (double-ended)
+
+      Map (key-value pairs, separate hierarchy)
+       └── SortedMap → NavigableMap
+      ```
+
+      ## When to Use What
+
+      ### List Implementations
+
+      | Implementation | Use When | Avoid When |
+      |---------------|----------|------------|
+      | **ArrayList** | Random access by index, iteration, appending | Frequent insert/remove in the middle |
+      | **LinkedList** | Frequent add/remove at head/tail (as Deque) | Random access by index |
+      | **CopyOnWriteArrayList** | Read-heavy, rarely modified, concurrent access | Frequent writes (copies entire array) |
+
+      **Default choice:** `ArrayList` in ~95% of cases. Its cache-friendly contiguous memory layout outperforms LinkedList even for middle insertions up to several thousand elements.
+
+      ### Set Implementations
+
+      | Implementation | Use When | Ordering |
+      |---------------|----------|----------|
+      | **HashSet** | Fast contains/add/remove, no ordering needed | None |
+      | **LinkedHashSet** | Need insertion-order iteration | Insertion order |
+      | **TreeSet** | Need sorted iteration or range queries | Natural/Comparator order |
+      | **EnumSet** | Set of enum constants | Enum declaration order |
+
+      ### Map Implementations
+
+      | Implementation | Use When | Ordering |
+      |---------------|----------|----------|
+      | **HashMap** | General purpose key-value storage | None |
+      | **LinkedHashMap** | Iteration in insertion/access order, LRU caches | Insertion or access order |
+      | **TreeMap** | Sorted keys, range queries (subMap, headMap) | Natural/Comparator order |
+      | **EnumMap** | Enum keys (extremely fast, array-backed) | Enum declaration order |
+      | **ConcurrentHashMap** | Thread-safe map with high concurrency | Single-threaded (slight overhead) |
+
+      ### Queue/Deque Implementations
+
+      | Implementation | Use When |
+      |---------------|----------|
+      | **ArrayDeque** | Stack (LIFO) or Queue (FIFO), faster than Stack/LinkedList |
+      | **PriorityQueue** | Elements processed by priority (min-heap) |
+      | **LinkedBlockingQueue** | Producer-consumer with blocking |
+      | **ConcurrentLinkedQueue** | Non-blocking concurrent queue |
+
+      ## Performance Characteristics
+
+      ### Time Complexity Summary
+
+      | Operation | ArrayList | LinkedList | HashSet | TreeSet |
+      |-----------|-----------|------------|---------|---------|
+      | get(index) | O(1) | O(n) | N/A | N/A |
+      | add(end) | O(1)* | O(1) | O(1)* | O(log n) |
+      | add(middle) | O(n) | O(1)** | N/A | N/A |
+      | contains | O(n) | O(n) | O(1)* | O(log n) |
+      | remove | O(n) | O(1)** | O(1)* | O(log n) |
+
+      *amortized, **if you already have a reference to the node
+
+      ### HashMap Key Considerations
+
+      - Always override both `hashCode()` and `equals()` for custom key objects
+      - Immutable keys are safest (changing a key's hash after insertion makes it unfindable)
+      - Load factor 0.75 balances space and time (resize at 75% capacity)
+      - Initial capacity should be set if the number of elements is known to avoid repeated resizing
+
+      ## Choosing the Right Collection: Decision Flowchart
+
+      1. **Need key-value pairs?** → Use a Map implementation
+      2. **Need unique elements?** → Use a Set implementation
+      3. **Need ordered sequence?** → Use a List implementation
+      4. **Need FIFO/LIFO/priority?** → Use a Queue/Deque
+
+      Then within each category:
+      - **Need thread safety?** → Use concurrent variant (ConcurrentHashMap, CopyOnWriteArrayList)
+      - **Need sorting?** → Use Tree variant (TreeMap, TreeSet)
+      - **Need insertion order?** → Use Linked variant (LinkedHashMap, LinkedHashSet)
+      - **Otherwise** → Use the Hash/Array variant (HashMap, HashSet, ArrayList)
+
+      ## Common Pitfalls
+
+      - **Modifying a collection during iteration** throws ConcurrentModificationException. Use `Iterator.remove()` or collect items to remove separately.
+      - **Using mutable objects as Map keys** can cause lost entries if the hash changes after insertion.
+      - **Autoboxing overhead** with primitive-heavy code: consider specialized libraries (Eclipse Collections, HPPC) for `int`/`long` collections.
+      - **Collections.unmodifiableList()** is a view, not a copy. Modifications to the original list are visible through the wrapper.

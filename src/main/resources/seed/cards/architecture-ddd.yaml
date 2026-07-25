@@ -1,0 +1,96 @@
+topic: "Architecture/DDD"
+cards:
+  - front: "What is Ubiquitous Language in DDD and why is it critical?"
+    back: "Ubiquitous Language is a shared vocabulary between developers and domain experts, used consistently in code, documentation, and conversation. It eliminates translation layers between business and technical teams. If the domain expert says 'Policy' but code says 'Contract', bugs and miscommunication follow. The language must be reflected in class names, method names, and module structure."
+    difficulty: EASY
+    tags: [ubiquitous-language, communication, ddd-fundamentals]
+
+  - front: "How do you determine Bounded Context boundaries in a large domain?"
+    back: "Bounded Context boundaries align where the same term means different things or where teams have different models. Identify them by: (1) linguistic boundaries — same word, different meaning (e.g., 'Account' in billing vs identity), (2) team ownership boundaries, (3) differing rates of change, (4) distinct business capabilities. Each context has its own Ubiquitous Language, model, and data store."
+    difficulty: MEDIUM
+    tags: [bounded-context, context-boundaries, strategic-ddd]
+
+  - front: "What invariants does an Aggregate Root enforce, and what are the design rules?"
+    back: "An Aggregate Root is the single entry point that guards all business invariants for a cluster of related entities. Rules: (1) external objects reference only the root, never internal entities, (2) all state changes go through root methods that validate invariants, (3) one aggregate per transaction — eventual consistency between aggregates, (4) keep aggregates small to reduce contention."
+    code_snippet: |
+      public class Order { // Aggregate Root
+          private OrderId id;
+          private List<OrderLine> lines;
+          private Money totalLimit;
+
+          public void addLine(Product product, int qty) {
+              OrderLine line = new OrderLine(product, qty);
+              if (calculateTotal().add(line.cost()).exceeds(totalLimit)) {
+                  throw new OrderLimitExceededException();
+              }
+              lines.add(line); // invariant enforced
+          }
+      }
+    difficulty: MEDIUM
+    tags: [aggregate-root, invariants, tactical-ddd]
+
+  - front: "How do Value Objects differ from Entities, and when should you prefer them?"
+    back: "Entities have identity — two entities with identical attributes are still different if IDs differ. Value Objects have no identity — they are defined solely by their attributes and are immutable. Prefer Value Objects by default: they are simpler, thread-safe, and side-effect free. Use Entities only when you need to track lifecycle and identity (e.g., a User, an Order). Value Objects examples: Money, Address, DateRange."
+    code_snippet: |
+      // Value Object: equality by attributes, immutable
+      public record Money(BigDecimal amount, Currency currency) {
+          public Money add(Money other) {
+              if (!currency.equals(other.currency))
+                  throw new CurrencyMismatchException();
+              return new Money(amount.add(other.amount), currency);
+          }
+      }
+
+      // Entity: equality by identity
+      public class Customer {
+          private final CustomerId id;
+          private String name;
+          @Override
+          public boolean equals(Object o) {
+              return o instanceof Customer c && id.equals(c.id);
+          }
+      }
+    difficulty: EASY
+    tags: [value-object, entity, tactical-ddd]
+
+  - front: "What are Domain Events and how do they enable decoupling between Bounded Contexts?"
+    back: "Domain Events represent something meaningful that happened in the domain (e.g., OrderPlaced, PaymentReceived). They enable decoupling by allowing bounded contexts to react to changes without direct dependencies. The publishing context doesn't know or care who listens. This supports eventual consistency, audit trails, and enables CQRS. Events should be immutable, past-tense named, and carry enough data for consumers to act without calling back."
+    code_snippet: |
+      public record OrderPlacedEvent(
+          OrderId orderId,
+          CustomerId customerId,
+          Money total,
+          Instant occurredAt
+      ) implements DomainEvent {}
+
+      // In aggregate root:
+      public void place() {
+          this.status = PLACED;
+          registerEvent(new OrderPlacedEvent(id, customerId, total, Instant.now()));
+      }
+    difficulty: MEDIUM
+    tags: [domain-events, eventual-consistency, decoupling]
+
+  - front: "What is an Anti-Corruption Layer (ACL) and when is it necessary?"
+    back: "An ACL is a translation layer that prevents a foreign or legacy model from leaking into your bounded context. It translates between external concepts and your domain model. Necessary when: (1) integrating with legacy systems whose model you can't change, (2) consuming third-party APIs with a different domain language, (3) protecting your model from upstream changes. Implemented as adapters, facades, or translators at context boundaries."
+    code_snippet: |
+      // ACL translates legacy CRM model to our domain
+      public class CrmCustomerTranslator {
+          private final LegacyCrmClient crmClient;
+
+          public Customer toDomainCustomer(String crmId) {
+              CrmRecord record = crmClient.fetchAccount(crmId);
+              return new Customer(
+                  new CustomerId(record.getAccountNo()),
+                  new FullName(record.getFirst(), record.getLast()),
+                  Address.from(record.getAddr1(), record.getCity(), record.getZip())
+              );
+          }
+      }
+    difficulty: HARD
+    tags: [anti-corruption-layer, integration, strategic-ddd]
+
+  - front: "Explain the main Context Mapping strategies and when to use each."
+    back: "Context Mapping defines relationships between bounded contexts. Key patterns: (1) Shared Kernel — two teams share a small common model (tight coupling, use sparingly), (2) Customer-Supplier — downstream team can negotiate changes with upstream, (3) Conformist — downstream accepts upstream's model as-is (no negotiation power), (4) Anti-Corruption Layer — downstream translates upstream model, (5) Open Host Service — upstream provides a well-defined protocol for all consumers, (6) Published Language — shared interchange format (e.g., JSON schema, protobuf)."
+    difficulty: HARD
+    tags: [context-mapping, strategic-ddd, integration-patterns]

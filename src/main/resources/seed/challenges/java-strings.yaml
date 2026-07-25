@@ -1,0 +1,114 @@
+topic: "DSA/Strings"
+challenges:
+  - title: "Reverse String In-Place"
+    difficulty: EASY
+    type: JAVA
+    time_limit_seconds: 180
+    problem_statement: |
+      Write a function that reverses a string. The input string is given as an array of characters `s`.
+
+      You must do this by modifying the input array **in-place** with O(1) extra memory.
+
+      **Constraints:**
+      - 1 <= s.length <= 10^5
+      - s[i] is a printable ASCII character.
+    starter_code: |
+      public class Solution {
+          public void reverseString(char[] s) {
+              // Your solution here - modify s in-place
+          }
+      }
+    test_cases:
+      - input: "s = ['h','e','l','l','o']"
+        expected: "['o','l','l','e','h']"
+        description: "Odd-length string reversal"
+      - input: "s = ['H','a','n','n','a','h']"
+        expected: "['h','a','n','n','a','H']"
+        description: "Even-length string reversal"
+      - input: "s = ['A']"
+        expected: "['A']"
+        description: "Single character: no change"
+      - input: "s = ['a','b']"
+        expected: "['b','a']"
+        description: "Two characters: simple swap"
+    hints:
+      - "Use two pointers: one at the start, one at the end."
+      - "Swap characters at both pointers and move them towards the center."
+      - "The loop runs n/2 times, giving O(n) time and O(1) space."
+
+  - title: "Valid Anagram"
+    difficulty: EASY
+    type: JAVA
+    time_limit_seconds: 240
+    problem_statement: |
+      Given two strings `s` and `t`, return `true` if `t` is an anagram of `s`, and `false` otherwise.
+
+      An anagram is a word formed by rearranging the letters of a different word, using all the original letters exactly once.
+
+      **Constraints:**
+      - 1 <= s.length, t.length <= 5 * 10^4
+      - s and t consist of lowercase English letters.
+
+      **Follow up:** What if the inputs contain Unicode characters? How would you adapt your solution?
+    starter_code: |
+      public class Solution {
+          public boolean isAnagram(String s, String t) {
+              // Your solution here
+              return false;
+          }
+      }
+    test_cases:
+      - input: "s = \"anagram\", t = \"nagaram\""
+        expected: "true"
+        description: "Valid anagram: same letters rearranged"
+      - input: "s = \"rat\", t = \"car\""
+        expected: "false"
+        description: "Not an anagram: different letters"
+      - input: "s = \"a\", t = \"ab\""
+        expected: "false"
+        description: "Different lengths: cannot be anagram"
+      - input: "s = \"aacc\", t = \"ccac\""
+        expected: "false"
+        description: "Same chars different counts"
+    hints:
+      - "If the strings have different lengths, they cannot be anagrams."
+      - "Use a frequency array of size 26 (for lowercase English). Increment for s, decrement for t. All counts should be zero at the end."
+      - "For Unicode follow-up: use a HashMap<Character, Integer> instead of a fixed-size array."
+
+  - title: "Longest Substring Without Repeating Characters"
+    difficulty: MEDIUM
+    type: JAVA
+    time_limit_seconds: 360
+    problem_statement: |
+      Given a string `s`, find the length of the longest substring without repeating characters.
+
+      **Constraints:**
+      - 0 <= s.length <= 5 * 10^4
+      - s consists of English letters, digits, symbols and spaces.
+    starter_code: |
+      public class Solution {
+          public int lengthOfLongestSubstring(String s) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "s = \"abcabcbb\""
+        expected: "3"
+        description: "Longest is 'abc' with length 3"
+      - input: "s = \"bbbbb\""
+        expected: "1"
+        description: "All same character: length 1"
+      - input: "s = \"pwwkew\""
+        expected: "3"
+        description: "Longest is 'wke' with length 3 (not 'pwke' - must be contiguous)"
+      - input: "s = \"\""
+        expected: "0"
+        description: "Empty string"
+      - input: "s = \"dvdf\""
+        expected: "3"
+        description: "Longest is 'vdf' - sliding window must shrink from left"
+    hints:
+      - "Use the sliding window technique with two pointers (left and right)."
+      - "Maintain a Set or Map of characters in the current window. When a duplicate is found, shrink the window from the left until the duplicate is removed."
+      - "Optimization: use a HashMap<Character, Integer> storing last seen index. When duplicate found, jump left pointer to max(left, lastSeen + 1) to avoid character-by-character shrinking."

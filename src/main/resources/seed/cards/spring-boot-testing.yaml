@@ -1,0 +1,125 @@
+topic: "Spring Boot/Testing"
+cards:
+  - front: "What does @SpringBootTest do and when should you avoid it?"
+    back: "@SpringBootTest loads the full application context including all beans, auto-configurations, and component scanning. It starts the entire Spring container, making it suitable for integration tests that need the real wiring. Avoid it for unit tests or narrow slice tests because it is slow - loading hundreds of beans when you only need a controller or repository wastes CI time and obscures test intent."
+    code_snippet: |
+      @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+      class OrderIntegrationTest {
+          @Autowired
+          private TestRestTemplate restTemplate;
+
+          @Test
+          void shouldCreateOrder() {
+              ResponseEntity<Order> response = restTemplate.postForEntity(
+                  "/api/orders", new OrderRequest("item-1", 2), Order.class);
+              assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+          }
+      }
+    difficulty: EASY
+    tags: [spring-boot-test, integration-testing]
+
+  - front: "How does @WebMvcTest differ from @SpringBootTest and what does it auto-configure?"
+    back: "@WebMvcTest is a test slice that loads only the web layer - controllers, @ControllerAdvice, filters, converters, and MockMvc. It does NOT load @Service, @Repository, or @Component beans. You must provide dependencies via @MockBean. This makes it fast and focused for testing request mapping, validation, serialization, and error handling without the full context overhead."
+    code_snippet: |
+      @WebMvcTest(OrderController.class)
+      class OrderControllerTest {
+          @Autowired
+          private MockMvc mockMvc;
+
+          @MockBean
+          private OrderService orderService;
+
+          @Test
+          void shouldReturn404WhenOrderNotFound() throws Exception {
+              when(orderService.findById(99L)).thenReturn(Optional.empty());
+
+              mockMvc.perform(get("/api/orders/99"))
+                  .andExpect(status().isNotFound());
+          }
+      }
+    difficulty: EASY
+    tags: [web-mvc-test, test-slices, mock-mvc]
+
+  - front: "What is the difference between @MockBean and @Mock in Spring Boot tests?"
+    back: "@MockBean is a Spring Boot test annotation that creates a Mockito mock AND registers it in the application context, replacing any existing bean of that type. @Mock (Mockito) creates a plain mock with no Spring context awareness. Use @MockBean in slice tests (@WebMvcTest, @SpringBootTest) where the mock must be injected by Spring. Use @Mock in pure unit tests with no Spring context for faster execution."
+    explanation: "@MockBean also resets the context cache if the mock type differs from the original bean, which can slow down test suites if overused across different test classes."
+    difficulty: MEDIUM
+    tags: [mockbean, mockito, test-context]
+
+  - front: "How does @DataJpaTest work and what makes it suitable for repository testing?"
+    back: "@DataJpaTest configures an embedded database, scans for @Entity classes, and configures Spring Data JPA repositories. It applies @Transactional by default so each test rolls back. It does NOT load controllers, services, or other non-JPA components. You can override the embedded DB with @AutoConfigureTestDatabase(replace = Replace.NONE) to test against a real database like PostgreSQL via TestContainers."
+    code_snippet: |
+      @DataJpaTest
+      class UserRepositoryTest {
+          @Autowired
+          private TestEntityManager entityManager;
+
+          @Autowired
+          private UserRepository userRepository;
+
+          @Test
+          void shouldFindByEmail() {
+              entityManager.persistAndFlush(new User("dev@example.com", "Dev"));
+
+              Optional<User> found = userRepository.findByEmail("dev@example.com");
+              assertThat(found).isPresent()
+                  .hasValueSatisfying(u -> assertThat(u.getName()).isEqualTo("Dev"));
+          }
+      }
+    difficulty: MEDIUM
+    tags: [data-jpa-test, repository-testing, test-slices]
+
+  - front: "How do you use MockMvc to test request validation and JSON response structure?"
+    back: "MockMvc performs requests without starting an HTTP server, allowing assertions on status, headers, and JSON body via jsonPath. You can test @Valid bean validation by posting invalid payloads and asserting 400 responses with field error details. Combined with @WebMvcTest, it provides fast feedback on controller contract correctness."
+    code_snippet: |
+      @Test
+      void shouldRejectInvalidOrder() throws Exception {
+          String invalidJson = """
+              {"itemId": "", "quantity": -1}
+              """;
+
+          mockMvc.perform(post("/api/orders")
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(invalidJson))
+              .andExpect(status().isBadRequest())
+              .andExpect(jsonPath("$.errors[0].field").value("itemId"))
+              .andExpect(jsonPath("$.errors[1].field").value("quantity"));
+      }
+    difficulty: MEDIUM
+    tags: [mock-mvc, validation, json-path]
+
+  - front: "How do TestContainers improve integration testing over embedded databases?"
+    back: "TestContainers spin up real Docker containers (PostgreSQL, Redis, Kafka) for tests, eliminating behavior differences between H2 and production databases. They catch issues with native SQL, database-specific features (JSON columns, window functions), and driver quirks that embedded DBs silently ignore. The @Container lifecycle ties container start/stop to test class lifecycle, and @DynamicPropertySource injects connection details into Spring context."
+    code_snippet: |
+      @SpringBootTest
+      @Testcontainers
+      class OrderRepositoryIT {
+          @Container
+          static PostgreSQLContainer<?> postgres =
+              new PostgreSQLContainer<>("postgres:15-alpine");
+
+          @DynamicPropertySource
+          static void configureProperties(DynamicPropertyRegistry registry) {
+              registry.add("spring.datasource.url", postgres::getJdbcUrl);
+              registry.add("spring.datasource.username", postgres::getUsername);
+              registry.add("spring.datasource.password", postgres::getPassword);
+          }
+
+          @Autowired
+          private OrderRepository orderRepository;
+
+          @Test
+          void shouldPersistWithJsonColumn() {
+              Order order = new Order(Map.of("key", "value"));
+              Order saved = orderRepository.save(order);
+              assertThat(saved.getId()).isNotNull();
+          }
+      }
+    difficulty: HARD
+    tags: [testcontainers, integration-testing, docker]
+
+  - front: "How does Spring Boot's test auto-configuration and slice isolation work internally?"
+    back: "Each @...Test annotation imports a specific set of auto-configuration classes via META-INF/spring/org.springframework.boot.test.autoconfigure.*.imports files. @WebMvcTest imports WebMvcAutoConfiguration, MockMvcAutoConfiguration, and Jackson but excludes DataSource and JPA. This selective import is controlled by @ImportAutoConfiguration and @OverrideAutoConfiguration(enabled=false) which disables full auto-configuration. Custom slices can be created by combining @TypeExcludeFilters with a custom AutoConfigureX annotation."
+    explanation: "Understanding slice internals helps debug why a bean is missing in a test - check if its auto-configuration is included in that slice's imports file."
+    difficulty: HARD
+    tags: [auto-configuration, test-slices, spring-internals]

@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: 010-create-indexes
+      author: interviewkata
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_card_next_review ON card(next_review) WHERE status != 'GRADUATED';
+
+        - createIndex:
+            indexName: idx_card_topic
+            tableName: card
+            columns:
+              - column:
+                  name: topic_id
+
+        - createIndex:
+            indexName: idx_submission_challenge
+            tableName: submission
+            columns:
+              - column:
+                  name: challenge_id
+
+        - createIndex:
+            indexName: idx_daily_activity_date
+            tableName: daily_activity
+            columns:
+              - column:
+                  name: activity_date
+
+        - createIndex:
+            indexName: idx_interview_turn_interview
+            tableName: interview_turn
+            columns:
+              - column:
+                  name: interview_id
+              - column:
+                  name: turn_number
+
+        - createIndex:
+            indexName: idx_mock_interview_date
+            tableName: mock_interview
+            columns:
+              - column:
+                  name: started_at
+
+        - createIndex:
+            indexName: idx_card_review_card
+            tableName: card_review
+            columns:
+              - column:
+                  name: card_id
+              - column:
+                  name: reviewed_at
+                  descending: true

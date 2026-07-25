@@ -1,0 +1,330 @@
+topic: "DSA/Graphs"
+challenges:
+  - title: "Number of Islands"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given a 2D grid of characters where '1' represents land and '0' represents water, count the total number of islands in the grid.
+
+      An island is defined as a group of adjacent land cells connected horizontally or vertically (not diagonally). Each island is completely surrounded by water or the grid boundary.
+
+      **Constraints:**
+      - m == grid.length
+      - n == grid[i].length
+      - 1 <= m, n <= 300
+      - grid[i][j] is '0' or '1'
+    starter_code: |
+      public class Solution {
+          public int numIslands(char[][] grid) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "grid = [['1','1','1','1','0'],['1','1','0','1','0'],['1','1','0','0','0'],['0','0','0','0','0']]"
+        expected: "1"
+        description: "Single island connected horizontally and vertically"
+      - input: "grid = [['1','1','0','0','0'],['1','1','0','0','0'],['0','0','1','0','0'],['0','0','0','1','1']]"
+        expected: "3"
+        description: "Three separate islands"
+      - input: "grid = [['1','0','1','0','1'],['0','1','0','1','0'],['1','0','1','0','1']]"
+        expected: "8"
+        description: "Checkerboard pattern - each cell is its own island"
+      - input: "grid = [['0','0','0'],['0','0','0']]"
+        expected: "0"
+        description: "All water - no islands"
+    hints:
+      - "Think about how to traverse all cells belonging to the same island. Once you find a '1', can you explore all connected '1's?"
+      - "Use DFS or BFS starting from each unvisited land cell. Mark visited cells by changing '1' to '0' (or using a visited set) to avoid counting the same island twice."
+      - "For each cell in the grid, if it is '1', increment your island count and sink the entire island using DFS/BFS by marking all connected '1's as '0'."
+
+  - title: "Surrounded Regions"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an m x n board containing 'X' and 'O', capture all regions that are completely surrounded by 'X'.
+
+      A region is captured by flipping all 'O' cells in that region to 'X'. A region is considered surrounded if none of its 'O' cells are on the border of the board. Any 'O' that is connected (horizontally or vertically) to an 'O' on the border cannot be captured.
+
+      **Constraints:**
+      - m == board.length
+      - n == board[i].length
+      - 1 <= m, n <= 200
+      - board[i][j] is 'X' or 'O'
+    starter_code: |
+      public class Solution {
+          public void solve(char[][] board) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "board = [['X','X','X','X'],['X','O','O','X'],['X','X','O','X'],['X','O','X','X']]"
+        expected: "[['X','X','X','X'],['X','X','X','X'],['X','X','X','X'],['X','O','X','X']]"
+        description: "Inner O's captured, border-connected O preserved"
+      - input: "board = [['X']]"
+        expected: "[['X']]"
+        description: "Single cell board"
+      - input: "board = [['O','O','O'],['O','O','O'],['O','O','O']]"
+        expected: "[['O','O','O'],['O','O','O'],['O','O','O']]"
+        description: "All O's connected to border - none captured"
+      - input: "board = [['X','X','X'],['X','O','X'],['X','X','X']]"
+        expected: "[['X','X','X'],['X','X','X'],['X','X','X']]"
+        description: "Single inner O completely surrounded - captured"
+    hints:
+      - "Instead of finding surrounded regions, think about which O's CANNOT be captured. What property do they share?"
+      - "Start from all O's on the border and mark them (and their connected O's) as safe using DFS/BFS. Any O not marked as safe is surrounded."
+      - "Use a three-phase approach: (1) Mark border-connected O's with a temporary marker like '#', (2) Flip all remaining O's to X, (3) Restore '#' back to O."
+
+  - title: "Clone Graph"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given a reference to a node in a connected undirected graph, return a deep copy (clone) of the entire graph.
+
+      Each node in the graph contains an integer value and a list of its neighbors. The graph is represented using adjacency lists.
+
+      Your cloned graph must be a completely new set of nodes with the same structure and values as the original. No node in the cloned graph should reference any node from the original graph.
+
+      Node definition:
+      class Node {
+          public int val;
+          public List<Node> neighbors;
+      }
+
+      **Constraints:**
+      - Number of nodes is in range [0, 100]
+      - 1 <= Node.val <= 100
+      - Node.val is unique for each node
+      - There are no repeated edges or self-loops
+      - The graph is connected and all nodes can be visited from the given node
+    starter_code: |
+      public class Solution {
+          public Node cloneGraph(Node node) {
+              // Your solution here
+              return null;
+          }
+      }
+    test_cases:
+      - input: "adjList = [[2,4],[1,3],[2,4],[1,3]]"
+        expected: "[[2,4],[1,3],[2,4],[1,3]]"
+        description: "4-node graph forming a cycle: 1-2-3-4-1"
+      - input: "adjList = [[]]"
+        expected: "[[]]"
+        description: "Single node with no neighbors"
+      - input: "adjList = []"
+        expected: "[]"
+        description: "Empty graph - null input returns null"
+      - input: "adjList = [[2],[1,3],[2]]"
+        expected: "[[2],[1,3],[2]]"
+        description: "Linear graph: 1-2-3"
+    hints:
+      - "You need a way to track which nodes have already been cloned to handle cycles. What data structure maps original nodes to their clones?"
+      - "Use a HashMap<Node, Node> to map each original node to its clone. When you encounter a node that is already in the map, return the existing clone instead of creating a new one."
+      - "Use BFS or DFS: clone the starting node, add it to the map, then for each neighbor either retrieve the existing clone from the map or create a new clone recursively."
+
+  - title: "Evaluate Division"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      You are given a set of equations in the form A / B = k, where A and B are variable strings and k is a real number. You are also given a list of queries, where each query asks for the result of C / D.
+
+      Return the answers to all queries. If a particular answer cannot be determined from the given equations, return -1.0 for that query.
+
+      Note that the input is always valid: no equation has a denominator of zero, and there are no contradictions in the equations.
+
+      **Constraints:**
+      - 1 <= equations.length <= 20
+      - equations[i].length == 2
+      - 1 <= equations[i][0].length, equations[i][1].length <= 5
+      - values.length == equations.length
+      - 0.0 < values[i] <= 20.0
+      - 1 <= queries.length <= 20
+      - queries[i].length == 2
+      - 1 <= queries[i][0].length, queries[i][1].length <= 5
+      - All input strings consist of lowercase English letters and digits
+    starter_code: |
+      public class Solution {
+          public double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
+              // Your solution here
+              return new double[0];
+          }
+      }
+    test_cases:
+      - input: "equations = [['a','b'],['b','c']], values = [2.0,3.0], queries = [['a','c'],['b','a'],['a','e'],['a','a'],['x','x']]"
+        expected: "[6.0, 0.5, -1.0, 1.0, -1.0]"
+        description: "a/b=2, b/c=3 => a/c=6, b/a=0.5, unknown=-1, self=1, nonexistent=-1"
+      - input: "equations = [['a','b'],['b','c'],['bc','cd']], values = [1.5,2.5,5.0], queries = [['a','c'],['c','b'],['bc','cd'],['cd','bc']]"
+        expected: "[3.75, 0.4, 5.0, 0.2]"
+        description: "Chain multiplication and inverse calculations"
+      - input: "equations = [['a','b']], values = [0.5], queries = [['a','b'],['b','a'],['a','c'],['x','y']]"
+        expected: "[0.5, 2.0, -1.0, -1.0]"
+        description: "Single equation with inverse and unknown queries"
+    hints:
+      - "Model the problem as a weighted directed graph. If a/b = k, create an edge from a to b with weight k, and from b to a with weight 1/k."
+      - "For each query C/D, find a path from C to D in the graph. The answer is the product of all edge weights along the path."
+      - "Use BFS or DFS to find the path between query nodes. If either node does not exist in the graph, or no path exists, return -1.0."
+
+  - title: "Course Schedule"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      There are a total of numCourses courses you need to take, labeled from 0 to numCourses - 1. Some courses have prerequisites: to take course A, you must first complete course B. This relationship is given as a pair [A, B].
+
+      Determine if it is possible to finish all courses. In other words, check whether the prerequisite structure contains a cycle that would make it impossible to complete all courses.
+
+      **Constraints:**
+      - 1 <= numCourses <= 2000
+      - 0 <= prerequisites.length <= 5000
+      - prerequisites[i].length == 2
+      - 0 <= prerequisites[i][0], prerequisites[i][1] < numCourses
+      - All prerequisite pairs are unique
+    starter_code: |
+      public class Solution {
+          public boolean canFinish(int numCourses, int[][] prerequisites) {
+              // Your solution here
+              return false;
+          }
+      }
+    test_cases:
+      - input: "numCourses = 2, prerequisites = [[1,0]]"
+        expected: "true"
+        description: "Simple prerequisite: take course 0 before course 1"
+      - input: "numCourses = 2, prerequisites = [[1,0],[0,1]]"
+        expected: "false"
+        description: "Cycle: courses 0 and 1 are mutual prerequisites"
+      - input: "numCourses = 4, prerequisites = [[1,0],[2,1],[3,2]]"
+        expected: "true"
+        description: "Linear chain of prerequisites with no cycle"
+      - input: "numCourses = 3, prerequisites = [[0,1],[1,2],[2,0]]"
+        expected: "false"
+        description: "Three-node cycle: 0->1->2->0"
+    hints:
+      - "This is a cycle detection problem in a directed graph. If there is a cycle among courses, it is impossible to finish all of them."
+      - "Use topological sort (Kahn's algorithm with BFS): start with nodes that have zero in-degree. If you can process all nodes, there is no cycle."
+      - "Alternative: Use DFS with three states per node (unvisited, in-progress, completed). A back edge to an in-progress node indicates a cycle."
+
+  - title: "Course Schedule II"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      There are numCourses courses labeled from 0 to numCourses - 1. You are given prerequisite pairs where [A, B] means you must take course B before course A.
+
+      Return an ordering of courses that allows you to finish all courses. If there are multiple valid orderings, return any of them. If it is impossible to finish all courses (due to cyclic dependencies), return an empty array.
+
+      **Constraints:**
+      - 1 <= numCourses <= 2000
+      - 0 <= prerequisites.length <= numCourses * (numCourses - 1)
+      - prerequisites[i].length == 2
+      - 0 <= prerequisites[i][0], prerequisites[i][1] < numCourses
+      - prerequisites[i][0] != prerequisites[i][1]
+      - All prerequisite pairs are unique
+    starter_code: |
+      public class Solution {
+          public int[] findOrder(int numCourses, int[][] prerequisites) {
+              // Your solution here
+              return new int[0];
+          }
+      }
+    test_cases:
+      - input: "numCourses = 2, prerequisites = [[1,0]]"
+        expected: "[0,1]"
+        description: "Must take course 0 before course 1"
+      - input: "numCourses = 4, prerequisites = [[1,0],[2,0],[3,1],[3,2]]"
+        expected: "[0,1,2,3]"
+        description: "Diamond dependency - course 0 first, then 1 and 2, finally 3"
+      - input: "numCourses = 2, prerequisites = [[1,0],[0,1]]"
+        expected: "[]"
+        description: "Cycle detected - impossible to complete"
+      - input: "numCourses = 3, prerequisites = []"
+        expected: "[0,1,2]"
+        description: "No prerequisites - any order is valid"
+    hints:
+      - "This extends Course Schedule by requiring you to output the actual topological order, not just detect if one exists."
+      - "Use Kahn's algorithm (BFS-based topological sort): maintain in-degree for each node, start with zero in-degree nodes, and record the order you process them."
+      - "If the result array length is less than numCourses after BFS completes, a cycle exists and you should return an empty array."
+
+  - title: "Snakes and Ladders"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      You are given an n x n integer matrix representing a Snakes and Ladders board. The board cells are labeled from 1 to n*n following a Boustrophedon (alternating direction) pattern starting from the bottom-left corner.
+
+      Starting from square 1, in each move you roll a 6-sided die (choosing to move to any of squares current+1 through current+6). If you land on a cell with a snake or ladder (board value != -1), you must move to the destination indicated by that cell's value.
+
+      Return the minimum number of dice rolls needed to reach square n*n. If it is not possible, return -1.
+
+      **Constraints:**
+      - n == board.length == board[i].length
+      - 2 <= n <= 20
+      - board[i][j] is either -1 or in range [1, n*n]
+      - Squares 1 and n*n do not have a snake or ladder
+    starter_code: |
+      public class Solution {
+          public int snakesAndLadders(int[][] board) {
+              // Your solution here
+              return -1;
+          }
+      }
+    test_cases:
+      - input: "board = [[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,35,-1,-1,13,-1],[-1,-1,-1,-1,-1,-1],[-1,15,-1,-1,-1,-1]]"
+        expected: "4"
+        description: "6x6 board with ladders - optimal path uses ladders to reach 36 in 4 rolls"
+      - input: "board = [[-1,-1],[-1,3]]"
+        expected: "1"
+        description: "2x2 board with ladder from square 1 area to square 3, reach 4 in 1 roll"
+      - input: "board = [[-1,-1,-1],[-1,-1,-1],[-1,-1,-1]]"
+        expected: "2"
+        description: "3x3 board with no snakes/ladders - need 2 rolls to reach 9"
+    hints:
+      - "This is a shortest path problem. What algorithm finds the shortest path in an unweighted graph?"
+      - "Use BFS starting from square 1. For each position, explore all 6 possible next squares (die rolls). If a square has a snake/ladder, move to its destination."
+      - "The tricky part is converting between the Boustrophedon numbering and matrix indices. Row from bottom = (label-1) / n, column depends on whether the row is left-to-right or right-to-left."
+
+  - title: "Minimum Genetic Mutation"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      A gene string is represented as an 8-character string composed of the characters 'A', 'C', 'G', and 'T'.
+
+      A mutation is defined as a single character change in the gene string. You are given a start gene string, an end gene string, and a bank of valid gene mutations. A mutation is only valid if the resulting gene string exists in the bank.
+
+      Find the minimum number of mutations needed to transform the start gene into the end gene. If no valid transformation sequence exists, return -1.
+
+      **Constraints:**
+      - startGene.length == endGene.length == 8
+      - startGene and endGene consist of characters from {'A', 'C', 'G', 'T'}
+      - 0 <= bank.length <= 10
+      - bank[i].length == 8
+      - bank[i] consists of characters from {'A', 'C', 'G', 'T'}
+    starter_code: |
+      public class Solution {
+          public int minMutation(String startGene, String endGene, String[] bank) {
+              // Your solution here
+              return -1;
+          }
+      }
+    test_cases:
+      - input: "startGene = \"AACCGGTT\", endGene = \"AACCGGTA\", bank = [\"AACCGGTA\"]"
+        expected: "1"
+        description: "Single mutation: last T changes to A"
+      - input: "startGene = \"AACCGGTT\", endGene = \"AAACGGTA\", bank = [\"AACCGGTA\",\"AACCGCTA\",\"AAACGGTA\"]"
+        expected: "2"
+        description: "Two mutations: AACCGGTT -> AACCGGTA -> AAACGGTA"
+      - input: "startGene = \"AAAAACCC\", endGene = \"AACCCCCC\", bank = [\"AAAACCCC\",\"AAACCCCC\",\"AACCCCCC\"]"
+        expected: "3"
+        description: "Three sequential mutations needed"
+      - input: "startGene = \"AACCGGTT\", endGene = \"AACCGGTA\", bank = []"
+        expected: "-1"
+        description: "Empty bank - no valid mutations possible"
+    hints:
+      - "This is similar to word ladder. Each gene is a node, and two genes are connected if they differ by exactly one character and both are in the bank."
+      - "Use BFS from the start gene. At each step, try changing each of the 8 positions to each of the 4 possible characters. Only proceed if the new gene is in the bank."
+      - "Use a HashSet for the bank for O(1) lookup. Remove visited genes from the set to avoid revisiting. BFS guarantees the first time you reach the end gene is the minimum mutations."

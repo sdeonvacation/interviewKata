@@ -1,0 +1,101 @@
+topic: "DSA/Trees"
+cards:
+  - front: "What are the time complexities of BST operations and when do they degrade?"
+    back: "BST operations (search, insert, delete) are O(h) where h is tree height. Balanced BST: h = O(log n), so operations are O(log n). Worst case (skewed tree): h = O(n), degrading to linked list performance. This is why self-balancing trees (AVL, Red-Black) are used in practice. Delete has three cases: leaf node (remove), one child (bypass), two children (replace with in-order successor/predecessor)."
+    difficulty: EASY
+    tags: [bst, time-complexity, operations]
+
+  - front: "Compare in-order, pre-order, post-order, and level-order tree traversals."
+    back: "In-order (Left, Root, Right): produces sorted sequence for BST. Pre-order (Root, Left, Right): useful for tree serialization and copying. Post-order (Left, Right, Root): useful for deletion and evaluating expression trees. Level-order (BFS): visits nodes level by level using a queue. All DFS traversals are O(n) time, O(h) space (recursion stack). Level-order is O(n) time, O(w) space where w is max width."
+    code_snippet: |
+      // Iterative in-order using stack
+      Stack<TreeNode> stack = new Stack<>();
+      TreeNode curr = root;
+      while (curr != null || !stack.isEmpty()) {
+          while (curr != null) {
+              stack.push(curr);
+              curr = curr.left;
+          }
+          curr = stack.pop();
+          result.add(curr.val); // visit
+          curr = curr.right;
+      }
+    difficulty: EASY
+    tags: [traversal, inorder, preorder, postorder, bfs]
+
+  - front: "How do AVL trees and Red-Black trees maintain balance? Compare them."
+    back: "AVL: strictly balanced (height difference between subtrees <= 1). Uses rotations (single/double) after insert/delete. Faster lookups due to stricter balance. Red-Black: relaxed balance via coloring rules (root is black, no two consecutive reds, equal black-height on all paths). Fewer rotations on insert/delete (max 2 rotations for insert, max 3 for delete). AVL better for read-heavy workloads; Red-Black better for write-heavy (used in Java TreeMap, Linux kernel)."
+    difficulty: HARD
+    tags: [avl, red-black-tree, balanced-tree, rotations]
+
+  - front: "Explain the Trie data structure and its applications."
+    back: "A Trie (prefix tree) stores strings character-by-character in a tree where each edge represents a character. Each node may mark end-of-word. Operations (insert, search, prefix search) are O(m) where m is string length, independent of number of stored strings. Applications: autocomplete, spell checking, IP routing (longest prefix match), word games, phone directories."
+    code_snippet: |
+      class TrieNode {
+          TrieNode[] children = new TrieNode[26];
+          boolean isEndOfWord;
+      }
+      // Insert word
+      void insert(String word) {
+          TrieNode node = root;
+          for (char c : word.toCharArray()) {
+              int idx = c - 'a';
+              if (node.children[idx] == null)
+                  node.children[idx] = new TrieNode();
+              node = node.children[idx];
+          }
+          node.isEndOfWord = true;
+      }
+    difficulty: MEDIUM
+    tags: [trie, prefix-tree, string, autocomplete]
+
+  - front: "What is a Segment Tree and what problems does it solve?"
+    back: "A Segment Tree is a binary tree where each node stores aggregate information (sum, min, max) for a range of array elements. Supports range queries and point/range updates in O(log n). Build: O(n). Applications: range sum/min/max queries with updates, counting inversions, interval scheduling. Lazy propagation enables O(log n) range updates by deferring updates to children until needed."
+    code_snippet: |
+      // Build segment tree for range sum
+      void build(int[] arr, int node, int start, int end) {
+          if (start == end) {
+              tree[node] = arr[start];
+          } else {
+              int mid = (start + end) / 2;
+              build(arr, 2*node, start, mid);
+              build(arr, 2*node+1, mid+1, end);
+              tree[node] = tree[2*node] + tree[2*node+1];
+          }
+      }
+    difficulty: HARD
+    tags: [segment-tree, range-query, lazy-propagation]
+
+  - front: "How do you find the Lowest Common Ancestor (LCA) of two nodes?"
+    back: "For BST: traverse from root — if both nodes are smaller, go left; if both larger, go right; otherwise current node is LCA. O(h). For general binary tree: (1) Recursive — if current node is either target, return it; recurse left and right; if both return non-null, current is LCA. O(n). (2) Binary Lifting — precompute 2^k-th ancestors for O(log n) queries after O(n log n) preprocessing. (3) Euler tour + RMQ for O(1) queries."
+    code_snippet: |
+      // LCA in binary tree (recursive)
+      TreeNode lca(TreeNode root, TreeNode p, TreeNode q) {
+          if (root == null || root == p || root == q) return root;
+          TreeNode left = lca(root.left, p, q);
+          TreeNode right = lca(root.right, p, q);
+          if (left != null && right != null) return root;
+          return left != null ? left : right;
+      }
+    difficulty: MEDIUM
+    tags: [lca, binary-tree, bst, ancestor]
+
+  - front: "How do you serialize and deserialize a binary tree?"
+    back: "Serialization converts a tree to a string; deserialization reconstructs it. Common approaches: (1) Pre-order with null markers — serialize as 'val,left,right' with '#' for null. Deserialize by reading tokens sequentially. (2) Level-order (BFS) with null markers. (3) Pre-order + in-order (no null markers needed, but requires unique values). Pre-order with nulls is simplest: O(n) time and space for both operations."
+    code_snippet: |
+      // Serialize: pre-order with null markers
+      String serialize(TreeNode root) {
+          if (root == null) return "#";
+          return root.val + "," + serialize(root.left) + "," + serialize(root.right);
+      }
+      // Deserialize
+      TreeNode deserialize(Queue<String> tokens) {
+          String val = tokens.poll();
+          if ("#".equals(val)) return null;
+          TreeNode node = new TreeNode(Integer.parseInt(val));
+          node.left = deserialize(tokens);
+          node.right = deserialize(tokens);
+          return node;
+      }
+    difficulty: MEDIUM
+    tags: [serialization, binary-tree, preorder]

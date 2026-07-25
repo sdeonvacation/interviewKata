@@ -1,0 +1,66 @@
+topic: "System Design/Load Balancing"
+cards:
+  - front: "Explain round robin vs weighted round robin load balancing. When would you choose weighted?"
+    back: |
+      Round robin distributes requests sequentially across servers in equal turns. Weighted round robin assigns a weight to each server, sending proportionally more traffic to higher-weight nodes. Choose weighted when servers have unequal capacity (e.g., 16-core vs 4-core machines) or during canary deployments where new versions should receive less traffic initially.
+    difficulty: EASY
+    tags: [load-balancing, round-robin, traffic-distribution]
+
+  - front: "How does the least connections algorithm work and what problem does it solve that round robin cannot?"
+    back: |
+      Least connections routes each new request to the server with the fewest active connections. It solves the problem of uneven load caused by variable request duration. Round robin can overload a server handling slow requests (large file uploads, long DB queries) while other servers sit idle. Least connections naturally adapts to heterogeneous workloads without manual weight tuning.
+    difficulty: EASY
+    tags: [load-balancing, least-connections, adaptive]
+
+  - front: "What is consistent hashing and why is it preferred over modulo-based hashing for distributed caches behind a load balancer?"
+    back: |
+      Consistent hashing maps both servers and keys onto a hash ring. Each key is served by the next server clockwise on the ring. When a node is added or removed, only K/N keys are remapped (K=total keys, N=nodes). Modulo hashing (key % N) remaps nearly all keys when N changes, causing a cache stampede. Virtual nodes improve uniformity by mapping each physical server to multiple ring positions.
+    code_snippet: |
+      // Simplified consistent hash ring in Java
+      TreeMap<Integer, String> ring = new TreeMap<>();
+      for (String server : servers) {
+          for (int i = 0; i < VIRTUAL_NODES; i++) {
+              int hash = hash(server + "#" + i);
+              ring.put(hash, server);
+          }
+      }
+      // Route a request
+      int keyHash = hash(requestKey);
+      Map.Entry<Integer, String> entry = ring.ceilingEntry(keyHash);
+      String target = (entry != null) ? entry.getValue() : ring.firstEntry().getValue();
+    difficulty: MEDIUM
+    tags: [consistent-hashing, distributed-systems, cache]
+
+  - front: "Compare L4 and L7 load balancing. What capabilities does L7 provide that L4 cannot?"
+    back: |
+      L4 (transport layer) routes based on IP and TCP/UDP port without inspecting payload. L7 (application layer) inspects HTTP headers, URLs, cookies, and body content. L7 enables content-based routing (path-based, header-based), SSL termination, request transformation, caching, and WAF integration. L4 is faster with lower latency since it avoids parsing; use it for non-HTTP protocols or when raw throughput matters more than routing intelligence.
+    difficulty: MEDIUM
+    tags: [L4-vs-L7, network-layers, routing]
+
+  - front: "What are the tradeoffs of sticky sessions (session affinity)? How would you eliminate the need for them?"
+    back: |
+      Sticky sessions pin a user to one server via cookies or IP hash. Tradeoffs: uneven load distribution, reduced fault tolerance (server failure loses all pinned sessions), complicates scaling and deployments. Eliminate them by externalizing session state to a shared store (Redis, Memcached) or using stateless JWTs. This allows any server to handle any request, enabling true horizontal scaling.
+    code_snippet: |
+      // Spring Session with Redis - eliminates sticky sessions
+      @EnableRedisHttpSession
+      @Configuration
+      public class SessionConfig {
+          @Bean
+          public LettuceConnectionFactory connectionFactory() {
+              return new LettuceConnectionFactory("redis-host", 6379);
+          }
+      }
+    difficulty: MEDIUM
+    tags: [sticky-sessions, stateless, session-management]
+
+  - front: "How do health checks work in a load balancer? Distinguish between active and passive health checks."
+    back: |
+      Active health checks: the load balancer periodically sends probe requests (HTTP GET /health, TCP connect) to backends and removes unresponsive servers from the pool. Passive health checks: the load balancer monitors real traffic responses and marks a server unhealthy after N consecutive failures (e.g., 5xx errors or timeouts). Best practice is combining both: passive for fast failure detection, active for confirming recovery before re-adding to pool.
+    difficulty: MEDIUM
+    tags: [health-checks, fault-tolerance, high-availability]
+
+  - front: "Design a global load balancing strategy using DNS. What are the limitations and how do you mitigate them?"
+    back: |
+      DNS-based load balancing returns different IP addresses per query using weighted or geo-based resolution (e.g., Route 53, Cloud DNS). Limitations: DNS TTL caching means clients hold stale IPs after failover (mitigation: low TTLs of 30-60s, but increases DNS query load), no health awareness at resolver level (mitigation: integrate health checks into DNS provider to remove unhealthy IPs), and no consideration of server load. For robust global routing, combine DNS-level geo-routing with regional L7 load balancers that handle fine-grained health-aware distribution.
+    difficulty: HARD
+    tags: [dns-load-balancing, global-routing, geo-distribution]

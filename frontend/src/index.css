@@ -1,0 +1,187 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #06090f;
+    color: #f0f6fc;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: rgba(245, 158, 11, 0.3);
+    color: #f0f6fc;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(245, 158, 11, 0.4);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+  }
+}
+
+@layer components {
+  .card {
+    background-color: rgba(13, 17, 23, 0.8);
+    backdrop-filter: blur(24px);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .card-glow {
+    background-color: rgba(13, 17, 23, 0.8);
+    backdrop-filter: blur(24px);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.15), 0 0 6px rgba(245, 158, 11, 0.1);
+  }
+
+  .btn-primary {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #06090f;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
+  }
+  .btn-primary:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+  }
+
+  .btn-secondary {
+    background-color: #0d1117;
+    color: #f0f6fc;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .btn-secondary:hover {
+    background-color: #161b22;
+  }
+
+  .btn-ghost {
+    background-color: transparent;
+    color: #8b949e;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: color 0.2s;
+  }
+  .btn-ghost:hover {
+    color: #f0f6fc;
+  }
+
+  .input-field {
+    background-color: #0d1117;
+    color: #f0f6fc;
+    font-family: 'Inter', sans-serif;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    outline: none;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .input-field:focus {
+    border-color: rgba(245, 158, 11, 0.5);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .badge-amber {
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+  }
+  .badge-emerald {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+  }
+  .badge-rose {
+    background-color: rgba(244, 63, 94, 0.15);
+    color: #fb7185;
+  }
+  .badge-sky {
+    background-color: rgba(14, 165, 233, 0.15);
+    color: #38bdf8;
+  }
+
+  .stat-card {
+    background-color: rgba(13, 17, 23, 0.8);
+    backdrop-filter: blur(24px);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .stat-card .stat-value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
+  }
+  .stat-card .stat-label {
+    font-size: 14px;
+    color: #8b949e;
+  }
+  .stat-card .stat-trend {
+    font-size: 12px;
+    font-weight: 500;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow-amber {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.15), 0 0 6px rgba(245, 158, 11, 0.1);
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+}

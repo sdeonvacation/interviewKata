@@ -1,0 +1,91 @@
+topic: "DSA/Dynamic Programming"
+cards:
+  - front: "What is the difference between memoization (top-down) and tabulation (bottom-up) DP?"
+    back: "Memoization: recursive approach that caches results of subproblems as they're computed. Starts from the original problem and breaks down. Tabulation: iterative approach that fills a table from smallest subproblems up. Memoization is easier to implement and only solves needed subproblems. Tabulation avoids recursion overhead, has better cache locality, and can optimize space by keeping only needed rows/states."
+    difficulty: EASY
+    tags: [memoization, tabulation, top-down, bottom-up]
+
+  - front: "What are the two key properties that indicate a problem can be solved with DP?"
+    back: "1) Optimal substructure: the optimal solution contains optimal solutions to subproblems. (e.g., shortest path — subpaths of shortest path are also shortest). 2) Overlapping subproblems: the same subproblems are solved multiple times. (e.g., Fibonacci — fib(5) computes fib(3) twice). If only optimal substructure exists without overlap, greedy or divide-and-conquer may be better."
+    explanation: "To identify DP problems: look for optimization (min/max/count), choices at each step, and recursive structure where subproblems repeat. Common patterns: linear DP, interval DP, tree DP, bitmask DP, digit DP."
+    difficulty: EASY
+    tags: [optimal-substructure, overlapping-subproblems, identification]
+
+  - front: "Explain the 0/1 Knapsack problem and its DP solution."
+    back: "Given n items with weights and values, and a knapsack capacity W, maximize total value without exceeding capacity. Each item is taken or not (0/1). DP state: dp[i][w] = max value using first i items with capacity w. Transition: dp[i][w] = max(dp[i-1][w], dp[i-1][w-weight[i]] + value[i]). Time: O(nW), Space: O(nW) reducible to O(W) since each row only depends on the previous row."
+    code_snippet: |
+      // Space-optimized 0/1 Knapsack
+      int[] dp = new int[W + 1];
+      for (int i = 0; i < n; i++) {
+          for (int w = W; w >= weight[i]; w--) { // reverse to avoid reuse
+              dp[w] = Math.max(dp[w], dp[w - weight[i]] + value[i]);
+          }
+      }
+      return dp[W];
+    difficulty: MEDIUM
+    tags: [knapsack, optimization, classic]
+
+  - front: "How does the Longest Common Subsequence (LCS) algorithm work?"
+    back: "Find the longest subsequence common to two strings. DP state: dp[i][j] = LCS length of first i chars of s1 and first j chars of s2. Transition: if s1[i-1] == s2[j-1], dp[i][j] = dp[i-1][j-1] + 1; else dp[i][j] = max(dp[i-1][j], dp[i][j-1]). Time: O(mn), Space: O(mn) reducible to O(min(m,n)). To reconstruct the actual subsequence, backtrack from dp[m][n]."
+    code_snippet: |
+      int[][] dp = new int[m + 1][n + 1];
+      for (int i = 1; i <= m; i++) {
+          for (int j = 1; j <= n; j++) {
+              if (s1.charAt(i-1) == s2.charAt(j-1))
+                  dp[i][j] = dp[i-1][j-1] + 1;
+              else
+                  dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+          }
+      }
+      return dp[m][n];
+    difficulty: MEDIUM
+    tags: [lcs, string, subsequence, classic]
+
+  - front: "Explain the Longest Increasing Subsequence (LIS) problem and its O(n log n) solution."
+    back: "Find the length of the longest strictly increasing subsequence. O(n²) DP: dp[i] = LIS ending at index i. O(n log n) patience sorting: maintain an array 'tails' where tails[i] = smallest tail element for increasing subsequence of length i+1. For each element, binary search for its position in tails. If larger than all, append; otherwise replace the first element >= it. Final answer is tails.length."
+    code_snippet: |
+      // O(n log n) LIS
+      List<Integer> tails = new ArrayList<>();
+      for (int num : arr) {
+          int pos = Collections.binarySearch(tails, num);
+          if (pos < 0) pos = -(pos + 1);
+          if (pos == tails.size()) tails.add(num);
+          else tails.set(pos, num);
+      }
+      return tails.size();
+    difficulty: HARD
+    tags: [lis, binary-search, patience-sorting]
+
+  - front: "Describe the Coin Change problem and its DP formulation."
+    back: "Given coin denominations and a target amount, find the minimum number of coins needed (or number of ways to make change). Min coins: dp[amount] = min(dp[amount - coin] + 1) for each coin. Initialize dp[0] = 0, rest = infinity. Count ways: dp[amount] += dp[amount - coin] for each coin. For unbounded supply, iterate coins in outer loop (combinations) or inner loop (permutations)."
+    code_snippet: |
+      // Minimum coins
+      int[] dp = new int[amount + 1];
+      Arrays.fill(dp, amount + 1);
+      dp[0] = 0;
+      for (int coin : coins) {
+          for (int a = coin; a <= amount; a++) {
+              dp[a] = Math.min(dp[a], dp[a - coin] + 1);
+          }
+      }
+      return dp[amount] > amount ? -1 : dp[amount];
+    difficulty: MEDIUM
+    tags: [coin-change, unbounded-knapsack, classic]
+
+  - front: "What is the state transition pattern for interval DP problems?"
+    back: "Interval DP solves problems on contiguous subarrays/substrings. State: dp[i][j] = optimal answer for interval [i, j]. Transition: try all split points k in [i, j-1]: dp[i][j] = optimize(dp[i][k] + dp[k+1][j] + cost(i,k,j)). Iterate by increasing interval length. Examples: matrix chain multiplication, burst balloons, palindrome partitioning, optimal BST. Time typically O(n³)."
+    code_snippet: |
+      // Matrix Chain Multiplication
+      for (int len = 2; len <= n; len++) {
+          for (int i = 0; i <= n - len; i++) {
+              int j = i + len - 1;
+              dp[i][j] = Integer.MAX_VALUE;
+              for (int k = i; k < j; k++) {
+                  int cost = dp[i][k] + dp[k+1][j]
+                           + dims[i] * dims[k+1] * dims[j+1];
+                  dp[i][j] = Math.min(dp[i][j], cost);
+              }
+          }
+      }
+    difficulty: HARD
+    tags: [interval-dp, matrix-chain, split-point]

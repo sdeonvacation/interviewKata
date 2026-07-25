@@ -1,0 +1,189 @@
+topic: "Architecture/Design Patterns"
+cards:
+  - front: "What is the Singleton pattern and how do you implement it safely in Java?"
+    back: "Singleton ensures a class has exactly one instance with a global access point. Thread-safe implementations: (1) Enum singleton (preferred — handles serialization and reflection). (2) Bill Pugh (static inner class — lazy, thread-safe via class loading). (3) Double-checked locking with volatile. Avoid: eager initialization wastes resources if unused; synchronized getInstance() has performance overhead."
+    code_snippet: |
+      // Enum Singleton (preferred)
+      public enum DatabaseConnection {
+          INSTANCE;
+          public void query(String sql) { /* ... */ }
+      }
+
+      // Bill Pugh (lazy initialization holder)
+      public class Singleton {
+          private Singleton() {}
+          private static class Holder {
+              private static final Singleton INSTANCE = new Singleton();
+          }
+          public static Singleton getInstance() {
+              return Holder.INSTANCE;
+          }
+      }
+    difficulty: EASY
+    tags: [singleton, creational, thread-safety]
+
+  - front: "Explain the Factory Method and Abstract Factory patterns."
+    back: "Factory Method: defines an interface for creating objects but lets subclasses decide which class to instantiate. Decouples client from concrete classes. Abstract Factory: provides an interface for creating families of related objects without specifying concrete classes. Use Factory Method when you have one product hierarchy; Abstract Factory when you have multiple related product families that must be used together."
+    code_snippet: |
+      // Factory Method
+      public abstract class NotificationFactory {
+          public abstract Notification createNotification();
+          public void send(String message) {
+              Notification n = createNotification();
+              n.notify(message);
+          }
+      }
+      public class EmailFactory extends NotificationFactory {
+          public Notification createNotification() {
+              return new EmailNotification();
+          }
+      }
+
+      // Abstract Factory
+      public interface UIFactory {
+          Button createButton();
+          TextField createTextField();
+      }
+      public class MaterialUIFactory implements UIFactory { /* ... */ }
+    difficulty: MEDIUM
+    tags: [factory, abstract-factory, creational]
+
+  - front: "What is the Strategy pattern and when should you use it?"
+    back: "Strategy defines a family of algorithms, encapsulates each one, and makes them interchangeable. The client selects the algorithm at runtime. Use when: (1) Multiple algorithms exist for a task and you want to switch between them. (2) You want to eliminate conditional statements for algorithm selection. (3) Algorithms should be independently testable. Follows Open/Closed Principle — add new strategies without modifying existing code."
+    code_snippet: |
+      public interface CompressionStrategy {
+          byte[] compress(byte[] data);
+      }
+      public class GzipCompression implements CompressionStrategy {
+          public byte[] compress(byte[] data) { /* gzip logic */ }
+      }
+      public class ZipCompression implements CompressionStrategy {
+          public byte[] compress(byte[] data) { /* zip logic */ }
+      }
+      // Client
+      public class FileCompressor {
+          private CompressionStrategy strategy;
+          public FileCompressor(CompressionStrategy strategy) {
+              this.strategy = strategy;
+          }
+          public byte[] compress(byte[] data) {
+              return strategy.compress(data);
+          }
+      }
+    difficulty: EASY
+    tags: [strategy, behavioral, polymorphism]
+
+  - front: "Explain the Observer pattern and its relationship to event-driven systems."
+    back: "Observer defines a one-to-many dependency where when one object (subject) changes state, all dependents (observers) are notified automatically. Promotes loose coupling — subject doesn't know concrete observer types. In Java: PropertyChangeListener, Spring ApplicationEvent. Pitfalls: memory leaks (forgotten subscriptions), ordering dependencies, cascade updates. Modern alternatives: reactive streams (RxJava, Project Reactor), event buses."
+    code_snippet: |
+      public interface EventListener {
+          void onEvent(Event event);
+      }
+      public class EventBus {
+          private final Map<String, List<EventListener>> listeners = new HashMap<>();
+
+          public void subscribe(String eventType, EventListener listener) {
+              listeners.computeIfAbsent(eventType, k -> new ArrayList<>())
+                       .add(listener);
+          }
+          public void publish(String eventType, Event event) {
+              listeners.getOrDefault(eventType, List.of())
+                       .forEach(l -> l.onEvent(event));
+          }
+      }
+    difficulty: MEDIUM
+    tags: [observer, behavioral, event-driven, pub-sub]
+
+  - front: "What is the Builder pattern and when is it preferred over constructors?"
+    back: "Builder separates construction of a complex object from its representation. Preferred when: (1) Constructor has many parameters (telescoping constructor anti-pattern). (2) Object has required and optional fields. (3) Object should be immutable after construction. (4) Construction involves multiple steps. In Java, often implemented as a static inner class. Lombok's @Builder generates this automatically."
+    code_snippet: |
+      public class HttpRequest {
+          private final String url;
+          private final String method;
+          private final Map<String, String> headers;
+          private final String body;
+
+          private HttpRequest(Builder builder) {
+              this.url = builder.url;
+              this.method = builder.method;
+              this.headers = Map.copyOf(builder.headers);
+              this.body = builder.body;
+          }
+          public static class Builder {
+              private final String url; // required
+              private String method = "GET";
+              private Map<String, String> headers = new HashMap<>();
+              private String body;
+
+              public Builder(String url) { this.url = url; }
+              public Builder method(String m) { this.method = m; return this; }
+              public Builder header(String k, String v) { headers.put(k, v); return this; }
+              public Builder body(String b) { this.body = b; return this; }
+              public HttpRequest build() { return new HttpRequest(this); }
+          }
+      }
+    difficulty: EASY
+    tags: [builder, creational, immutable, fluent-api]
+
+  - front: "Explain the Decorator pattern and how it differs from inheritance."
+    back: "Decorator dynamically adds responsibilities to objects by wrapping them. Both decorator and wrapped object implement the same interface. Unlike inheritance (static, compile-time), decorators compose behavior at runtime and can be stacked. Use when: extending functionality without subclass explosion, adding cross-cutting concerns (logging, caching, validation). Java examples: BufferedInputStream wrapping FileInputStream, Collections.unmodifiableList()."
+    code_snippet: |
+      public interface DataSource {
+          String readData();
+          void writeData(String data);
+      }
+      public class FileDataSource implements DataSource { /* base */ }
+
+      public class EncryptionDecorator implements DataSource {
+          private final DataSource wrapped;
+          public EncryptionDecorator(DataSource source) { this.wrapped = source; }
+          public String readData() { return decrypt(wrapped.readData()); }
+          public void writeData(String data) { wrapped.writeData(encrypt(data)); }
+      }
+      // Usage: new EncryptionDecorator(new CompressionDecorator(new FileDataSource()))
+    difficulty: MEDIUM
+    tags: [decorator, structural, composition, wrapping]
+
+  - front: "What is the Proxy pattern and what are its common variants?"
+    back: "Proxy provides a surrogate or placeholder for another object to control access. Variants: (1) Virtual Proxy — lazy initialization of expensive objects. (2) Protection Proxy — access control based on permissions. (3) Remote Proxy — represents an object in a different address space (RMI). (4) Caching Proxy — caches results of expensive operations. (5) Logging Proxy — adds logging around method calls. In Java: java.lang.reflect.Proxy for dynamic proxies, Spring AOP proxies."
+    code_snippet: |
+      public class CachingProxy implements DataService {
+          private final DataService realService;
+          private final Map<String, Object> cache = new ConcurrentHashMap<>();
+
+          public CachingProxy(DataService realService) {
+              this.realService = realService;
+          }
+          public Object getData(String key) {
+              return cache.computeIfAbsent(key, realService::getData);
+          }
+      }
+    difficulty: MEDIUM
+    tags: [proxy, structural, lazy-loading, access-control]
+
+  - front: "Explain the Command pattern and its use in undo/redo systems."
+    back: "Command encapsulates a request as an object, allowing parameterization, queuing, logging, and undo/redo. Components: Command (interface with execute/undo), ConcreteCommand (binds receiver to action), Invoker (triggers commands), Receiver (performs actual work). For undo: maintain a history stack of executed commands; each command knows how to reverse itself. Enables macro commands (composite of multiple commands)."
+    code_snippet: |
+      public interface Command {
+          void execute();
+          void undo();
+      }
+      public class InsertTextCommand implements Command {
+          private final TextEditor editor;
+          private final String text;
+          private final int position;
+
+          public InsertTextCommand(TextEditor editor, String text, int pos) {
+              this.editor = editor; this.text = text; this.position = pos;
+          }
+          public void execute() { editor.insert(text, position); }
+          public void undo() { editor.delete(position, text.length()); }
+      }
+      // Invoker with undo stack
+      public class CommandHistory {
+          private final Deque<Command> history = new ArrayDeque<>();
+          public void execute(Command cmd) { cmd.execute(); history.push(cmd); }
+          public void undo() { if (!history.isEmpty()) history.pop().undo(); }
+      }
+    difficulty: MEDIUM
+    tags: [command, behavioral, undo-redo, encapsulation]

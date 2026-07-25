@@ -1,0 +1,79 @@
+topic: "Database/SQL Fundamentals"
+cards:
+  - front: "What are the ACID properties and what does each guarantee?"
+    back: "Atomicity: entire transaction succeeds or fails completely (no partial writes). Consistency: transaction moves DB from one valid state to another (constraints/triggers enforced). Isolation: concurrent transactions don't interfere with each other (as if sequential). Durability: once committed, data survives crashes (written to non-volatile storage). Trade-offs: strict ACID reduces throughput; many systems relax isolation for performance."
+    difficulty: EASY
+    tags: [acid, transactions, fundamentals]
+
+  - front: "What are the SQL isolation levels and what anomalies does each prevent?"
+    back: "READ UNCOMMITTED: allows dirty reads, non-repeatable reads, phantoms. READ COMMITTED (PostgreSQL default): prevents dirty reads; allows non-repeatable reads and phantoms. REPEATABLE READ: prevents dirty and non-repeatable reads; PostgreSQL also prevents phantoms (snapshot isolation). SERIALIZABLE: prevents all anomalies including write skew; transactions appear to execute serially. Higher isolation = more blocking/aborts = lower throughput."
+    explanation: "Dirty read: reading uncommitted data from another transaction. Non-repeatable read: re-reading same row gives different result. Phantom: re-executing query returns new/removed rows."
+    difficulty: MEDIUM
+    tags: [isolation-levels, transactions, concurrency]
+
+  - front: "How does a B-tree index work and why is it the default index type?"
+    back: "B-tree is a balanced tree where each node contains sorted keys and pointers to child nodes. Leaf nodes contain pointers to actual rows. Properties: O(log n) search, insert, delete. Supports equality (=) and range queries (<, >, BETWEEN). Keeps data sorted enabling ORDER BY without extra sort. Self-balancing: splits/merges maintain O(log n) height. Default because it handles most query patterns well (point lookups, ranges, sorting, prefix LIKE)."
+    difficulty: MEDIUM
+    tags: [b-tree, index, data-structures]
+
+  - front: "What is the difference between clustered and non-clustered indexes?"
+    back: "Clustered index: defines physical row order on disk. Table data IS the index leaf level. Only ONE per table. In PostgreSQL, this is the table heap itself (CLUSTER command reorders once but doesn't maintain). In MySQL InnoDB, primary key IS the clustered index. Non-clustered (secondary) index: separate structure pointing to the row location. Multiple allowed. Lookups may need a 'bookmark lookup' to fetch non-indexed columns from the base table."
+    difficulty: MEDIUM
+    tags: [clustered-index, non-clustered, physical-storage]
+
+  - front: "How do you read an EXPLAIN ANALYZE output in PostgreSQL?"
+    back: "Key metrics: 1) actual time (first row..last row in ms). 2) rows: estimated vs actual (big difference = stale statistics). 3) loops: how many times node executed. 4) Plan nodes: Seq Scan (full table), Index Scan (index + heap), Index Only Scan (covers query), Bitmap Scan (two-phase: build bitmap, then fetch). 5) Nested Loop vs Hash Join vs Merge Join. Look for: Seq Scan on large tables, high row estimates vs actual, Sort with large external sorts."
+    code_snippet: |
+      EXPLAIN ANALYZE SELECT * FROM orders WHERE customer_id = 42;
+      -- Index Scan using idx_orders_customer on orders
+      --   (cost=0.43..8.45 rows=1 width=64)
+      --   (actual time=0.023..0.025 rows=3 loops=1)
+      -- Planning Time: 0.15 ms
+      -- Execution Time: 0.08 ms
+    difficulty: HARD
+    tags: [explain-analyze, query-plan, postgresql, performance]
+
+  - front: "What is the N+1 query problem and how do you solve it?"
+    back: "N+1 problem: fetching a parent entity with N children results in 1 query for parents + N individual queries for each child's related data. Example: loading 100 orders then lazily fetching customer for each = 101 queries. Solutions: 1) JOIN FETCH / eager join in one query. 2) Batch fetching (@BatchSize in Hibernate). 3) Subselect fetching. 4) EntityGraph or @Fetch(FetchMode.SUBSELECT). 5) DTO projection with explicit JOIN in JPQL. Detect with: Hibernate SQL logging or p6spy."
+    difficulty: EASY
+    tags: [n-plus-one, orm, performance, hibernate]
+
+  - front: "What is connection pooling and why is it essential for database performance?"
+    back: "Connection pooling maintains a cache of reusable database connections. Opening a new DB connection involves TCP handshake, TLS negotiation, authentication, memory allocation - expensive (5-50ms). Pools (HikariCP, pgBouncer) keep connections open and lend them to requests. Key settings: maximumPoolSize (typically 2*CPU cores + effective_spindle_count for OLTP), minimumIdle, connectionTimeout, idleTimeout, maxLifetime. Too many connections cause contention on DB side (context switching, lock contention)."
+    difficulty: MEDIUM
+    tags: [connection-pooling, hikaricp, performance]
+
+  - front: "What is the difference between optimistic and pessimistic locking?"
+    back: "Optimistic: assume conflicts are rare. Read data with a version/timestamp. On write, check version hasn't changed; if it has, retry or fail (StaleObjectStateException). No DB locks held during read. Good for: high-read, low-contention. Pessimistic: acquire explicit lock on read (SELECT FOR UPDATE). Blocks other transactions from modifying the row. Good for: high-contention, short transactions. Trade-off: pessimistic prevents conflicts but reduces concurrency; optimistic allows concurrency but may require retries."
+    code_snippet: |
+      // JPA Optimistic Locking
+      @Entity
+      public class Account {
+          @Version
+          private long version; // auto-incremented on update
+      }
+      
+      -- Pessimistic (SQL)
+      SELECT * FROM accounts WHERE id = 1 FOR UPDATE;
+      -- Row is locked until transaction commits/rolls back
+    difficulty: MEDIUM
+    tags: [optimistic-locking, pessimistic-locking, concurrency]
+
+  - front: "What are the normal forms (1NF through 3NF) in database normalization?"
+    back: "1NF: each column holds atomic (indivisible) values; no repeating groups or arrays. 2NF: 1NF + every non-key column depends on the ENTIRE primary key (eliminates partial dependencies in composite keys). 3NF: 2NF + no transitive dependencies (non-key column depending on another non-key column). Example violation of 3NF: storing city AND zip_code where city depends on zip_code, not directly on the primary key. BCNF: every determinant is a candidate key."
+    difficulty: EASY
+    tags: [normalization, 1nf, 2nf, 3nf, schema-design]
+
+  - front: "What is the logical order of SQL query execution?"
+    back: "Logical processing order (not written order): 1) FROM + JOINs (determine working set). 2) WHERE (filter rows). 3) GROUP BY (aggregate). 4) HAVING (filter groups). 5) SELECT (pick columns, evaluate expressions). 6) DISTINCT. 7) ORDER BY. 8) LIMIT/OFFSET. This is why you can't use a SELECT alias in WHERE (not evaluated yet), but CAN use it in ORDER BY. HAVING filters after aggregation; WHERE filters before."
+    code_snippet: |
+      -- Written order:
+      SELECT department, COUNT(*) as cnt  -- step 5
+      FROM employees                      -- step 1
+      WHERE salary > 50000               -- step 2
+      GROUP BY department                 -- step 3
+      HAVING COUNT(*) > 5                -- step 4
+      ORDER BY cnt DESC                  -- step 7
+      LIMIT 10;                          -- step 8
+    difficulty: EASY
+    tags: [sql-order, query-execution, fundamentals]

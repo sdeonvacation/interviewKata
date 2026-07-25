@@ -1,0 +1,265 @@
+topic: "System Design/Microservices"
+exercises:
+  - title: "Design Twitter"
+    difficulty: MEDIUM
+    estimated_minutes: 50
+    prompt: |
+      Design a social media platform like Twitter that supports posting short messages, following users, and viewing a personalized timeline feed.
+
+      ## Requirements
+
+      ### Functional
+      - Users can post tweets (280 chars max) with optional media attachments
+      - Follow/unfollow other users
+      - Home timeline: aggregated feed of tweets from followed users, ranked by recency
+      - Like, retweet, and reply to tweets
+      - Search tweets by keyword or hashtag
+      - Trending topics based on recent activity
+
+      ### Non-Functional
+      - Timeline generation under 200ms
+      - Support 500M users, 200M DAU
+      - Handle celebrity accounts with 50M+ followers
+      - Eventually consistent timeline (few seconds delay acceptable)
+
+      ## Topics to Cover
+      - Fan-out on write vs fan-out on read for timeline
+      - Handling celebrity users (hybrid approach)
+      - Tweet storage and retrieval at scale
+      - Search indexing and trending computation
+      - Media upload and CDN delivery
+    constraints: |
+      - 500M total users, 200M DAU
+      - 400M tweets per day (~5000 tweets/second)
+      - Average user follows 200 accounts
+      - Celebrity accounts: 1% of users have 1M+ followers
+      - Timeline fetch: 200ms p99
+      - Media: 20% of tweets have images/video
+    evaluation_rubric:
+      feed_generation: 25
+      scalability: 25
+      data_model: 20
+      api_design: 15
+      trade_offs: 15
+    reference_approach: |
+      - Feed: Hybrid approach — fan-out on write for normal users; fan-out on read for celebrities (>500K followers)
+      - Tweet storage: Sharded by user_id in distributed DB (Cassandra/DynamoDB)
+      - Timeline cache: Pre-computed feed in Redis sorted sets per user (last 800 tweets)
+      - Fan-out service: On tweet publish, push tweet_id to followers' timeline caches asynchronously
+      - Celebrity handling: Merge celebrity tweets at read time into user's cached timeline
+      - Media: Upload to object store (S3); serve via CDN; store media_url in tweet record
+      - Search: Elasticsearch index on tweet text; update asynchronously via event stream
+      - Trending: Sliding window count of hashtags using stream processing (Flink/Spark Streaming)
+      - API: POST /tweets; GET /timeline; GET /search?q=; POST /follow/{user_id}
+
+  - title: "Design Instagram"
+    difficulty: MEDIUM
+    estimated_minutes: 50
+    prompt: |
+      Design a photo and video sharing platform like Instagram with feeds, stories, and explore functionality.
+
+      ## Requirements
+
+      ### Functional
+      - Upload photos/videos with captions and filters
+      - Follow users and view chronological + ranked feed
+      - Stories that disappear after 24 hours
+      - Explore page with personalized content recommendations
+      - Like, comment, and direct messaging
+      - Hashtag and location-based discovery
+
+      ### Non-Functional
+      - Image upload and processing under 5 seconds
+      - Feed load time under 300ms
+      - Support 1B users, 500M DAU
+      - 99.99% availability for feed reads
+      - Efficient storage for billions of images
+
+      ## Topics to Cover
+      - Image processing pipeline (resize, filter, thumbnail generation)
+      - Feed ranking algorithm and generation
+      - Stories architecture (ephemeral content with TTL)
+      - Content recommendation engine
+      - CDN strategy for global media delivery
+    constraints: |
+      - 1B users, 500M DAU
+      - 100M photos uploaded per day
+      - Average image: 2MB raw, 200KB after processing (5 sizes)
+      - Stories: 500M daily stories, 24-hour TTL
+      - Feed: top 500 posts from followed accounts ranked
+      - Storage: ~2PB new image data per year
+    evaluation_rubric:
+      media_pipeline: 25
+      feed_design: 25
+      scalability: 20
+      data_model: 15
+      storage_strategy: 15
+    reference_approach: |
+      - Upload pipeline: Client → Upload Service → Object Store → async processing (resize, thumbnails, filters) → CDN
+      - Storage: Original + 5 resolutions per image in S3; metadata in sharded MySQL/Vitess
+      - Feed: Pre-generated ranked feed per user; hybrid fan-out (write for <10K followers, read for celebrities)
+      - Ranking: ML model scoring posts by engagement probability, recency, relationship strength
+      - Stories: Separate storage with 24h TTL; served from Redis/Memcached for active stories
+      - Explore: Collaborative filtering + content-based recommendations; precomputed candidate sets
+      - CDN: Multi-tier — edge cache for thumbnails, origin for full-res; geo-distributed
+      - Direct messages: Separate service with WebSocket connections; end-to-end encryption
+      - API: POST /media/upload; GET /feed; GET /stories/{user_id}; GET /explore
+
+  - title: "Design Facebook Messenger"
+    difficulty: MEDIUM
+    estimated_minutes: 50
+    prompt: |
+      Design a real-time messaging platform supporting one-on-one and group conversations with delivery receipts and media sharing.
+
+      ## Requirements
+
+      ### Functional
+      - Send/receive text messages in real-time (1:1 and group chats up to 250 members)
+      - Message delivery status (sent, delivered, read)
+      - Share images, videos, and files
+      - Online/offline presence indicators
+      - Message history with search
+      - Push notifications for offline users
+
+      ### Non-Functional
+      - Message delivery latency under 100ms for online users
+      - Support 1B+ connected users simultaneously
+      - Messages must never be lost (at-least-once delivery)
+      - End-to-end encryption for private conversations
+      - Message ordering guaranteed within a conversation
+
+      ## Topics to Cover
+      - WebSocket connection management at scale
+      - Message ordering and delivery guarantees
+      - Group message fan-out
+      - Offline message queuing and sync
+      - Encryption key management
+    constraints: |
+      - 1B connected users, 100B messages per day
+      - Average message size: 200 bytes text, 2MB media
+      - Group chats: up to 250 members
+      - Message delivery: under 100ms for online recipients
+      - Connection servers: handle 500K WebSocket connections each
+      - Message retention: indefinite
+    evaluation_rubric:
+      real_time_delivery: 25
+      scalability: 25
+      data_model: 20
+      ordering_guarantees: 15
+      offline_handling: 15
+    reference_approach: |
+      - Connection: WebSocket gateway servers; each handles 500K persistent connections
+      - Routing: Connection registry maps user_id → gateway server; route messages to correct gateway
+      - Message flow: Sender → Gateway → Message Service → store in DB → route to recipient gateway → deliver
+      - Ordering: Sequence number per conversation; client reorders if received out-of-order
+      - Group messages: Fan-out at message service layer; parallel delivery to all online members
+      - Offline: Queue undelivered messages; sync on reconnect with last_seen_sequence
+      - Storage: Messages partitioned by conversation_id; Cassandra or HBase for write throughput
+      - Receipts: Delivered when gateway ACKs; read when recipient opens conversation
+      - Push: If user offline >30s, trigger push notification via APNS/FCM
+
+  - title: "Design YouTube/Netflix"
+    difficulty: MEDIUM
+    estimated_minutes: 55
+    prompt: |
+      Design a video streaming platform that handles video upload, processing, storage, and adaptive streaming to millions of concurrent viewers.
+
+      ## Requirements
+
+      ### Functional
+      - Upload videos (up to 4K resolution, max 12 hours)
+      - Transcode videos into multiple resolutions and formats
+      - Adaptive bitrate streaming based on viewer's bandwidth
+      - Video recommendations and search
+      - Comments, likes, and view tracking
+      - Live streaming support
+
+      ### Non-Functional
+      - Video playback start under 2 seconds
+      - Support 100M concurrent streams
+      - 99.99% availability for video playback
+      - Upload processing within 30 minutes for a 1-hour video
+      - Global low-latency delivery
+
+      ## Topics to Cover
+      - Video transcoding pipeline and format selection
+      - Adaptive bitrate streaming (HLS/DASH)
+      - CDN architecture for video delivery
+      - Storage tiering (hot/warm/cold)
+      - Recommendation engine architecture
+    constraints: |
+      - 500M DAU, 100M concurrent streams at peak
+      - 500 hours of video uploaded per minute
+      - Average video: 10 minutes, 5 transcoded versions (240p to 4K)
+      - Storage: ~1PB new video data per day
+      - CDN: serve from edge within 50ms of viewer
+      - Bandwidth: 5Mbps average per stream = 500 Tbps total
+    evaluation_rubric:
+      video_pipeline: 25
+      streaming_architecture: 25
+      scalability: 20
+      storage_design: 15
+      cdn_strategy: 15
+    reference_approach: |
+      - Upload: Chunked upload to object store; metadata to DB; trigger transcoding pipeline
+      - Transcoding: DAG-based pipeline — split video into segments, transcode in parallel, merge
+      - Formats: HLS/DASH with segments at 240p, 480p, 720p, 1080p, 4K; multiple audio tracks
+      - Streaming: Client requests manifest → selects quality based on bandwidth → fetches segments
+      - CDN: Multi-tier — edge PoPs cache popular content; origin pull for long-tail
+      - Storage: Hot (SSD, recent/popular) → Warm (HDD, older) → Cold (archival, rarely accessed)
+      - Recommendations: Collaborative filtering + watch history; precomputed candidate lists
+      - Live: Ingest via RTMP → segment in real-time → push to CDN edge; 5-15s latency
+      - API: POST /videos/upload; GET /videos/{id}/manifest; GET /recommendations
+
+  - title: "Design Spotify"
+    difficulty: MEDIUM
+    estimated_minutes: 50
+    prompt: |
+      Design a music streaming service that handles audio delivery, playlist management, personalized recommendations, and offline playback.
+
+      ## Requirements
+
+      ### Functional
+      - Stream audio tracks with instant playback start
+      - Create, edit, and share playlists
+      - Personalized recommendations (Discover Weekly, Daily Mix)
+      - Search by song, artist, album, or lyrics
+      - Offline download for premium users
+      - Social features (follow artists, share tracks)
+
+      ### Non-Functional
+      - Playback start under 200ms
+      - Support 50M concurrent streams
+      - Seamless quality adaptation on bandwidth changes
+      - Offline sync completes within minutes for large playlists
+      - 99.99% availability for streaming
+
+      ## Topics to Cover
+      - Audio streaming and buffering strategy
+      - Content delivery for audio files
+      - Recommendation algorithms and data pipeline
+      - Offline sync and DRM
+      - Search across massive music catalog
+    constraints: |
+      - 400M users, 50M concurrent streams
+      - Catalog: 80M tracks, average 4MB per track (multiple quality levels)
+      - Storage: 320TB for full catalog at all quality levels
+      - Playback start: under 200ms
+      - Recommendations: refresh daily for 400M users
+      - Search: 100K queries/second across 80M tracks
+    evaluation_rubric:
+      streaming_design: 25
+      recommendation_system: 25
+      scalability: 20
+      data_model: 15
+      offline_sync: 15
+    reference_approach: |
+      - Audio delivery: Pre-segment tracks into chunks; client buffers ahead 30s; CDN edge delivery
+      - Quality levels: 96kbps, 160kbps, 320kbps (Ogg Vorbis); adaptive based on network
+      - Storage: Tracks in object store; metadata (artist, album, duration) in relational DB
+      - CDN: Edge caches for top 1% popular tracks (covers 80% of plays); origin for long-tail
+      - Recommendations: User listening history → collaborative filtering + audio features → daily batch job
+      - Playlists: Playlist service with ordered track references; support collaborative editing
+      - Search: Elasticsearch with fuzzy matching on title, artist, album, lyrics
+      - Offline: Download encrypted tracks to device; DRM license check on playback; sync delta on reconnect
+      - API: GET /tracks/{id}/stream; GET /playlists/{id}; GET /recommendations/daily-mix

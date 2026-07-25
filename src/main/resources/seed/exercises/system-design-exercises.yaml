@@ -1,0 +1,395 @@
+topic: "System Design/Scalability"
+exercises:
+  - title: "Design a URL Shortener"
+    difficulty: MEDIUM
+    estimated_minutes: 45
+    prompt: |
+      Design a URL shortening service similar to bit.ly or TinyURL.
+
+      Functional Requirements:
+      - Given a long URL, generate a unique short URL
+      - When users access the short URL, redirect to the original long URL
+      - Users can optionally specify a custom short link
+      - Links expire after a configurable time-to-live (TTL)
+      - Analytics: track click count, geographic distribution, referrer
+
+      Non-Functional Requirements:
+      - High availability (99.99% uptime)
+      - Low latency redirects (< 10ms p99)
+      - Short URLs should be as short as possible
+      - System should be horizontally scalable
+
+      Consider:
+      - How to generate unique short codes (hash vs counter-based)
+      - Storage strategy for billions of URLs
+      - Caching layer for popular URLs
+      - How to handle custom aliases and collisions
+      - Rate limiting to prevent abuse
+    constraints: |
+      - Handle 100M new URLs per month (write-heavy initially, read-heavy over time)
+      - 10:1 read-to-write ratio (1B redirects per month)
+      - Redirect latency < 10ms at p99
+      - URL length: 7-8 characters using [a-zA-Z0-9]
+      - Data retention: 5 years default, configurable per URL
+      - Storage estimate: ~500 bytes per URL record, ~500GB over 5 years
+    evaluation_rubric:
+      categories:
+        - name: "Scalability"
+          weight: 0.25
+          criteria: ["Horizontal scaling strategy", "Database sharding approach", "Read replica usage"]
+        - name: "Data Model"
+          weight: 0.20
+          criteria: ["Short code generation algorithm", "Collision handling", "Schema design"]
+        - name: "Caching"
+          weight: 0.20
+          criteria: ["Cache layer design", "Cache invalidation on expiry", "Hot URL optimization"]
+        - name: "Availability"
+          weight: 0.20
+          criteria: ["Redundancy", "Failover strategy", "Geographic distribution"]
+        - name: "Trade-offs"
+          weight: 0.15
+          criteria: ["CAP theorem awareness", "Consistency vs availability choice", "Cost considerations"]
+
+  - title: "Design a Rate Limiter"
+    difficulty: MEDIUM
+    estimated_minutes: 30
+    prompt: |
+      Design a distributed rate limiting service that can be used across multiple microservices.
+
+      Functional Requirements:
+      - Limit requests per user/IP/API key within a time window
+      - Support multiple rate limiting algorithms (fixed window, sliding window, token bucket)
+      - Configurable limits per endpoint, user tier, or API key
+      - Return appropriate headers (X-RateLimit-Remaining, X-RateLimit-Reset)
+      - Support both hard limits (reject) and soft limits (throttle/queue)
+
+      Non-Functional Requirements:
+      - Sub-millisecond decision latency
+      - Distributed: work across multiple application instances
+      - Accurate counting even under high concurrency
+      - Graceful degradation if rate limiter is unavailable
+
+      Consider:
+      - Algorithm trade-offs (token bucket vs sliding window log vs sliding window counter)
+      - Distributed synchronization (Redis-based vs local + sync)
+      - Race conditions in counter updates
+      - How to handle rate limiter failures (fail-open vs fail-closed)
+    constraints: |
+      - Decision latency < 1ms at p99
+      - Support 1M+ requests per second across all services
+      - Accuracy: no more than 1% over-admission under normal conditions
+      - Configuration changes propagate within 5 seconds
+      - Memory budget: < 100 bytes per rate limit rule per user
+    evaluation_rubric:
+      categories:
+        - name: "Algorithm Design"
+          weight: 0.30
+          criteria: ["Algorithm selection with justification", "Accuracy analysis", "Edge case handling"]
+        - name: "Distributed Coordination"
+          weight: 0.30
+          criteria: ["Cross-instance synchronization", "Race condition handling", "Consistency model"]
+        - name: "Performance"
+          weight: 0.20
+          criteria: ["Latency optimization", "Memory efficiency", "Atomic operations"]
+        - name: "Resilience"
+          weight: 0.20
+          criteria: ["Failure mode handling", "Graceful degradation", "Monitoring/alerting"]
+
+  - title: "Design a Real-Time Chat System"
+    difficulty: HARD
+    estimated_minutes: 60
+    prompt: |
+      Design a real-time messaging system similar to WhatsApp or Slack.
+
+      Functional Requirements:
+      - One-on-one messaging and group chats (up to 1000 members)
+      - Message delivery guarantees (sent, delivered, read receipts)
+      - Online/offline presence indicators
+      - Message history and search
+      - File/image sharing
+      - Push notifications for offline users
+
+      Non-Functional Requirements:
+      - Real-time delivery (< 100ms for online users)
+      - Message ordering guarantees within a conversation
+      - Offline message queuing and delivery on reconnect
+      - End-to-end encryption support
+      - Scale to 500M daily active users
+
+      Consider:
+      - Connection management (WebSocket vs long polling vs SSE)
+      - Message routing and fan-out for group chats
+      - Storage strategy for messages (hot vs cold storage)
+      - Presence system design at scale
+      - How to handle network partitions and reconnections
+    constraints: |
+      - 500M daily active users, 50M concurrent connections
+      - Message delivery < 100ms for online recipients
+      - 40B messages per day
+      - Message storage: indefinite for 1:1, configurable for groups
+      - Max group size: 1000 members
+      - File sharing: up to 100MB per file
+      - 99.99% message delivery guarantee
+    evaluation_rubric:
+      categories:
+        - name: "Real-Time Architecture"
+          weight: 0.25
+          criteria: ["Connection protocol choice", "Message routing", "Fan-out strategy for groups"]
+        - name: "Reliability"
+          weight: 0.25
+          criteria: ["Delivery guarantees", "Ordering guarantees", "Offline handling"]
+        - name: "Scalability"
+          weight: 0.25
+          criteria: ["Connection server scaling", "Message storage partitioning", "Presence at scale"]
+        - name: "Data Model"
+          weight: 0.15
+          criteria: ["Message schema", "Conversation indexing", "Search infrastructure"]
+        - name: "Security"
+          weight: 0.10
+          criteria: ["E2E encryption approach", "Authentication", "Data privacy"]
+
+  - title: "Design a News Feed System"
+    difficulty: HARD
+    estimated_minutes: 60
+    prompt: |
+      Design a social media news feed system similar to Facebook's or Twitter's timeline.
+
+      Functional Requirements:
+      - Users see posts from people they follow, ranked by relevance
+      - Support text, image, video, and link posts
+      - Real-time updates when new posts are published
+      - Like, comment, and share interactions
+      - Personalized ranking (not just chronological)
+
+      Non-Functional Requirements:
+      - Feed generation < 200ms
+      - Support users following thousands of accounts
+      - Handle celebrity accounts (millions of followers)
+      - Eventually consistent (new posts appear within seconds)
+      - Scale to 1B users
+
+      Consider:
+      - Push vs pull model (fan-out on write vs fan-out on read)
+      - Hybrid approach for celebrity accounts
+      - Feed ranking and ML integration points
+      - Caching strategy for feed pages
+      - How to handle feed updates in real-time
+    constraints: |
+      - 1B total users, 500M DAU
+      - Average user follows 200 accounts
+      - Celebrity accounts: up to 100M followers
+      - Feed generation latency < 200ms at p95
+      - New post visible to followers within 5 seconds
+      - Feed page size: 20 posts, support infinite scroll
+      - 10M new posts per hour
+    evaluation_rubric:
+      categories:
+        - name: "Feed Generation"
+          weight: 0.30
+          criteria: ["Push vs pull trade-off", "Hybrid approach for celebrities", "Feed assembly pipeline"]
+        - name: "Ranking"
+          weight: 0.20
+          criteria: ["Ranking signals", "ML integration", "Freshness vs relevance balance"]
+        - name: "Scalability"
+          weight: 0.25
+          criteria: ["Fan-out strategy", "Storage partitioning", "Cache design"]
+        - name: "Real-Time Updates"
+          weight: 0.15
+          criteria: ["New post propagation", "Feed invalidation", "Long-polling/SSE/WebSocket"]
+        - name: "Data Model"
+          weight: 0.10
+          criteria: ["Post storage", "Social graph storage", "Feed cache structure"]
+
+  - title: "Design a Distributed Key-Value Store"
+    difficulty: MEDIUM
+    estimated_minutes: 45
+    prompt: |
+      Design a distributed key-value store similar to DynamoDB or Cassandra.
+
+      Functional Requirements:
+      - Basic operations: put(key, value), get(key), delete(key)
+      - Configurable consistency levels (ONE, QUORUM, ALL)
+      - Automatic data partitioning across nodes
+      - Support for TTL on keys
+      - Range queries on keys (if using ordered partitioning)
+
+      Non-Functional Requirements:
+      - High availability (AP system with tunable consistency)
+      - Horizontal scalability (add nodes without downtime)
+      - Automatic failure detection and recovery
+      - Low latency reads and writes (< 10ms at p99)
+
+      Consider:
+      - Partitioning strategy (consistent hashing with virtual nodes)
+      - Replication and consistency protocols
+      - Conflict resolution (vector clocks, last-write-wins)
+      - Failure detection (gossip protocol, phi accrual)
+      - Read repair and anti-entropy mechanisms
+    constraints: |
+      - Store petabytes of data across thousands of nodes
+      - Read/write latency < 10ms at p99 for quorum operations
+      - Handle 1M operations per second per node
+      - Survive up to 2 simultaneous node failures per replica group
+      - Rebalancing on node add/remove within minutes
+      - Value size: up to 1MB
+    evaluation_rubric:
+      categories:
+        - name: "Partitioning"
+          weight: 0.25
+          criteria: ["Consistent hashing implementation", "Virtual nodes", "Rebalancing strategy"]
+        - name: "Replication & Consistency"
+          weight: 0.30
+          criteria: ["Replication factor", "Quorum protocol", "Conflict resolution"]
+        - name: "Failure Handling"
+          weight: 0.25
+          criteria: ["Failure detection", "Hinted handoff", "Read repair", "Anti-entropy"]
+        - name: "Storage Engine"
+          weight: 0.20
+          criteria: ["LSM tree or B-tree choice", "Compaction strategy", "Memory management"]
+
+  - title: "Design a Notification System"
+    difficulty: MEDIUM
+    estimated_minutes: 45
+    prompt: |
+      Design a scalable notification system that supports multiple channels.
+
+      Functional Requirements:
+      - Support push notifications (iOS/Android), SMS, email, and in-app notifications
+      - Template-based notification content with personalization
+      - User preference management (opt-in/out per channel and category)
+      - Notification scheduling (immediate and delayed)
+      - Delivery tracking and analytics
+      - Rate limiting per user to prevent notification fatigue
+
+      Non-Functional Requirements:
+      - Process 10M notifications per hour
+      - Delivery within 30 seconds for real-time notifications
+      - At-least-once delivery guarantee
+      - Graceful handling of third-party provider failures
+      - Support for A/B testing notification content
+
+      Consider:
+      - Priority queues for urgent vs batch notifications
+      - Provider abstraction for multi-channel delivery
+      - Retry strategy with exponential backoff
+      - Deduplication to prevent duplicate sends
+      - How to handle provider rate limits and quotas
+    constraints: |
+      - 10M notifications per hour peak, 100M per day
+      - Real-time notifications delivered within 30 seconds
+      - Batch notifications processed within 1 hour window
+      - 99.9% delivery rate (excluding user opt-outs)
+      - Support 100+ notification templates
+      - User base: 50M users with varying preferences
+    evaluation_rubric:
+      categories:
+        - name: "Architecture"
+          weight: 0.25
+          criteria: ["Component separation", "Queue design", "Provider abstraction"]
+        - name: "Reliability"
+          weight: 0.25
+          criteria: ["At-least-once delivery", "Retry strategy", "Deduplication"]
+        - name: "Scalability"
+          weight: 0.25
+          criteria: ["Horizontal scaling", "Priority handling", "Batch processing"]
+        - name: "User Experience"
+          weight: 0.25
+          criteria: ["Preference management", "Rate limiting", "Channel selection logic"]
+
+  - title: "Design a Search Autocomplete System"
+    difficulty: HARD
+    estimated_minutes: 45
+    prompt: |
+      Design a search autocomplete (typeahead) system similar to Google's search suggestions.
+
+      Functional Requirements:
+      - Return top 5-10 suggestions as user types each character
+      - Suggestions ranked by popularity, recency, and personalization
+      - Support for trending queries (boost recent popular searches)
+      - Multi-language support
+      - Spell correction / fuzzy matching
+
+      Non-Functional Requirements:
+      - Response time < 50ms (users expect instant feedback)
+      - Handle 100K queries per second
+      - Update suggestions based on new search data (near real-time)
+      - Graceful degradation under load
+
+      Consider:
+      - Data structure for prefix matching (Trie vs inverted index)
+      - How to rank and score suggestions
+      - Caching strategy for common prefixes
+      - How to update the suggestion index without downtime
+      - Personalization without sacrificing latency
+    constraints: |
+      - Response latency < 50ms at p99
+      - 100K autocomplete requests per second
+      - Suggestion corpus: 5B unique queries
+      - Update frequency: new trending queries reflected within 15 minutes
+      - Storage: prefix tree for 5B queries (~100GB compressed)
+      - Personalization: last 1000 searches per user
+    evaluation_rubric:
+      categories:
+        - name: "Data Structure"
+          weight: 0.30
+          criteria: ["Trie design or alternative", "Memory optimization", "Prefix matching efficiency"]
+        - name: "Ranking"
+          weight: 0.25
+          criteria: ["Scoring algorithm", "Trending detection", "Personalization approach"]
+        - name: "Performance"
+          weight: 0.25
+          criteria: ["Latency optimization", "Caching strategy", "Request fan-out"]
+        - name: "Data Pipeline"
+          weight: 0.20
+          criteria: ["Index update mechanism", "Near real-time processing", "Offline vs online components"]
+
+  - title: "Design a Distributed Cache"
+    difficulty: HARD
+    estimated_minutes: 60
+    prompt: |
+      Design a distributed caching system similar to Redis Cluster or Memcached.
+
+      Functional Requirements:
+      - Key-value storage with TTL support
+      - Support for data structures (strings, lists, sets, sorted sets, hashes)
+      - Atomic operations (increment, compare-and-swap)
+      - Pub/sub messaging
+      - Cluster management (add/remove nodes, rebalancing)
+      - Persistence options (snapshot and append-only log)
+
+      Non-Functional Requirements:
+      - Sub-millisecond read/write latency
+      - Linear scalability with node count
+      - Automatic failover with minimal data loss
+      - Memory-efficient storage
+      - Support for 10M+ operations per second per node
+
+      Consider:
+      - Data partitioning across nodes (hash slots)
+      - Replication for high availability
+      - Client-side vs server-side routing
+      - Memory management and eviction policies
+      - Persistence vs pure in-memory trade-offs
+      - How to handle hot keys
+    constraints: |
+      - Sub-millisecond latency (< 500μs at p99)
+      - 10M operations per second per node
+      - Cluster size: up to 1000 nodes
+      - Memory per node: up to 256GB
+      - Failover time: < 5 seconds
+      - Data loss on failover: < 1 second of writes
+      - Support keys up to 512 bytes, values up to 512MB
+    evaluation_rubric:
+      categories:
+        - name: "Architecture"
+          weight: 0.25
+          criteria: ["Cluster topology", "Routing strategy", "Node communication protocol"]
+        - name: "Data Management"
+          weight: 0.25
+          criteria: ["Partitioning scheme", "Replication protocol", "Consistency guarantees"]
+        - name: "Performance"
+          weight: 0.25
+          criteria: ["Memory management", "Eviction policies", "Hot key handling", "IO model"]
+        - name: "Reliability"
+          weight: 0.25
+          criteria: ["Failover mechanism", "Persistence strategy", "Split-brain handling"]

@@ -1,0 +1,119 @@
+topic: "Spring Boot/Web MVC"
+cards:
+  - front: "What is the difference between @RestController and @Controller?"
+    back: |
+      @RestController is a composed annotation combining @Controller and @ResponseBody.
+      @Controller returns view names resolved by ViewResolver, while @RestController
+      serializes return values directly to the HTTP response body via HttpMessageConverters.
+    code_snippet: |
+      @RestController
+      @RequestMapping("/api")
+      public class UserController {
+          @GetMapping("/users/{id}")
+          public User getUser(@PathVariable Long id) {
+              return userService.findById(id); // serialized to JSON
+          }
+      }
+    difficulty: EASY
+    tags: [spring-mvc, annotations]
+
+  - front: "Describe the DispatcherServlet request lifecycle in Spring MVC."
+    back: |
+      DispatcherServlet receives the request, consults HandlerMapping to find the controller
+      method, invokes it via HandlerAdapter (applying interceptors pre/post), then resolves
+      the returned value through ViewResolver or HttpMessageConverter. Exception handling
+      occurs via HandlerExceptionResolver if any phase throws.
+    difficulty: MEDIUM
+    tags: [spring-mvc, architecture, servlet]
+
+  - front: "How does validation work with @Valid and BindingResult?"
+    back: |
+      @Valid triggers JSR-380 Bean Validation on the annotated parameter. BindingResult
+      must immediately follow the validated parameter in the method signature. If validation
+      fails and BindingResult is present, Spring populates it with errors instead of throwing
+      MethodArgumentNotValidException, giving the controller manual error handling control.
+    code_snippet: |
+      @PostMapping("/users")
+      public ResponseEntity<?> create(
+              @Valid @RequestBody UserDto dto,
+              BindingResult result) {
+          if (result.hasErrors()) {
+              return ResponseEntity.badRequest()
+                  .body(result.getFieldErrors());
+          }
+          return ResponseEntity.ok(userService.save(dto));
+      }
+    difficulty: MEDIUM
+    tags: [validation, bean-validation, error-handling]
+
+  - front: "How does @ControllerAdvice provide global exception handling?"
+    back: |
+      @ControllerAdvice classes act as cross-cutting interceptors for all controllers.
+      Methods annotated with @ExceptionHandler within them catch exceptions thrown by any
+      controller. You can scope advice to specific packages or annotations via basePackages
+      or assignableTypes attributes.
+    code_snippet: |
+      @RestControllerAdvice
+      public class GlobalExceptionHandler {
+          @ExceptionHandler(EntityNotFoundException.class)
+          @ResponseStatus(HttpStatus.NOT_FOUND)
+          public ErrorResponse handleNotFound(EntityNotFoundException ex) {
+              return new ErrorResponse(ex.getMessage());
+          }
+      }
+    difficulty: EASY
+    tags: [exception-handling, controller-advice]
+
+  - front: "Explain content negotiation in Spring MVC and how to configure it."
+    back: |
+      Content negotiation determines the response media type based on Accept header,
+      URL suffix, or request parameter. Spring uses ContentNegotiationConfigurer to set
+      strategy priority and default type. HttpMessageConverters (Jackson for JSON,
+      JAXB for XML) serialize the response to the negotiated format.
+    code_snippet: |
+      @Configuration
+      public class WebConfig implements WebMvcConfigurer {
+          @Override
+          public void configureContentNegotiation(
+                  ContentNegotiationConfigurer configurer) {
+              configurer.defaultContentType(MediaType.APPLICATION_JSON)
+                  .mediaType("xml", MediaType.APPLICATION_XML);
+          }
+      }
+    difficulty: HARD
+    tags: [content-negotiation, configuration, media-types]
+
+  - front: "What are the ways to configure CORS in Spring Boot?"
+    back: |
+      Three levels: @CrossOrigin on controller/method for granular control,
+      WebMvcConfigurer.addCorsMappings() for global path-based rules, or a CorsFilter
+      bean for servlet-level handling. Spring Boot also supports spring.web.cors properties.
+      Global config is preferred for consistency across endpoints.
+    code_snippet: |
+      @Override
+      public void addCorsMappings(CorsRegistry registry) {
+          registry.addMapping("/api/**")
+              .allowedOrigins("https://app.example.com")
+              .allowedMethods("GET", "POST", "PUT", "DELETE")
+              .allowCredentials(true);
+      }
+    difficulty: MEDIUM
+    tags: [cors, security, configuration]
+
+  - front: "How do @RequestMapping composed annotations work and what is their method resolution order?"
+    back: |
+      @GetMapping, @PostMapping etc. are composed annotations combining @RequestMapping
+      with a specific HTTP method. Resolution narrows by path, method, params, headers,
+      consumes, and produces in that order. Ambiguous mappings throw IllegalStateException
+      at startup. AntPathMatcher scores specificity when multiple patterns match at runtime.
+    code_snippet: |
+      @PutMapping(
+          value = "/users/{id}",
+          consumes = MediaType.APPLICATION_JSON_VALUE,
+          produces = MediaType.APPLICATION_JSON_VALUE)
+      public User update(@PathVariable Long id,
+                         @Valid @RequestBody UserDto dto) {
+          return userService.update(id, dto);
+      }
+    difficulty: HARD
+    tags: [request-mapping, routing, annotations]

@@ -1,0 +1,91 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-create-design-exercise-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: design_exercise
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: topic_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_design_exercise_topic
+                    references: topic(id)
+              - column:
+                  name: title
+                  type: varchar(300)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: prompt
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: constraints
+                  type: text
+              - column:
+                  name: evaluation_rubric
+                  type: jsonb
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reference_approach
+                  type: text
+              - column:
+                  name: difficulty
+                  type: varchar(20)
+                  defaultValue: MEDIUM
+              - column:
+                  name: estimated_minutes
+                  type: int
+              - column:
+                  name: created_at
+                  type: timestamp without time zone
+                  defaultValueComputed: now()
+
+  - changeSet:
+      id: 006-create-design-submission-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: design_submission
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: exercise_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_design_submission_exercise
+                    references: design_exercise(id)
+              - column:
+                  name: answer
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ai_score
+                  type: double
+              - column:
+                  name: ai_feedback
+                  type: jsonb
+              - column:
+                  name: submitted_at
+                  type: timestamp without time zone
+                  defaultValueComputed: now()

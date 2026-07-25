@@ -1,0 +1,164 @@
+topic: "DSA/Trees"
+challenges:
+  - title: "Implement Trie (Prefix Tree)"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Design and implement a Trie (also known as a prefix tree) data structure that
+      supports inserting strings and searching for exact matches or prefix matches.
+
+      Implement the Trie class with the following operations:
+      - Trie() initializes the trie object.
+      - void insert(String word) inserts the string word into the trie.
+      - boolean search(String word) returns true if the exact string word exists in
+        the trie (i.e., was previously inserted), and false otherwise.
+      - boolean startsWith(String prefix) returns true if there is any previously
+        inserted string that begins with the given prefix, and false otherwise.
+
+      Constraints:
+      - 1 <= word.length, prefix.length <= 2000
+      - word and prefix consist only of lowercase English letters.
+      - At most 3 * 10^4 total calls will be made to insert, search, and startsWith.
+    starter_code: |
+      public class Trie {
+          public Trie() {
+              // Initialize your data structure here
+          }
+
+          public void insert(String word) {
+              // Your solution here
+          }
+
+          public boolean search(String word) {
+              // Your solution here
+          }
+
+          public boolean startsWith(String prefix) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "insert('apple'), search('apple')"
+        expected: "true"
+        description: "Searching for an inserted word returns true"
+      - input: "insert('apple'), search('app')"
+        expected: "false"
+        description: "Searching for a prefix that was not inserted as a complete word returns false"
+      - input: "insert('apple'), startsWith('app')"
+        expected: "true"
+        description: "startsWith returns true when a word with that prefix exists"
+      - input: "insert('apple'), insert('app'), search('app')"
+        expected: "true"
+        description: "After inserting 'app' as a separate word, search returns true"
+    hints:
+      - "Each node in the trie can have up to 26 children (one per lowercase letter). Use an array of size 26 or a HashMap to store child references."
+      - "Mark certain nodes as 'end of word' to distinguish between a complete inserted word and a prefix that happens to match part of a longer word."
+      - "Both search and startsWith traverse the trie the same way, but search additionally checks the end-of-word flag at the final node."
+
+  - title: "Design Add and Search Words Data Structure"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Design a data structure that supports adding new words and searching for strings
+      that may contain the wildcard character '.'.
+
+      Implement the WordDictionary class:
+      - WordDictionary() initializes the object.
+      - void addWord(String word) adds a word to the data structure.
+      - boolean search(String word) returns true if any previously added string matches
+        the given word. The word may contain '.' characters, where each '.' can match
+        any single letter.
+
+      For example, if "bad" and "dad" have been added:
+      - search("pad") returns false (no match)
+      - search("bad") returns true (exact match)
+      - search(".ad") returns true (matches both "bad" and "dad")
+      - search("b..") returns true (matches "bad")
+
+      Constraints:
+      - 1 <= word.length <= 25
+      - word in addWord consists only of lowercase English letters.
+      - word in search consists of lowercase English letters or '.'.
+      - At most 10^4 calls will be made to addWord and search.
+    starter_code: |
+      public class WordDictionary {
+          public WordDictionary() {
+              // Initialize your data structure here
+          }
+
+          public void addWord(String word) {
+              // Your solution here
+          }
+
+          public boolean search(String word) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "addWord('bad'), addWord('dad'), addWord('mad'), search('pad')"
+        expected: "false"
+        description: "No added word matches 'pad'"
+      - input: "addWord('bad'), addWord('dad'), addWord('mad'), search('bad')"
+        expected: "true"
+        description: "Exact match for previously added word"
+      - input: "addWord('bad'), addWord('dad'), addWord('mad'), search('.ad')"
+        expected: "true"
+        description: "Dot wildcard matches any single character in first position"
+      - input: "addWord('bad'), search('b..')"
+        expected: "true"
+        description: "Multiple dot wildcards match any characters in those positions"
+    hints:
+      - "Use a trie as the underlying data structure. The addWord operation is identical to a standard trie insert."
+      - "For search, when you encounter a '.', you must explore all possible children at that level since the dot can match any character."
+      - "Use recursion or DFS for the search method. At each '.', iterate through all non-null children and recursively check the remainder of the pattern."
+
+  - title: "Word Search II"
+    difficulty: HARD
+    type: DSA
+    time_limit_seconds: 900
+    problem_statement: |
+      Given an m x n grid of characters (board) and a list of strings (words), find all
+      words from the list that can be formed by traversing sequentially adjacent cells
+      on the board.
+
+      Adjacent cells are those that are horizontally or vertically neighboring. The same
+      cell may not be used more than once within a single word's path.
+
+      Return all words from the input list that can be found on the board. Each word
+      should appear at most once in the output regardless of how many ways it can be
+      formed on the board.
+
+      Constraints:
+      - m == board.length
+      - n == board[i].length
+      - 1 <= m, n <= 12
+      - board[i][j] is a lowercase English letter.
+      - 1 <= words.length <= 3 * 10^4
+      - 1 <= words[i].length <= 10
+      - words[i] consists only of lowercase English letters.
+      - All strings in words are unique.
+    starter_code: |
+      public class Solution {
+          public List<String> findWords(char[][] board, String[] words) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "board = [['o','a','a','n'],['e','t','a','e'],['i','h','k','r'],['i','f','l','v']], words = ['oath','pea','eat','rain']"
+        expected: "['eat','oath']"
+        description: "'oath' traces o(0,0)->a(1,0)->t(1,1)->h(2,1) and 'eat' traces e(1,3)->a(1,2)->t(1,1)"
+      - input: "board = [['a','b'],['c','d']], words = ['abcb']"
+        expected: "[]"
+        description: "Cannot reuse cell (0,1) for both 'b' characters in 'abcb'"
+      - input: "board = [['a']], words = ['a']"
+        expected: "['a']"
+        description: "Single cell board with matching single character word"
+      - input: "board = [['a','b'],['c','d']], words = ['ab','cb','ad','cd']"
+        expected: "['ab','ad','cb','cd']"
+        description: "All four words can be formed from adjacent cells"
+    hints:
+      - "Build a trie from the words list. This allows you to prune DFS branches early when the current path prefix does not match any word."
+      - "Start a DFS from every cell on the board. At each step, check if the current character exists as a child in the trie node. If not, prune that path immediately."
+      - "To avoid duplicates, remove or mark a word in the trie once found. To track visited cells in the current path, temporarily modify the board character (e.g., replace with '#') and restore it after backtracking."

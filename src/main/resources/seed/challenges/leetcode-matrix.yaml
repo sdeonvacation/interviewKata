@@ -1,0 +1,210 @@
+topic: "DSA/Arrays"
+challenges:
+  - title: "Valid Sudoku"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Determine whether a 9x9 Sudoku board is valid. Only the filled cells need to be validated according to the following rules:
+
+      1. Each row must contain the digits 1-9 without repetition.
+      2. Each column must contain the digits 1-9 without repetition.
+      3. Each of the nine 3x3 sub-boxes of the grid must contain the digits 1-9 without repetition.
+
+      Note: A Sudoku board (partially filled) could be valid but is not necessarily solvable. Only the filled cells need to be validated.
+
+      The board is represented as a 2D char array where empty cells are indicated by the character '.'.
+
+      **Constraints:**
+      - board.length == 9
+      - board[i].length == 9
+      - board[i][j] is a digit '1'-'9' or '.'
+    starter_code: |
+      public class Solution {
+          public boolean isValidSudoku(char[][] board) {
+              // Your solution here
+              return false;
+          }
+      }
+    test_cases:
+      - input: "board = [['5','3','.','.','7','.','.','.','.'],['6','.','.','1','9','5','.','.','.'],['.','9','8','.','.','.','.','6','.'],['8','.','.','.','6','.','.','.','3'],['4','.','.','8','.','3','.','.','1'],['7','.','.','.','2','.','.','.','6'],['.','6','.','.','.','.','2','8','.'],['.','.','.','4','1','9','.','.','5'],['.','.','.','.','8','.','.','7','9']]"
+        expected: "true"
+        description: "Standard valid Sudoku board"
+      - input: "board = [['8','3','.','.','7','.','.','.','.'],['6','.','.','1','9','5','.','.','.'],['.','9','8','.','.','.','.','6','.'],['8','.','.','.','6','.','.','.','3'],['4','.','.','8','.','3','.','.','1'],['7','.','.','.','2','.','.','.','6'],['.','6','.','.','.','.','2','8','.'],['.','.','.','4','1','9','.','.','5'],['.','.','.','.','8','.','.','7','9']]"
+        expected: "false"
+        description: "Invalid board - duplicate 8 in first column"
+      - input: "board = [['.','.','.','.','.','.','.','.','.'],['.','.','.','.','.','.','.','.','.'],['.','.','.','.','.','.','.','.','.'],['.','.','.','.','.','.','.','.','.'],['.','.','.','.','.','.','.','.','.'],['.','.','.','.','.','.','.','.','.'],['.','.','.','.','.','.','.','.','.'],['.','.','.','.','.','.','.','.','.'],['.','.','.','.','.','.','.','.','.']]"
+        expected: "true"
+        description: "Empty board is valid"
+      - input: "board = [['.','.','4','.','.','.','6','3','.'],['.','.','.','.','.','.','.','.','.'],['.','.','.','.','.','.','.','.','.'],['.','.','6','.','.','.','.','.','.'],['.','.','.','.','.','.','.','.','.'],['.','.','.','.','.','.','.','.','.'],['.','.','.','.','.','.','.','.','.'],['.','.','.','.','.','.','.','.','.'],['.','.','.','.','.','.','.','.','.']]]"
+        expected: "false"
+        description: "Invalid board - duplicate 6 in top-left 3x3 box"
+    hints:
+      - "Think about what data structures you can use to track which digits you have already seen in each row, column, and box."
+      - "Use HashSets - one for each row, one for each column, and one for each 3x3 box. For a cell at (r, c), its box index is (r/3)*3 + (c/3)."
+      - "Iterate through every cell once. For each digit found, check if it already exists in the corresponding row set, column set, or box set. If yes, return false."
+
+  - title: "Spiral Matrix"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an m x n matrix, return all elements of the matrix in spiral order.
+
+      Spiral order means traversing the matrix starting from the top-left corner, moving right across the top row, then down the right column, then left across the bottom row, then up the left column, and repeating this pattern inward until all elements are visited.
+
+      **Constraints:**
+      - m == matrix.length
+      - n == matrix[i].length
+      - 1 <= m, n <= 10
+      - -100 <= matrix[i][j] <= 100
+    starter_code: |
+      public class Solution {
+          public List<Integer> spiralOrder(int[][] matrix) {
+              // Your solution here
+              return new ArrayList<>();
+          }
+      }
+    test_cases:
+      - input: "matrix = [[1,2,3],[4,5,6],[7,8,9]]"
+        expected: "[1,2,3,6,9,8,7,4,5]"
+        description: "3x3 square matrix spiral traversal"
+      - input: "matrix = [[1,2,3,4],[5,6,7,8],[9,10,11,12]]"
+        expected: "[1,2,3,4,8,12,11,10,9,5,6,7]"
+        description: "3x4 rectangular matrix spiral traversal"
+      - input: "matrix = [[1,2,3]]"
+        expected: "[1,2,3]"
+        description: "Single row matrix"
+      - input: "matrix = [[1],[2],[3]]"
+        expected: "[1,2,3]"
+        description: "Single column matrix"
+    hints:
+      - "Maintain boundaries that shrink inward after each layer is fully traversed."
+      - "Use four variables: top, bottom, left, right. Traverse right along top row, then down along right column, then left along bottom row, then up along left column. After each direction, shrink the corresponding boundary."
+      - "Be careful with edge cases: after moving right, increment top. After moving down, decrement right. Check that boundaries haven't crossed before traversing left or up to avoid duplicates."
+
+  - title: "Rotate Image"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      You are given an n x n 2D matrix representing an image. Rotate the image by 90 degrees clockwise.
+
+      You must rotate the image in-place, meaning you must modify the input 2D matrix directly. Do NOT allocate another 2D matrix for the rotation.
+
+      **Constraints:**
+      - n == matrix.length == matrix[i].length
+      - 1 <= n <= 20
+      - -1000 <= matrix[i][j] <= 1000
+    starter_code: |
+      public class Solution {
+          public void rotate(int[][] matrix) {
+              // Your solution here - modify matrix in-place
+          }
+      }
+    test_cases:
+      - input: "matrix = [[1,2,3],[4,5,6],[7,8,9]]"
+        expected: "[[7,4,1],[8,5,2],[9,6,3]]"
+        description: "3x3 matrix rotated 90 degrees clockwise"
+      - input: "matrix = [[5,1,9,11],[2,4,8,10],[13,3,6,7],[15,14,12,16]]"
+        expected: "[[15,13,2,5],[14,3,4,1],[12,6,8,9],[16,7,10,11]]"
+        description: "4x4 matrix rotated 90 degrees clockwise"
+      - input: "matrix = [[1]]"
+        expected: "[[1]]"
+        description: "Single element matrix remains unchanged"
+      - input: "matrix = [[1,2],[3,4]]"
+        expected: "[[3,1],[4,2]]"
+        description: "2x2 matrix rotation"
+    hints:
+      - "Can you decompose the rotation into simpler transformations like transpose and reverse?"
+      - "First transpose the matrix (swap matrix[i][j] with matrix[j][i]), then reverse each row. This achieves a 90-degree clockwise rotation."
+      - "For transpose, only iterate over the upper triangle (j > i) to avoid double-swapping. Then for each row, reverse elements using two pointers from both ends."
+
+  - title: "Set Matrix Zeroes"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an m x n integer matrix, if an element is 0, set its entire row and entire column to 0. You must do it in-place.
+
+      A straightforward solution using O(mn) space is not optimal. Try to find a solution that uses constant extra space.
+
+      **Constraints:**
+      - m == matrix.length
+      - n == matrix[0].length
+      - 1 <= m, n <= 200
+      - -2^31 <= matrix[i][j] <= 2^31 - 1
+
+      **Follow up:**
+      - Can you solve it using O(m + n) space?
+      - Can you solve it using O(1) constant space?
+    starter_code: |
+      public class Solution {
+          public void setZeroes(int[][] matrix) {
+              // Your solution here - modify matrix in-place
+          }
+      }
+    test_cases:
+      - input: "matrix = [[1,1,1],[1,0,1],[1,1,1]]"
+        expected: "[[1,0,1],[0,0,0],[1,0,1]]"
+        description: "Single zero in center sets its row and column to zero"
+      - input: "matrix = [[0,1,2,0],[3,4,5,2],[1,3,1,5]]"
+        expected: "[[0,0,0,0],[0,4,5,0],[0,3,1,0]]"
+        description: "Multiple zeroes in first row propagate"
+      - input: "matrix = [[1,2,3],[4,5,6],[7,8,9]]"
+        expected: "[[1,2,3],[4,5,6],[7,8,9]]"
+        description: "No zeroes - matrix unchanged"
+      - input: "matrix = [[0]]"
+        expected: "[[0]]"
+        description: "Single element zero"
+    hints:
+      - "Think about using extra arrays to record which rows and columns should be zeroed. That gives O(m+n) space."
+      - "For O(1) space, use the first row and first column of the matrix itself as markers. Before doing so, record whether the first row and first column originally contained any zeroes."
+      - "Iterate through the matrix (skipping first row/col). If matrix[i][j] == 0, set matrix[i][0] = 0 and matrix[0][j] = 0 as markers. Then iterate again using these markers to zero out cells. Finally handle the first row and column using the flags you saved."
+
+  - title: "Game of Life"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      The Game of Life is a cellular automaton devised by John Conway. Given an m x n grid of cells where each cell has an initial state - live (1) or dead (0) - compute the next state of the board applying these rules simultaneously to every cell:
+
+      1. Any live cell with fewer than two live neighbors dies (underpopulation).
+      2. Any live cell with two or three live neighbors lives on to the next generation.
+      3. Any live cell with more than three live neighbors dies (overpopulation).
+      4. Any dead cell with exactly three live neighbors becomes a live cell (reproduction).
+
+      Each cell has eight neighbors (horizontal, vertical, diagonal). The next state is computed simultaneously for all cells - meaning changes to a cell cannot affect the calculation of its neighbors in the same step.
+
+      You must solve this in-place (modify the board directly).
+
+      **Constraints:**
+      - m == board.length
+      - n == board[i].length
+      - 1 <= m, n <= 25
+      - board[i][j] is 0 or 1
+
+      **Follow up:** Can you solve it in-place without using extra space beyond a few variables?
+    starter_code: |
+      public class Solution {
+          public void gameOfLife(int[][] board) {
+              // Your solution here - modify board in-place
+          }
+      }
+    test_cases:
+      - input: "board = [[0,1,0],[0,0,1],[1,1,1],[0,0,0]]"
+        expected: "[[0,0,0],[1,0,1],[0,1,1],[0,1,0]]"
+        description: "Standard 4x3 board with mix of births and deaths"
+      - input: "board = [[1,1],[1,0]]"
+        expected: "[[1,1],[1,1]]"
+        description: "2x2 board - dead cell with 3 neighbors becomes alive"
+      - input: "board = [[0,0,0],[0,0,0],[0,0,0]]"
+        expected: "[[0,0,0],[0,0,0],[0,0,0]]"
+        description: "All dead cells remain dead"
+      - input: "board = [[1,1,1],[1,1,1],[1,1,1]]"
+        expected: "[[1,0,1],[0,0,0],[1,0,1]]"
+        description: "Dense board - center and edge cells die from overpopulation"
+    hints:
+      - "The challenge is doing it in-place. If you update a cell, you lose its original value which neighbors still need. Can you encode both states in the cell?"
+      - "Use intermediate values to encode transitions: 2 means 'was alive, now dead' and 3 means 'was dead, now alive'. When counting neighbors, check if original value was alive (value == 1 or value == 2)."
+      - "First pass: iterate all cells and apply rules using encoded values (2 and 3) instead of directly setting 0 or 1. Second pass: convert encoded values to final states (value % 2 gives the new state for values 0-3)."

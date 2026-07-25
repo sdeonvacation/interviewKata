@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/001-create-topics.yaml
+  - include:
+      file: db/changelog/002-create-cards.yaml
+  - include:
+      file: db/changelog/003-create-guides.yaml
+  - include:
+      file: db/changelog/004-create-quizzes.yaml
+  - include:
+      file: db/changelog/005-create-challenges.yaml
+  - include:
+      file: db/changelog/006-create-design-exercises.yaml
+  - include:
+      file: db/changelog/007-create-mock-interviews.yaml
+  - include:
+      file: db/changelog/008-create-progress.yaml
+  - include:
+      file: db/changelog/009-seed-topic-hierarchy.yaml
+  - include:
+      file: db/changelog/010-create-indexes.yaml

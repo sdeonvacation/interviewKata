@@ -1,0 +1,223 @@
+topic: "DSA/Bit Manipulation"
+challenges:
+  - title: "Add Binary"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given two strings `a` and `b` that each represent a binary number, compute their sum and return the result as a binary string.
+
+      Each string consists only of the characters '0' or '1' and is non-empty with no leading zeros (except for the number "0" itself).
+
+      You must not use built-in big integer libraries or convert the inputs directly to integers.
+
+      **Constraints:**
+      - 1 <= a.length, b.length <= 10^4
+      - a and b consist only of '0' or '1'
+      - Each string does not contain leading zeros except for the zero itself
+    starter_code: |
+      public class Solution {
+          public String addBinary(String a, String b) {
+              // Your solution here
+              return "";
+          }
+      }
+    test_cases:
+      - input: "a = \"11\", b = \"1\""
+        expected: "\"100\""
+        description: "Simple addition with carry propagation"
+      - input: "a = \"1010\", b = \"1011\""
+        expected: "\"10101\""
+        description: "Two 4-bit numbers producing 5-bit result"
+      - input: "a = \"0\", b = \"0\""
+        expected: "\"0\""
+        description: "Both inputs are zero"
+      - input: "a = \"111\", b = \"111\""
+        expected: "\"1110\""
+        description: "Multiple carry propagations"
+    hints:
+      - "Start adding from the rightmost digits of both strings, just like manual addition."
+      - "Maintain a carry variable. At each position, sum the two digits plus the carry, then compute the new digit and updated carry."
+      - "Use a StringBuilder to build the result in reverse, then reverse it at the end."
+
+  - title: "Reverse Bits"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given a 32-bit unsigned integer `n`, reverse all of its bits and return the resulting integer.
+
+      For example, the input binary representation `00000010100101000001111010011100` becomes `00111001011110000010100101000000` when reversed, which corresponds to a different unsigned integer.
+
+      Note: In Java, there is no unsigned integer type. The input is given as a signed integer, but the internal binary representation is the same regardless of sign. The returned integer's binary representation should be the reverse of the input's binary representation.
+
+      **Constraints:**
+      - The input must be a 32-bit integer
+    starter_code: |
+      public class Solution {
+          public int reverseBits(int n) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "n = 00000010100101000001111010011100 (43261596)"
+        expected: "964176192 (00111001011110000010100101000000)"
+        description: "Standard 32-bit reversal"
+      - input: "n = 11111111111111111111111111111101 (4294967293)"
+        expected: "-1073741825 (10111111111111111111111111111111)"
+        description: "Nearly all bits set"
+      - input: "n = 00000000000000000000000000000001 (1)"
+        expected: "-2147483648 (10000000000000000000000000000000)"
+        description: "Single bit in LSB moves to MSB"
+      - input: "n = 00000000000000000000000000000000 (0)"
+        expected: "0 (00000000000000000000000000000000)"
+        description: "All zeros remain all zeros"
+    hints:
+      - "Process the input bit by bit from least significant to most significant."
+      - "For each bit extracted from the right side of n, shift your result left and add that bit."
+      - "Repeat exactly 32 times to ensure all bit positions are handled, including leading zeros."
+
+  - title: "Number of 1 Bits"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given a positive integer `n`, determine how many bits in its binary representation are set to 1. This is also known as the Hamming weight of the number.
+
+      **Constraints:**
+      - 1 <= n <= 2^31 - 1
+    starter_code: |
+      public class Solution {
+          public int hammingWeight(int n) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "n = 11 (binary: 1011)"
+        expected: "3"
+        description: "Three bits are set in decimal 11"
+      - input: "n = 128 (binary: 10000000)"
+        expected: "1"
+        description: "Power of two has exactly one set bit"
+      - input: "n = 2147483645 (binary: 1111111111111111111111111111101)"
+        expected: "30"
+        description: "Large number with most bits set"
+      - input: "n = 1 (binary: 1)"
+        expected: "1"
+        description: "Smallest positive integer"
+    hints:
+      - "You can check the least significant bit using n & 1, then shift n right."
+      - "A more efficient trick: n & (n - 1) clears the lowest set bit each time. Count how many times you can do this before n becomes zero."
+      - "The second approach runs in O(k) where k is the number of set bits, rather than always iterating 32 times."
+
+  - title: "Single Number"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given a non-empty array of integers `nums` where every element appears exactly twice except for one element which appears only once, find and return that unique element.
+
+      Your solution must run in linear time and use only constant extra space.
+
+      **Constraints:**
+      - 1 <= nums.length <= 3 * 10^4
+      - -3 * 10^4 <= nums[i] <= 3 * 10^4
+      - Every element appears twice except for one element which appears once
+    starter_code: |
+      public class Solution {
+          public int singleNumber(int[] nums) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "nums = [2,2,1]"
+        expected: "1"
+        description: "Single element at the end"
+      - input: "nums = [4,1,2,1,2]"
+        expected: "4"
+        description: "Single element at the beginning"
+      - input: "nums = [1]"
+        expected: "1"
+        description: "Array with only one element"
+      - input: "nums = [-1,3,3,-1,5]"
+        expected: "5"
+        description: "Mix of negative and positive numbers"
+    hints:
+      - "Think about a bitwise operation where applying it to the same value twice cancels out."
+      - "XOR has the property: a ^ a = 0 and a ^ 0 = a. XOR is also commutative and associative."
+      - "XOR all elements together. Pairs cancel to zero, leaving only the single element."
+
+  - title: "Single Number II"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an integer array `nums` where every element appears exactly three times except for one element which appears exactly once, find and return that unique element.
+
+      Your solution must run in linear time and use only constant extra space.
+
+      **Constraints:**
+      - 1 <= nums.length <= 3 * 10^4
+      - -2^31 <= nums[i] <= 2^31 - 1
+      - Every element appears exactly three times except for one element which appears once
+    starter_code: |
+      public class Solution {
+          public int singleNumber(int[] nums) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "nums = [2,2,3,2]"
+        expected: "3"
+        description: "Single element among triplets"
+      - input: "nums = [0,1,0,1,0,1,99]"
+        expected: "99"
+        description: "Larger array with one unique element"
+      - input: "nums = [30000,500,100,30000,100,30000,100]"
+        expected: "500"
+        description: "Larger values appearing three times"
+      - input: "nums = [-2,-2,1,-2,4,4,4]"
+        expected: "1"
+        description: "Mix of negative and positive numbers"
+    hints:
+      - "Consider counting the number of set bits at each of the 32 bit positions across all numbers."
+      - "At each bit position, if you sum all contributions, the total mod 3 gives you the bit value of the unique number."
+      - "Alternatively, use two state variables (ones, twos) to simulate a counter that cycles through 0, 1, 2 for each bit position."
+
+  - title: "Bitwise AND of Numbers Range"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given two integers `left` and `right` representing an inclusive range [left, right], compute the bitwise AND of every integer in this range and return the result.
+
+      **Constraints:**
+      - 0 <= left <= right <= 2^31 - 1
+    starter_code: |
+      public class Solution {
+          public int rangeBitwiseAnd(int left, int right) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "left = 5, right = 7"
+        expected: "4"
+        description: "5 AND 6 AND 7 = 101 & 110 & 111 = 100 = 4"
+      - input: "left = 0, right = 0"
+        expected: "0"
+        description: "Single element range of zero"
+      - input: "left = 1, right = 2147483647"
+        expected: "0"
+        description: "Very large range results in zero"
+      - input: "left = 12, right = 15"
+        expected: "12"
+        description: "1100 & 1101 & 1110 & 1111 = 1100 = 12"
+    hints:
+      - "Observe that as numbers increment, lower bits flip frequently. Only the common prefix of left and right in binary survives the AND."
+      - "Shift both left and right to the right until they become equal. The number of shifts tells you how many trailing bits were cleared."
+      - "Shift the common prefix back left by the same number of positions to get the final answer."

@@ -1,0 +1,100 @@
+topic: "Spring Boot/Data Access"
+cards:
+  - front: "What does Spring Data JPA provide through repository interfaces, and what is the role of @Repository?"
+    back: |
+      Spring Data JPA auto-generates CRUD implementations from interfaces extending JpaRepository or CrudRepository.
+      @Repository marks the class as a persistence layer component and enables automatic translation of JPA exceptions into Spring's DataAccessException hierarchy.
+      With Spring Boot, @Repository is optional on interfaces extending Spring Data base interfaces since they are auto-detected.
+    difficulty: EASY
+    tags: [spring-data, repositories]
+
+  - front: "How do derived query methods work in Spring Data JPA? What are their limitations?"
+    back: |
+      Spring Data parses method names like findByStatusAndCreatedDateAfter() and generates JPQL at startup.
+      Supports keywords like Between, Like, In, OrderBy, and property traversal via underscores.
+      Limitations: complex joins are unreadable, no support for subqueries or GROUP BY, and method names become unwieldy beyond 2-3 conditions.
+    code_snippet: |
+      List<Order> findByStatusAndTotalGreaterThan(Status status, BigDecimal total);
+      Optional<User> findFirstByEmailIgnoreCase(String email);
+      List<Product> findByCategory_NameOrderByPriceDesc(String categoryName);
+    difficulty: EASY
+    tags: [spring-data, query-methods]
+
+  - front: "How does @Query differ when using JPQL vs native SQL, and when would you choose each?"
+    back: |
+      @Query with JPQL operates on entity objects and is database-agnostic, validated at startup.
+      Native queries use raw SQL with nativeQuery=true, useful for database-specific features like window functions or CTEs.
+      JPQL for portability and type safety; native for performance-critical queries or features outside JPA spec.
+    code_snippet: |
+      @Query("SELECT o FROM Order o WHERE o.customer.id = :custId AND o.status = :status")
+      List<Order> findOrders(@Param("custId") Long custId, @Param("status") Status status);
+
+      @Query(value = "SELECT * FROM orders WHERE created_at > NOW() - INTERVAL '7 days'",
+             nativeQuery = true)
+      List<Order> findRecentNative();
+    difficulty: MEDIUM
+    tags: [spring-data, jpql, native-query]
+
+  - front: "Explain pagination and sorting in Spring Data JPA. How do you implement a paginated endpoint?"
+    back: |
+      Pass Pageable parameter to repository methods to get a Page<T> with content, total elements, and page metadata.
+      Spring MVC auto-resolves Pageable from request params (page, size, sort).
+      Page executes a count query; use Slice<T> if you only need hasNext without total count for better performance.
+    code_snippet: |
+      Page<User> findByActive(boolean active, Pageable pageable);
+
+      // Controller
+      @GetMapping("/users")
+      Page<User> list(@PageableDefault(size = 20, sort = "name") Pageable pageable) {
+          return userRepository.findByActive(true, pageable);
+      }
+    difficulty: MEDIUM
+    tags: [spring-data, pagination, sorting]
+
+  - front: "Explain @Transactional propagation levels. What happens with REQUIRES_NEW vs REQUIRED?"
+    back: |
+      REQUIRED (default) joins the existing transaction or creates one if none exists.
+      REQUIRES_NEW suspends the current transaction and creates a new independent one; the outer transaction does not see inner changes until inner commits.
+      Use REQUIRES_NEW for audit logging or operations that must commit regardless of outer rollback.
+      Key pitfall: self-invocation bypasses the proxy, so @Transactional on a method called internally from the same bean is ignored.
+    code_snippet: |
+      @Transactional(propagation = Propagation.REQUIRES_NEW)
+      public void logAuditEvent(AuditEvent event) {
+          auditRepository.save(event); // commits even if caller rolls back
+      }
+    difficulty: MEDIUM
+    tags: [transactions, propagation, spring]
+
+  - front: "What is the N+1 problem in JPA and how do you solve it?"
+    back: |
+      N+1 occurs when loading an entity triggers one query for the parent and N additional queries for each lazy-loaded association.
+      Solutions: JOIN FETCH in JPQL forces eager loading in a single query; @EntityGraph declaratively specifies attributes to fetch eagerly; @BatchSize(size=N) batches lazy loads into IN clauses.
+      JOIN FETCH risks cartesian products with multiple collections; use Set or @Fetch(SUBSELECT) for multiple bags.
+    code_snippet: |
+      @Query("SELECT o FROM Order o JOIN FETCH o.items WHERE o.customer.id = :custId")
+      List<Order> findWithItems(@Param("custId") Long custId);
+
+      @EntityGraph(attributePaths = {"items", "items.product"})
+      List<Order> findByStatus(Status status);
+    difficulty: HARD
+    tags: [n-plus-one, performance, jpa]
+
+  - front: "How does Hibernate's first-level cache work and when can it cause issues?"
+    back: |
+      First-level cache (persistence context) is session-scoped, storing managed entities by ID. Repeated findById calls within the same transaction hit the cache, not the DB.
+      Issues: stale reads when another process modifies data mid-transaction; memory pressure with large batch operations loading thousands of entities.
+      Fix stale reads with entityManager.refresh() or clear(). Fix batch memory with periodic flush() and clear() in chunks.
+    code_snippet: |
+      @Transactional
+      public void batchUpdate(List<Long> ids) {
+          for (int i = 0; i < ids.size(); i++) {
+              Entity e = repo.findById(ids.get(i)).orElseThrow();
+              e.setProcessed(true);
+              if (i % 50 == 0) {
+                  entityManager.flush();
+                  entityManager.clear(); // evict first-level cache
+              }
+          }
+      }
+    difficulty: HARD
+    tags: [hibernate, caching, persistence-context]

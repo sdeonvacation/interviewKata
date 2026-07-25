@@ -1,0 +1,212 @@
+topic: "DSA/Sorting"
+challenges:
+  - title: "Convert Sorted Array to BST"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given an integer array nums sorted in strictly ascending order, construct a height-balanced
+      binary search tree from its elements.
+
+      A height-balanced binary search tree is defined as a binary tree in which the depth of the
+      left and right subtrees of every node differs by at most 1.
+
+      Any valid height-balanced BST built from the given array is acceptable.
+
+      Constraints:
+      - 1 <= nums.length <= 10^4
+      - -10^4 <= nums[i] <= 10^4
+      - nums is sorted in strictly increasing order
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public TreeNode sortedArrayToBST(int[] nums) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "nums = [-10, -3, 0, 5, 9]"
+        expected: "[0, -3, 9, -10, null, 5] or [0, -10, 5, null, -3, null, 9]"
+        description: "Mid element 0 becomes root, left subtree from [-10,-3], right from [5,9]"
+      - input: "nums = [1, 3]"
+        expected: "[3, 1] or [1, null, 3]"
+        description: "Two elements - either can be root of a valid height-balanced BST"
+      - input: "nums = [1]"
+        expected: "[1]"
+        description: "Single element becomes the root with no children"
+      - input: "nums = [1, 2, 3, 4, 5, 6, 7]"
+        expected: "[4, 2, 6, 1, 3, 5, 7]"
+        description: "Perfect binary tree from 7 elements with mid element 4 as root"
+    hints:
+      - "The middle element of a sorted array is the ideal root for a balanced BST since it splits elements evenly on both sides."
+      - "Apply the same logic recursively: pick the middle of the left half as left child, middle of right half as right child."
+      - "Base case: when the subarray is empty, return null. Use integer division for the midpoint index."
+
+  - title: "Sort List"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given the head of a singly linked list, sort the list in ascending order and return
+      the sorted list's head.
+
+      You must achieve O(n log n) time complexity. As a follow-up challenge, try to solve
+      it using O(1) extra space (excluding the recursion stack).
+
+      Constraints:
+      - The number of nodes in the list is in the range [0, 5 * 10^4].
+      - -10^5 <= Node.val <= 10^5
+    starter_code: |
+      // Definition for singly-linked list:
+      // class ListNode {
+      //     int val;
+      //     ListNode next;
+      //     ListNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public ListNode sortList(ListNode head) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "head = [4, 2, 1, 3]"
+        expected: "[1, 2, 3, 4]"
+        description: "Unsorted list of 4 elements sorted in ascending order"
+      - input: "head = [-1, 5, 3, 4, 0]"
+        expected: "[-1, 0, 3, 4, 5]"
+        description: "List with negative values sorted correctly"
+      - input: "head = []"
+        expected: "[]"
+        description: "Empty list returns empty"
+      - input: "head = [1]"
+        expected: "[1]"
+        description: "Single node list is already sorted"
+    hints:
+      - "Merge sort is well-suited for linked lists because splitting at the midpoint and merging can be done without random access."
+      - "Use the slow/fast pointer technique to find the middle of the list, then split into two halves."
+      - "Recursively sort each half, then merge the two sorted halves using a standard merge procedure for linked lists."
+
+  - title: "Construct Quad Tree"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an n x n binary matrix grid where n is a power of 2, construct a Quad-Tree
+      representation of the grid.
+
+      Each node in the Quad-Tree has two attributes:
+      - val: True if the node represents a grid of all 1s, False if all 0s. For non-leaf
+        nodes, val can be any value.
+      - isLeaf: True if the node is a leaf (the region it represents has all identical values),
+        False if it has four children.
+
+      A non-leaf node has exactly four children: topLeft, topRight, bottomLeft, bottomRight,
+      representing the four quadrants of the region when subdivided equally.
+
+      Construction rules:
+      1. If all values in the current region are the same, create a leaf node with that value.
+      2. Otherwise, divide the region into four equal quadrants and recursively construct
+         a node for each quadrant. The current node is not a leaf.
+
+      Constraints:
+      - n == grid.length == grid[0].length
+      - n is a power of 2 (1, 2, 4, 8, ...)
+      - 1 <= n <= 64
+      - grid[i][j] is either 0 or 1
+    starter_code: |
+      // Definition for a QuadTree node:
+      // class Node {
+      //     public boolean val;
+      //     public boolean isLeaf;
+      //     public Node topLeft;
+      //     public Node topRight;
+      //     public Node bottomLeft;
+      //     public Node bottomRight;
+      //     public Node(boolean val, boolean isLeaf) {
+      //         this.val = val;
+      //         this.isLeaf = isLeaf;
+      //     }
+      //     public Node(boolean val, boolean isLeaf, Node tl, Node tr, Node bl, Node br) {
+      //         this.val = val;
+      //         this.isLeaf = isLeaf;
+      //         this.topLeft = tl;
+      //         this.topRight = tr;
+      //         this.bottomLeft = bl;
+      //         this.bottomRight = br;
+      //     }
+      // }
+
+      public class Solution {
+          public Node construct(int[][] grid) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "grid = [[0,1],[1,0]]"
+        expected: "[[0,1],[1,0,0,1,1,0]]"
+        description: "2x2 grid with mixed values: root is non-leaf with 4 leaf children"
+      - input: "grid = [[1,1],[1,1]]"
+        expected: "[[1,1]]"
+        description: "2x2 grid with all 1s: single leaf node with val=true"
+      - input: "grid = [[1,1,0,0],[1,1,0,0],[0,0,1,1],[0,0,1,1]]"
+        expected: "[[0,1],[1,1,0,1,0,1,1,1]]"
+        description: "4x4 grid subdivides into 4 uniform quadrants, each becomes a leaf"
+    hints:
+      - "Start by checking if all values in the current region are the same. If yes, return a leaf node."
+      - "If not uniform, split the region into four equal quadrants using midpoints of row and column ranges, then recurse on each quadrant."
+      - "Track the current region using row start, column start, and size parameters in your recursive function."
+
+  - title: "Merge k Sorted Lists"
+    difficulty: HARD
+    type: DSA
+    time_limit_seconds: 900
+    problem_statement: |
+      You are given an array of k linked lists, where each linked list is individually sorted
+      in ascending order. Merge all k linked lists into a single sorted linked list and return
+      its head.
+
+      Constraints:
+      - k == lists.length
+      - 0 <= k <= 10^4
+      - 0 <= lists[i].length <= 500
+      - -10^4 <= lists[i][j] <= 10^4
+      - Each lists[i] is sorted in ascending order
+      - The total number of nodes across all lists does not exceed 10^4
+    starter_code: |
+      // Definition for singly-linked list:
+      // class ListNode {
+      //     int val;
+      //     ListNode next;
+      //     ListNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public ListNode mergeKLists(ListNode[] lists) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "lists = [[1,4,5],[1,3,4],[2,6]]"
+        expected: "[1, 1, 2, 3, 4, 4, 5, 6]"
+        description: "Three sorted lists merged into one sorted list"
+      - input: "lists = []"
+        expected: "[]"
+        description: "Empty array of lists returns empty list"
+      - input: "lists = [[]]"
+        expected: "[]"
+        description: "Array containing one empty list returns empty list"
+      - input: "lists = [[1],[2],[3],[4],[5]]"
+        expected: "[1, 2, 3, 4, 5]"
+        description: "Five single-element lists merged in sorted order"
+    hints:
+      - "A brute force approach collects all values, sorts them, and rebuilds the list, but this doesn't leverage the pre-sorted property."
+      - "Use a min-heap (PriorityQueue) to always extract the smallest current head among all k lists. Push the next node from the extracted node's list back into the heap."
+      - "Alternatively, apply divide and conquer: pair up lists and merge each pair, reducing k lists to k/2, then k/4, and so on until one remains. This gives O(n log k) time."

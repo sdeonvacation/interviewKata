@@ -1,0 +1,133 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-quiz-question-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: quiz_question
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: guide_id
+                  type: uuid
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_quiz_question_guide
+                    references: guide(id)
+              - column:
+                  name: topic_id
+                  type: uuid
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_quiz_question_topic
+                    references: topic(id)
+              - column:
+                  name: question_type
+                  type: varchar(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: question_text
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: options
+                  type: jsonb
+              - column:
+                  name: correct_answer
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: explanation
+                  type: text
+              - column:
+                  name: difficulty
+                  type: varchar(20)
+                  defaultValue: MEDIUM
+              - column:
+                  name: ai_generated
+                  type: boolean
+                  defaultValueBoolean: false
+
+  - changeSet:
+      id: 004-create-quiz-session-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: quiz_session
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: guide_id
+                  type: uuid
+              - column:
+                  name: started_at
+                  type: timestamp without time zone
+                  defaultValueComputed: now()
+              - column:
+                  name: completed_at
+                  type: timestamp without time zone
+              - column:
+                  name: score
+                  type: double
+              - column:
+                  name: total_questions
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: correct_answers
+                  type: int
+                  defaultValueNumeric: 0
+
+  - changeSet:
+      id: 004-create-quiz-answer-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: quiz_answer
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: session_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_quiz_answer_session
+                    references: quiz_session(id)
+              - column:
+                  name: question_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_quiz_answer_question
+                    references: quiz_question(id)
+              - column:
+                  name: user_answer
+                  type: text
+              - column:
+                  name: is_correct
+                  type: boolean
+              - column:
+                  name: answered_at
+                  type: timestamp without time zone
+                  defaultValueComputed: now()

@@ -1,0 +1,273 @@
+topic: "DSA/Arrays"
+challenges:
+  - title: "Letter Combinations of a Phone Number"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given a string containing digits from 2 to 9 inclusive, return all possible letter combinations that the digits could represent. The mapping of digits to letters follows a traditional telephone keypad:
+
+      - 2 -> "abc"
+      - 3 -> "def"
+      - 4 -> "ghi"
+      - 5 -> "jkl"
+      - 6 -> "mno"
+      - 7 -> "pqrs"
+      - 8 -> "tuv"
+      - 9 -> "wxyz"
+
+      Note that the digit 1 does not map to any letters. Return the answer in any order. If the input string is empty, return an empty list.
+
+      **Constraints:**
+      - 0 <= digits.length <= 4
+      - digits[i] is a digit in the range ['2', '9']
+    starter_code: |
+      public class Solution {
+          public List<String> letterCombinations(String digits) {
+              // Your solution here
+              return new ArrayList<>();
+          }
+      }
+    test_cases:
+      - input: "digits = \"23\""
+        expected: "[\"ad\",\"ae\",\"af\",\"bd\",\"be\",\"bf\",\"cd\",\"ce\",\"cf\"]"
+        description: "Two digits producing 9 combinations"
+      - input: "digits = \"\""
+        expected: "[]"
+        description: "Empty input returns empty list"
+      - input: "digits = \"2\""
+        expected: "[\"a\",\"b\",\"c\"]"
+        description: "Single digit returns its mapped letters"
+      - input: "digits = \"79\""
+        expected: "[\"pw\",\"px\",\"py\",\"pz\",\"qw\",\"qx\",\"qy\",\"qz\",\"rw\",\"rx\",\"ry\",\"rz\",\"sw\",\"sx\",\"sy\",\"sz\"]"
+        description: "Two digits with 4 letters each producing 16 combinations"
+    hints:
+      - "Build a mapping from each digit to its corresponding letters. Then explore every combination by choosing one letter per digit."
+      - "Use backtracking: at each position, iterate over all letters for the current digit, append one to the current combination, recurse to the next digit, then remove the last letter before trying the next option."
+      - "The total number of combinations is the product of the number of letters for each digit. For digits with 3 letters each, two digits yield 9 combinations."
+
+  - title: "Combinations"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given two integers n and k, return all possible combinations of k numbers chosen from the range [1, n]. You may return the combinations in any order.
+
+      A combination is a selection of items where order does not matter. For example, [1,2] and [2,1] are considered the same combination.
+
+      **Constraints:**
+      - 1 <= n <= 20
+      - 1 <= k <= n
+    starter_code: |
+      public class Solution {
+          public List<List<Integer>> combine(int n, int k) {
+              // Your solution here
+              return new ArrayList<>();
+          }
+      }
+    test_cases:
+      - input: "n = 4, k = 2"
+        expected: "[[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]"
+        description: "Choose 2 from 4 elements yields 6 combinations"
+      - input: "n = 1, k = 1"
+        expected: "[[1]]"
+        description: "Single element, choose 1"
+      - input: "n = 5, k = 3"
+        expected: "[[1,2,3],[1,2,4],[1,2,5],[1,3,4],[1,3,5],[1,4,5],[2,3,4],[2,3,5],[2,4,5],[3,4,5]]"
+        description: "Choose 3 from 5 elements yields 10 combinations"
+      - input: "n = 3, k = 3"
+        expected: "[[1,2,3]]"
+        description: "Choose all elements gives exactly one combination"
+    hints:
+      - "Think about building each combination by deciding which numbers to include. Start from 1 and at each step decide to include the current number or skip it."
+      - "Use backtracking with a start index to avoid duplicates. At each recursive call, iterate from the start index to n, add the current number, recurse with start incremented, then remove the number."
+      - "Prune early: if the remaining numbers from the current position to n are fewer than the slots left to fill, you can skip that branch entirely."
+
+  - title: "Permutations"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an array of distinct integers, return all possible permutations of the array. You may return the answer in any order.
+
+      A permutation is an arrangement of all elements where order matters. For example, [1,2,3] and [3,2,1] are different permutations of the same set.
+
+      **Constraints:**
+      - 1 <= nums.length <= 6
+      - -10 <= nums[i] <= 10
+      - All integers in nums are unique
+    starter_code: |
+      public class Solution {
+          public List<List<Integer>> permute(int[] nums) {
+              // Your solution here
+              return new ArrayList<>();
+          }
+      }
+    test_cases:
+      - input: "nums = [1,2,3]"
+        expected: "[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]"
+        description: "Three distinct elements produce 6 permutations"
+      - input: "nums = [0,1]"
+        expected: "[[0,1],[1,0]]"
+        description: "Two elements produce 2 permutations"
+      - input: "nums = [1]"
+        expected: "[[1]]"
+        description: "Single element has one permutation"
+      - input: "nums = [5,4,6,2]"
+        expected: "24 permutations"
+        description: "Four distinct elements produce 4! = 24 permutations"
+    hints:
+      - "Unlike combinations, permutations care about order. You need to place each unused element at the current position."
+      - "Use a boolean visited array or swap-based approach. For each position, try every element that has not been used yet, mark it as used, recurse for the next position, then unmark it."
+      - "The swap approach: swap the current index with each index from current to end, recurse on current+1, then swap back. This generates all arrangements in place."
+
+  - title: "Combination Sum"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an array of distinct integers (candidates) and a target integer, find all unique combinations of candidates where the chosen numbers sum to the target. The same number may be chosen from candidates an unlimited number of times.
+
+      Two combinations are unique if the frequency of at least one of the chosen numbers is different. Return the combinations in any order.
+
+      **Constraints:**
+      - 1 <= candidates.length <= 30
+      - 2 <= candidates[i] <= 40
+      - All elements of candidates are distinct
+      - 1 <= target <= 40
+    starter_code: |
+      public class Solution {
+          public List<List<Integer>> combinationSum(int[] candidates, int target) {
+              // Your solution here
+              return new ArrayList<>();
+          }
+      }
+    test_cases:
+      - input: "candidates = [2,3,6,7], target = 7"
+        expected: "[[2,2,3],[7]]"
+        description: "Two valid combinations summing to 7"
+      - input: "candidates = [2,3,5], target = 8"
+        expected: "[[2,2,2,2],[2,3,3],[3,5]]"
+        description: "Three valid combinations summing to 8"
+      - input: "candidates = [2], target = 1"
+        expected: "[]"
+        description: "No combination possible when smallest candidate exceeds target"
+      - input: "candidates = [1], target = 3"
+        expected: "[[1,1,1]]"
+        description: "Single candidate repeated to reach target"
+    hints:
+      - "Since the same number can be reused, when you include a candidate you can recurse without advancing to the next candidate."
+      - "Sort the candidates first. Use backtracking with a start index to avoid generating duplicate combinations. At each step, subtract the chosen candidate from the remaining target."
+      - "Prune: if the current candidate exceeds the remaining target, break out of the loop since all subsequent candidates (sorted) will also exceed it."
+
+  - title: "N-Queens II"
+    difficulty: HARD
+    type: DSA
+    time_limit_seconds: 900
+    problem_statement: |
+      The n-queens puzzle asks you to place n queens on an n x n chessboard such that no two queens threaten each other. Two queens threaten each other if they share the same row, column, or diagonal.
+
+      Given an integer n, return the total number of distinct solutions to the n-queens puzzle.
+
+      **Constraints:**
+      - 1 <= n <= 9
+    starter_code: |
+      public class Solution {
+          public int totalNQueens(int n) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "n = 4"
+        expected: "2"
+        description: "4x4 board has exactly 2 distinct solutions"
+      - input: "n = 1"
+        expected: "1"
+        description: "1x1 board trivially has 1 solution"
+      - input: "n = 8"
+        expected: "92"
+        description: "Classic 8-queens has 92 solutions"
+      - input: "n = 5"
+        expected: "10"
+        description: "5x5 board has 10 distinct solutions"
+    hints:
+      - "Place queens row by row. For each row, try placing a queen in each column and check if it conflicts with any previously placed queen."
+      - "Track which columns and diagonals are under attack. The two diagonal directions can be identified by (row - col) for one and (row + col) for the other. Use sets or boolean arrays to mark occupied columns and diagonals."
+      - "When you successfully place queens in all n rows, increment your solution count. Backtrack by removing the queen from the current row and unmarking its column and diagonals before trying the next column."
+
+  - title: "Generate Parentheses"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given n pairs of parentheses, write a function to generate all combinations of well-formed (balanced) parentheses.
+
+      A string of parentheses is well-formed if every opening parenthesis '(' has a corresponding closing parenthesis ')' and they are properly nested.
+
+      **Constraints:**
+      - 1 <= n <= 8
+    starter_code: |
+      public class Solution {
+          public List<String> generateParenthesis(int n) {
+              // Your solution here
+              return new ArrayList<>();
+          }
+      }
+    test_cases:
+      - input: "n = 3"
+        expected: "[\"((()))\",\"(()())\",\"(())()\",\"()(())\",\"()()()\"]"
+        description: "3 pairs produce 5 valid combinations"
+      - input: "n = 1"
+        expected: "[\"()\"]"
+        description: "1 pair has exactly one valid combination"
+      - input: "n = 2"
+        expected: "[\"(())\",\"()()\"]"
+        description: "2 pairs produce 2 valid combinations"
+      - input: "n = 4"
+        expected: "14 valid combinations"
+        description: "4 pairs produce the 4th Catalan number = 14 combinations"
+    hints:
+      - "At each position you can either add an opening or closing parenthesis, subject to validity constraints."
+      - "Track the count of open and close parentheses used so far. You can add '(' if open count is less than n. You can add ')' only if close count is less than open count."
+      - "Use backtracking: build the string character by character, branching on valid choices. When the string length reaches 2*n, you have a complete valid combination."
+
+  - title: "Word Search"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an m x n grid of characters (board) and a string (word), determine if the word exists in the grid.
+
+      The word can be constructed from letters of sequentially adjacent cells, where adjacent cells are those directly up, down, left, or right of each other. The same cell may not be used more than once in constructing the word.
+
+      **Constraints:**
+      - m == board.length
+      - n == board[i].length
+      - 1 <= m, n <= 6
+      - 1 <= word.length <= 15
+      - board and word consist of only lowercase and uppercase English letters
+    starter_code: |
+      public class Solution {
+          public boolean exist(char[][] board, String word) {
+              // Your solution here
+              return false;
+          }
+      }
+    test_cases:
+      - input: "board = [['A','B','C','E'],['S','F','C','S'],['A','D','E','E']], word = \"ABCCED\""
+        expected: "true"
+        description: "Word found following a valid path through adjacent cells"
+      - input: "board = [['A','B','C','E'],['S','F','C','S'],['A','D','E','E']], word = \"SEE\""
+        expected: "true"
+        description: "Word found starting from bottom-right area"
+      - input: "board = [['A','B','C','E'],['S','F','C','S'],['A','D','E','E']], word = \"ABCB\""
+        expected: "false"
+        description: "Word requires reusing a cell which is not allowed"
+      - input: "board = [['A']], word = \"A\""
+        expected: "true"
+        description: "Single cell board matching single character word"
+    hints:
+      - "Try starting the search from every cell in the grid that matches the first character of the word."
+      - "Use DFS/backtracking: from the current cell, explore all four directions. Mark cells as visited (e.g., temporarily change the character) to prevent reuse, then restore them when backtracking."
+      - "At each recursive call, check if the current cell matches the current character index in the word. If you have matched all characters, return true. If out of bounds or character does not match, return false."

@@ -1,0 +1,141 @@
+topic: "DSA/Trees"
+challenges:
+  - title: "Validate Binary Search Tree"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given the root of a binary tree, determine whether it is a valid Binary Search Tree (BST).
+
+      A binary tree qualifies as a valid BST if and only if:
+      - All nodes in the left subtree have values strictly less than the current node's value.
+      - All nodes in the right subtree have values strictly greater than the current node's value.
+      - Both the left and right subtrees must also independently satisfy the BST property.
+
+      Note: It is not sufficient to only compare a node with its immediate children.
+      Every node in the left subtree must be less than the root, not just the direct left child.
+
+      Constraints:
+      - The number of nodes in the tree is in the range [1, 10^4].
+      - -2^31 <= Node.val <= 2^31 - 1
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public boolean isValidBST(TreeNode root) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [2, 1, 3]"
+        expected: "true"
+        description: "Simple valid BST with root 2, left 1, right 3"
+      - input: "root = [5, 1, 4, null, null, 3, 6]"
+        expected: "false"
+        description: "Node 4 is in right subtree of 5 but has child 3 which violates BST property"
+      - input: "root = [5, 4, 6, null, null, 3, 7]"
+        expected: "false"
+        description: "Node 3 is in right subtree of 5 but is less than 5"
+      - input: "root = [1]"
+        expected: "true"
+        description: "Single node is always a valid BST"
+    hints:
+      - "A naive approach comparing each node only to its direct children will miss cases where a deeper node violates an ancestor's constraint."
+      - "Pass down valid range boundaries (min, max) as you recurse. Each node must fall within the range defined by its ancestors."
+      - "Use Long.MIN_VALUE and Long.MAX_VALUE as initial bounds. For left child, update upper bound to parent's value. For right child, update lower bound to parent's value."
+
+  - title: "Minimum Absolute Difference in BST"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given the root of a Binary Search Tree (BST), return the minimum absolute difference
+      between the values of any two different nodes in the tree.
+
+      Since a BST's in-order traversal produces values in sorted order, the minimum
+      difference must occur between two consecutive values in that sorted sequence.
+
+      Constraints:
+      - The number of nodes in the tree is in the range [2, 10^4].
+      - 0 <= Node.val <= 10^5
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public int getMinimumDifference(TreeNode root) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "root = [4, 2, 6, 1, 3]"
+        expected: "1"
+        description: "In-order is [1,2,3,4,6], minimum diff is 1 (between 1-2 or 2-3 or 3-4)"
+      - input: "root = [1, 0, 48, null, null, 12, 49]"
+        expected: "1"
+        description: "In-order is [0,1,12,48,49], minimum diff is 1 (between 0 and 1)"
+      - input: "root = [236, 104, 701, null, 227, null, 911]"
+        expected: "9"
+        description: "In-order is [104,227,236,701,911], minimum diff is 9 (between 227 and 236)"
+    hints:
+      - "What traversal of a BST gives you values in sorted order?"
+      - "Perform an in-order traversal and track the previously visited node. The minimum difference must be between two adjacent values in the sorted sequence."
+      - "Use a class-level variable to track the previous value and the running minimum. Update both during the in-order traversal."
+
+  - title: "Convert Sorted Array to Binary Search Tree"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given an integer array nums sorted in strictly ascending order, convert it into a
+      height-balanced Binary Search Tree.
+
+      A height-balanced BST is one in which the depth of the two subtrees of every node
+      never differs by more than one.
+
+      There may be multiple valid answers. Any height-balanced BST built from the given
+      array is acceptable.
+
+      Constraints:
+      - 1 <= nums.length <= 10^4
+      - -10^4 <= nums[i] <= 10^4
+      - nums is sorted in strictly increasing order
+    starter_code: |
+      // Definition for a binary tree node:
+      // class TreeNode {
+      //     int val;
+      //     TreeNode left;
+      //     TreeNode right;
+      //     TreeNode(int val) { this.val = val; }
+      // }
+
+      public class Solution {
+          public TreeNode sortedArrayToBST(int[] nums) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "nums = [-10, -3, 0, 5, 9]"
+        expected: "[0, -3, 9, -10, null, 5] or [0, -10, 5, null, -3, null, 9]"
+        description: "Middle element 0 becomes root, recursively build left and right subtrees"
+      - input: "nums = [1, 3]"
+        expected: "[3, 1] or [1, null, 3]"
+        description: "Either element can be root in a valid height-balanced BST"
+      - input: "nums = [1, 2, 3, 4, 5, 6, 7]"
+        expected: "[4, 2, 6, 1, 3, 5, 7]"
+        description: "Perfectly balanced tree with middle element as root at each level"
+    hints:
+      - "In a sorted array, which element should be the root to ensure the tree is balanced?"
+      - "Pick the middle element as the root. Everything to its left forms the left subtree, everything to its right forms the right subtree. Apply this recursively."
+      - "Use a helper method with left and right index bounds. Base case: left > right returns null. Recursive case: mid = (left + right) / 2, create node, recurse on both halves."

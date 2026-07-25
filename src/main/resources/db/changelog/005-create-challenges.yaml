@@ -1,0 +1,106 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-create-challenge-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: challenge
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: topic_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_challenge_topic
+                    references: topic(id)
+              - column:
+                  name: title
+                  type: varchar(300)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: problem_statement
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: difficulty
+                  type: varchar(20)
+                  defaultValue: MEDIUM
+              - column:
+                  name: challenge_type
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: starter_code
+                  type: text
+              - column:
+                  name: test_cases
+                  type: jsonb
+                  constraints:
+                    nullable: false
+              - column:
+                  name: hints
+                  type: jsonb
+                  defaultValue: '[]'
+              - column:
+                  name: time_limit_seconds
+                  type: int
+                  defaultValueNumeric: 300
+              - column:
+                  name: created_at
+                  type: timestamp without time zone
+                  defaultValueComputed: now()
+
+  - changeSet:
+      id: 005-create-submission-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: submission
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: challenge_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_submission_challenge
+                    references: challenge(id)
+              - column:
+                  name: code
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: test_results
+                  type: jsonb
+              - column:
+                  name: ai_review
+                  type: text
+              - column:
+                  name: execution_time_ms
+                  type: int
+              - column:
+                  name: submitted_at
+                  type: timestamp without time zone
+                  defaultValueComputed: now()

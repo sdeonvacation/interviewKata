@@ -1,0 +1,237 @@
+topic: "System Design/API Design"
+exercises:
+  - title: "Design a URL Shortening Service"
+    difficulty: EASY
+    estimated_minutes: 25
+    prompt: |
+      Design a URL shortening service similar to TinyURL or bit.ly that converts long URLs into short, shareable links.
+
+      ## Requirements
+
+      ### Functional
+      - Given a long URL, generate a unique shortened URL
+      - Redirect users from the short URL to the original URL
+      - Allow users to set custom short aliases
+      - Track basic analytics (click count per link)
+      - Support link expiration with configurable TTL
+
+      ### Non-Functional
+      - Low-latency redirects (sub-50ms)
+      - High availability for read path
+      - Short URLs should be compact (6-8 characters)
+
+      ## Topics to Cover
+      - Short code generation strategy (hash-based vs counter-based)
+      - Storage choice for URL mappings
+      - Caching frequently accessed URLs
+      - Handling collisions in short code generation
+    constraints: |
+      - 10M new URLs per month
+      - 100:1 read-to-write ratio
+      - 7-character codes using [a-zA-Z0-9] (3.5 trillion combinations)
+      - Average URL record size: 500 bytes
+      - 99.9% availability target
+    evaluation_rubric:
+      api_design: 25
+      data_model: 25
+      scalability: 20
+      encoding_strategy: 20
+      trade_offs: 10
+    reference_approach: |
+      - API: POST /shorten {longUrl, customAlias?, ttl?} → shortUrl; GET /{code} → 301 redirect
+      - Encoding: Base62 on auto-increment ID or MD5 hash truncated to 7 chars
+      - Storage: Key-value store (DynamoDB/Redis) for fast lookups by short code
+      - Cache: Redis/Memcached layer for hot URLs (LRU eviction)
+      - Collision handling: Append random suffix and retry on hash collision
+      - Expiration: TTL field checked on read; background cleanup job for expired entries
+      - Analytics: Async write to separate analytics store on each redirect
+      - Read path: Client → LB → Cache → DB → 301 redirect
+
+  - title: "Design Pastebin"
+    difficulty: EASY
+    estimated_minutes: 20
+    prompt: |
+      Design a text-sharing service like Pastebin where users can store and share plain text or code snippets via a unique URL.
+
+      ## Requirements
+
+      ### Functional
+      - Users can create a paste with text content and get a unique URL
+      - Pastes can be public or unlisted (accessible only via direct link)
+      - Support syntax highlighting for common languages
+      - Pastes expire after a configurable duration
+      - Users can view raw text or formatted version
+
+      ### Non-Functional
+      - Fast paste retrieval (sub-100ms)
+      - Support large pastes (up to 10MB)
+      - High read availability
+
+      ## Topics to Cover
+      - Object storage vs database for paste content
+      - URL generation and uniqueness
+      - Content delivery and caching
+      - Metadata vs content separation
+    constraints: |
+      - 5M new pastes per day
+      - Average paste size: 10KB, max: 10MB
+      - 5:1 read-to-write ratio
+      - Retention: 30 days default, permanent for registered users
+      - 99.9% read availability
+    evaluation_rubric:
+      data_model: 25
+      storage_design: 25
+      api_design: 20
+      scalability: 20
+      trade_offs: 10
+    reference_approach: |
+      - API: POST /pastes {content, language?, expiry?} → pasteUrl; GET /pastes/{id} → content
+      - Storage: Metadata in relational DB; content in object store (S3) for large pastes
+      - URL generation: Base62-encoded unique ID (6-8 chars)
+      - Caching: CDN for popular pastes; application cache for recent pastes
+      - Expiration: TTL stored in metadata; lazy deletion on access + periodic cleanup
+      - Separation: Metadata (title, language, created_at, expiry) in DB; raw content in blob store
+      - Read path: CDN → App Server → Cache → Object Store
+
+  - title: "Design a Parking Lot System"
+    difficulty: EASY
+    estimated_minutes: 25
+    prompt: |
+      Design a system to manage a multi-floor parking lot with different vehicle types and real-time availability tracking.
+
+      ## Requirements
+
+      ### Functional
+      - Track available spots per floor and vehicle type (motorcycle, car, bus)
+      - Assign nearest available spot when a vehicle enters
+      - Calculate parking fee based on duration and vehicle type
+      - Display real-time availability on entrance displays
+      - Support monthly pass holders with reserved spots
+
+      ### Non-Functional
+      - Real-time spot availability updates
+      - Handle concurrent entry/exit at multiple gates
+      - System remains functional if network to central server drops
+      - Sub-second spot assignment
+
+      ## Topics to Cover
+      - Concurrency control for spot assignment
+      - Data model for floors, spots, and vehicles
+      - Pricing strategy implementation
+      - Real-time availability broadcasting
+    constraints: |
+      - 5 floors, 500 spots per floor (2500 total)
+      - Peak: 200 vehicles entering/exiting per hour
+      - 4 entry gates, 4 exit gates operating concurrently
+      - Fee calculation: per-hour rates varying by vehicle type
+      - Display refresh: under 2 seconds
+    evaluation_rubric:
+      data_model: 30
+      concurrency_handling: 25
+      api_design: 20
+      real_time_updates: 15
+      edge_cases: 10
+    reference_approach: |
+      - Data model: Floor → Spots (type, status, vehicle_id); Vehicle (plate, type, entry_time)
+      - Spot assignment: Find nearest available spot of matching type using floor-priority queue
+      - Concurrency: Optimistic locking on spot status (CAS operation) to prevent double-assignment
+      - Pricing: Strategy pattern — HourlyRate, DailyMax, MonthlyPass with vehicle-type multipliers
+      - Real-time: Publish spot changes to WebSocket/SSE for display boards
+      - Entry flow: Scan plate → assign spot → raise gate → update availability
+      - Exit flow: Scan plate → calculate fee → process payment → release spot → raise gate
+      - Offline mode: Gates operate with local cache; sync when connectivity restores
+
+  - title: "Design a Conference Room Booking System"
+    difficulty: EASY
+    estimated_minutes: 25
+    prompt: |
+      Design a system for booking conference rooms in an office building, handling scheduling conflicts and resource management.
+
+      ## Requirements
+
+      ### Functional
+      - Users can search available rooms by time slot, capacity, and amenities
+      - Book a room for a specific time range with attendee list
+      - Cancel or modify existing bookings
+      - Recurring meeting support (daily, weekly)
+      - Conflict detection — prevent double-booking
+
+      ### Non-Functional
+      - Strong consistency for booking operations (no double-books)
+      - Fast availability queries (sub-200ms)
+      - Support 1000 concurrent users checking availability
+      - Calendar integration capability
+
+      ## Topics to Cover
+      - Conflict detection and prevention strategy
+      - Recurring event storage and expansion
+      - Search and filtering for available rooms
+      - Notification system for booking changes
+    constraints: |
+      - 50 conference rooms across 3 buildings
+      - 5000 employees, peak 500 concurrent booking requests
+      - Booking granularity: 15-minute slots
+      - Look-ahead window: 30 days
+      - Average 200 bookings per day
+    evaluation_rubric:
+      data_model: 25
+      conflict_resolution: 25
+      api_design: 20
+      query_performance: 15
+      recurring_events: 15
+    reference_approach: |
+      - Data model: Room (capacity, amenities, building); Booking (room_id, start, end, organizer, attendees, recurrence_rule)
+      - Conflict detection: Check overlapping time ranges with SELECT ... WHERE room_id=? AND start < ? AND end > ?
+      - Concurrency: Serializable isolation or advisory locks per room during booking
+      - Recurring events: Store recurrence rule (RFC 5545); expand instances on query
+      - Search: Index on (building, capacity, amenities) for filtered availability queries
+      - API: GET /rooms/available?start=&end=&capacity=; POST /bookings; DELETE /bookings/{id}
+      - Notifications: Event-driven — publish booking changes to notify attendees via email/Slack
+
+  - title: "Design an Online Presence Indicator"
+    difficulty: EASY
+    estimated_minutes: 20
+    prompt: |
+      Design a system that tracks and displays user online/offline status in real-time, similar to the green dot in Slack or WhatsApp.
+
+      ## Requirements
+
+      ### Functional
+      - Show real-time online/offline/away status for each user
+      - Detect user going offline (explicit logout or timeout)
+      - Allow users to set custom status (Do Not Disturb, Away)
+      - Friends/contacts can subscribe to status changes
+      - Show "last seen" timestamp for offline users
+
+      ### Non-Functional
+      - Status updates propagated within 5 seconds
+      - Handle millions of concurrent connected users
+      - Minimize server resource usage for idle connections
+      - Graceful degradation under load
+
+      ## Topics to Cover
+      - Heartbeat mechanism for presence detection
+      - Efficient fan-out of status changes to subscribers
+      - Connection management at scale
+      - Storage for presence state
+    constraints: |
+      - 50M concurrent users
+      - Heartbeat interval: 30 seconds
+      - Status change propagation: under 5 seconds
+      - Average user has 200 contacts to notify
+      - 99.9% accuracy for online/offline detection
+    evaluation_rubric:
+      scalability: 30
+      real_time_design: 25
+      data_model: 20
+      fan_out_strategy: 15
+      trade_offs: 10
+    reference_approach: |
+      - Heartbeat: Client sends ping every 30s; server marks offline after 2 missed heartbeats
+      - Connection: WebSocket for active users; long-polling fallback
+      - Storage: Redis with TTL keys — user:{id}:presence with 60s TTL, refreshed on heartbeat
+      - Fan-out: Publish status change to pub/sub channel; subscribers receive via WebSocket
+      - Last seen: Update timestamp on each heartbeat; persist to DB on disconnect
+      - Optimization: Batch status queries for contact list (MGET in Redis)
+      - Custom status: Separate field in user presence record; manual override disables auto-detection
+      - Scaling: Partition users across presence servers by user_id hash

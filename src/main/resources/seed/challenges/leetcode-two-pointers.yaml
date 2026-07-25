@@ -1,0 +1,202 @@
+topic: "DSA/Arrays"
+challenges:
+  - title: "Valid Palindrome"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given a string s, determine whether it reads the same forwards and backwards after
+      converting all uppercase letters to lowercase and removing all non-alphanumeric characters.
+
+      An empty string is considered a valid palindrome.
+
+      Constraints:
+      - 1 <= s.length <= 2 * 10^5
+      - s consists of printable ASCII characters
+    starter_code: |
+      public class Solution {
+          public boolean isPalindrome(String s) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "s = \"A man, a plan, a canal: Panama\""
+        expected: "true"
+        description: "Classic palindrome after removing non-alphanumeric and ignoring case"
+      - input: "s = \"race a car\""
+        expected: "false"
+        description: "Not a palindrome"
+      - input: "s = \" \""
+        expected: "true"
+        description: "Empty string after cleanup is a palindrome"
+      - input: "s = \"0P\""
+        expected: "false"
+        description: "Mixed digit and letter, not a palindrome"
+    hints:
+      - "Think about approaching the string from both ends simultaneously."
+      - "Use two pointers starting at the beginning and end. Skip characters that are not letters or digits."
+      - "Compare characters at left and right pointers (case-insensitive). Move inward. If any mismatch found, return false."
+
+  - title: "Is Subsequence"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given two strings s and t, determine if s is a subsequence of t.
+
+      A subsequence is formed by deleting zero or more characters from the original string
+      without changing the relative order of the remaining characters.
+
+      Constraints:
+      - 0 <= s.length <= 100
+      - 0 <= t.length <= 10^4
+      - s and t consist only of lowercase English letters
+
+      Follow up: If there are many incoming s strings and you want to check each one against the
+      same t, how would you optimize?
+    starter_code: |
+      public class Solution {
+          public boolean isSubsequence(String s, String t) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "s = \"abc\", t = \"ahbgdc\""
+        expected: "true"
+        description: "a, b, c appear in order within t"
+      - input: "s = \"axc\", t = \"ahbgdc\""
+        expected: "false"
+        description: "x does not appear in t after a"
+      - input: "s = \"\", t = \"ahbgdc\""
+        expected: "true"
+        description: "Empty string is subsequence of any string"
+      - input: "s = \"abc\", t = \"abc\""
+        expected: "true"
+        description: "Identical strings, trivially a subsequence"
+    hints:
+      - "Can you traverse both strings simultaneously and track progress?"
+      - "Use a pointer for each string. Advance the t-pointer every step. Advance the s-pointer only when characters match."
+      - "If the s-pointer reaches the end of s, all characters were found in order. Return whether s-pointer equals s.length."
+
+  - title: "Two Sum II - Input Array Is Sorted"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given a 1-indexed array of integers that is already sorted in non-decreasing order, find
+      two numbers such that they add up to a specific target number.
+
+      Return the indices of the two numbers (1-indexed) as an integer array [index1, index2]
+      where 1 <= index1 < index2 <= numbers.length.
+
+      There is exactly one solution, and you may not use the same element twice.
+      Your solution must use only constant extra space.
+
+      Constraints:
+      - 2 <= numbers.length <= 3 * 10^4
+      - -1000 <= numbers[i] <= 1000
+      - numbers is sorted in non-decreasing order
+      - -1000 <= target <= 1000
+      - Exactly one solution exists
+    starter_code: |
+      public class Solution {
+          public int[] twoSum(int[] numbers, int target) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "numbers = [2,7,11,15], target = 9"
+        expected: "[1, 2]"
+        description: "2 + 7 = 9, indices are 1 and 2"
+      - input: "numbers = [2,3,4], target = 6"
+        expected: "[1, 3]"
+        description: "2 + 4 = 6, indices are 1 and 3"
+      - input: "numbers = [-1,0], target = -1"
+        expected: "[1, 2]"
+        description: "Negative numbers, -1 + 0 = -1"
+      - input: "numbers = [1,2,3,4,4,9,56,90], target = 8"
+        expected: "[4, 5]"
+        description: "Duplicate values, 4 + 4 = 8"
+    hints:
+      - "The array is sorted. How can you exploit that property to avoid brute force?"
+      - "Place one pointer at the start and one at the end. If the sum is too large, move the right pointer left. If too small, move the left pointer right."
+      - "Since the array is sorted, moving left increases the sum and moving right decreases it. Converge until you find the target sum. Return 1-indexed positions."
+
+  - title: "Container With Most Water"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      You are given an integer array height of length n. There are n vertical lines drawn such
+      that the two endpoints of the i-th line are (i, 0) and (i, height[i]).
+
+      Find two lines that, together with the x-axis, form a container that holds the most water.
+      Return the maximum amount of water the container can store.
+
+      Note: The container cannot be tilted.
+
+      Constraints:
+      - n == height.length
+      - 2 <= n <= 10^5
+      - 0 <= height[i] <= 10^4
+    starter_code: |
+      public class Solution {
+          public int maxArea(int[] height) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "height = [1,8,6,2,5,4,8,3,7]"
+        expected: "49"
+        description: "Lines at index 1 (height 8) and index 8 (height 7) form max area = 7 * 7"
+      - input: "height = [1,1]"
+        expected: "1"
+        description: "Only two lines, area = min(1,1) * 1 = 1"
+      - input: "height = [4,3,2,1,4]"
+        expected: "16"
+        description: "Lines at index 0 and 4 (both height 4), area = 4 * 4 = 16"
+      - input: "height = [1,2,1]"
+        expected: "2"
+        description: "Lines at index 0 and 2 (both height 1), area = 1 * 2 = 2"
+    hints:
+      - "Brute force checks all pairs in O(n^2). Can you do better by starting with the widest container?"
+      - "Use two pointers at both ends. The area is limited by the shorter line. Move the pointer pointing to the shorter line inward to potentially find a taller line."
+      - "At each step compute area = min(height[left], height[right]) * (right - left). Track the maximum. Always move the shorter side inward since keeping it cannot improve the area."
+
+  - title: "3Sum"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an integer array nums, find all unique triplets [nums[i], nums[j], nums[k]] such
+      that i != j, i != k, j != k, and nums[i] + nums[j] + nums[k] == 0.
+
+      The solution set must not contain duplicate triplets. The order of the output and the
+      order of elements within each triplet does not matter.
+
+      Constraints:
+      - 3 <= nums.length <= 3000
+      - -10^5 <= nums[i] <= 10^5
+    starter_code: |
+      public class Solution {
+          public List<List<Integer>> threeSum(int[] nums) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "nums = [-1,0,1,2,-1,-4]"
+        expected: "[[-1,-1,2],[-1,0,1]]"
+        description: "Two unique triplets sum to zero"
+      - input: "nums = [0,1,1]"
+        expected: "[]"
+        description: "No triplet sums to zero"
+      - input: "nums = [0,0,0]"
+        expected: "[[0,0,0]]"
+        description: "All zeros form a valid triplet"
+      - input: "nums = [-2,0,1,1,2]"
+        expected: "[[-2,0,2],[-2,1,1]]"
+        description: "Multiple valid triplets with shared elements"
+    hints:
+      - "Sorting the array first can help both with finding triplets and avoiding duplicates."
+      - "Fix one element and reduce the problem to Two Sum II on the remaining sorted portion. Skip duplicate values for the fixed element."
+      - "Sort the array. For each index i, use two pointers (left = i+1, right = end) to find pairs summing to -nums[i]. Skip duplicates by advancing past repeated values for i, left, and right."

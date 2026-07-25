@@ -1,0 +1,124 @@
+topic: "DSA/Arrays"
+cards:
+  - front: "Explain the two-pointer technique and when to apply it."
+    back: "Two pointers use two indices traversing an array (often from both ends or at different speeds) to solve problems in O(n) time without extra space. Apply when: (1) Searching pairs in sorted arrays. (2) Removing duplicates in-place. (3) Partitioning arrays (Dutch National Flag). (4) Detecting cycles (fast/slow pointers). Key insight: pointer movement eliminates portions of the search space."
+    code_snippet: |
+      // Two Sum in sorted array
+      int left = 0, right = arr.length - 1;
+      while (left < right) {
+          int sum = arr[left] + arr[right];
+          if (sum == target) return new int[]{left, right};
+          else if (sum < target) left++;
+          else right--;
+      }
+    difficulty: EASY
+    tags: [two-pointers, arrays, technique]
+
+  - front: "How does the sliding window technique work? What problems does it solve?"
+    back: "Sliding window maintains a window [left, right] over a contiguous subarray, expanding right to include elements and shrinking left to maintain constraints. Converts brute-force O(n²) to O(n). Solves: maximum/minimum subarray of size k, longest substring without repeating characters, minimum window substring, maximum sum subarray of size k. Two variants: fixed-size window and variable-size window."
+    code_snippet: |
+      // Longest substring without repeating characters
+      Set<Character> window = new HashSet<>();
+      int left = 0, maxLen = 0;
+      for (int right = 0; right < s.length(); right++) {
+          while (window.contains(s.charAt(right))) {
+              window.remove(s.charAt(left++));
+          }
+          window.add(s.charAt(right));
+          maxLen = Math.max(maxLen, right - left + 1);
+      }
+    difficulty: MEDIUM
+    tags: [sliding-window, subarray, technique]
+
+  - front: "What is the prefix sum technique and how is it used for range queries?"
+    back: "Prefix sum precomputes cumulative sums so any subarray sum can be answered in O(1). prefix[i] = sum of elements from index 0 to i-1. Sum of range [l, r] = prefix[r+1] - prefix[l]. Build in O(n), query in O(1). Extends to 2D (prefix sum matrix for submatrix queries). Used in: range sum queries, counting subarrays with given sum, equilibrium index problems."
+    code_snippet: |
+      // Build prefix sum
+      int[] prefix = new int[arr.length + 1];
+      for (int i = 0; i < arr.length; i++) {
+          prefix[i + 1] = prefix[i] + arr[i];
+      }
+      // Query sum of range [l, r]
+      int rangeSum = prefix[r + 1] - prefix[l];
+    difficulty: EASY
+    tags: [prefix-sum, range-query, technique]
+
+  - front: "Explain Kadane's algorithm for maximum subarray sum."
+    back: "Kadane's algorithm finds the maximum sum contiguous subarray in O(n) time, O(1) space. Key insight: at each position, the maximum subarray ending here is either the current element alone or the current element plus the maximum subarray ending at the previous position. If the running sum becomes negative, reset it — a negative prefix can never improve a future subarray."
+    code_snippet: |
+      int maxSum = arr[0], currentSum = arr[0];
+      for (int i = 1; i < arr.length; i++) {
+          currentSum = Math.max(arr[i], currentSum + arr[i]);
+          maxSum = Math.max(maxSum, currentSum);
+      }
+      return maxSum;
+    explanation: "Variant: to find the actual subarray, track start/end indices. Reset start when currentSum resets to arr[i]. Update end when maxSum updates."
+    difficulty: MEDIUM
+    tags: [kadane, maximum-subarray, dynamic-programming]
+
+  - front: "Describe the Dutch National Flag algorithm and its applications."
+    back: "Dutch National Flag (3-way partition) sorts an array of three distinct values in a single pass using three pointers: low, mid, high. Elements before low are first value, between low and mid are second value, after high are third value. O(n) time, O(1) space. Applications: sort colors (LeetCode 75), partition around pivot in quicksort, segregate 0s/1s/2s."
+    code_snippet: |
+      // Sort array of 0s, 1s, 2s
+      int low = 0, mid = 0, high = arr.length - 1;
+      while (mid <= high) {
+          if (arr[mid] == 0) swap(arr, low++, mid++);
+          else if (arr[mid] == 1) mid++;
+          else swap(arr, mid, high--);
+      }
+    difficulty: MEDIUM
+    tags: [dutch-national-flag, partitioning, three-way]
+
+  - front: "How do you apply binary search on a sorted array and what are common pitfalls?"
+    back: "Binary search halves the search space each iteration: O(log n). Pitfalls: (1) Integer overflow in mid calculation — use left + (right - left) / 2. (2) Off-by-one in boundaries — decide inclusive [left, right] vs exclusive [left, right). (3) Infinite loops — ensure search space shrinks every iteration. (4) Variants: lower_bound (first >= target), upper_bound (first > target), search in rotated array."
+    code_snippet: |
+      // Lower bound: first index where arr[i] >= target
+      int left = 0, right = arr.length;
+      while (left < right) {
+          int mid = left + (right - left) / 2;
+          if (arr[mid] < target) left = mid + 1;
+          else right = mid;
+      }
+      return left;
+    difficulty: EASY
+    tags: [binary-search, sorted-array, lower-bound]
+
+  - front: "Explain the merge intervals algorithm and its approach."
+    back: "Merge overlapping intervals: (1) Sort intervals by start time. (2) Iterate, maintaining a current merged interval. (3) If next interval overlaps (start <= current.end), extend current.end = max(current.end, next.end). (4) Otherwise, add current to result and start new interval. Time: O(n log n) for sort. Applications: meeting room scheduling, free time calculation, interval coverage."
+    code_snippet: |
+      Arrays.sort(intervals, (a, b) -> a[0] - b[0]);
+      List<int[]> merged = new ArrayList<>();
+      int[] current = intervals[0];
+      for (int i = 1; i < intervals.length; i++) {
+          if (intervals[i][0] <= current[1]) {
+              current[1] = Math.max(current[1], intervals[i][1]);
+          } else {
+              merged.add(current);
+              current = intervals[i];
+          }
+      }
+      merged.add(current);
+    difficulty: MEDIUM
+    tags: [merge-intervals, sorting, greedy]
+
+  - front: "What techniques are used for matrix traversal problems?"
+    back: "Common techniques: (1) Spiral traversal — maintain four boundaries (top, bottom, left, right), shrink after each direction. (2) Diagonal traversal — iterate by sum of indices (i+j = constant). (3) BFS/DFS for connected components (island problems). (4) In-place marking for visited cells. (5) Direction arrays: dx={0,0,1,-1}, dy={1,-1,0,0} for 4-directional movement. Key: check bounds before accessing neighbors."
+    code_snippet: |
+      // 4-directional BFS on matrix
+      int[] dx = {0, 0, 1, -1};
+      int[] dy = {1, -1, 0, 0};
+      Queue<int[]> queue = new LinkedList<>();
+      queue.offer(new int[]{startRow, startCol});
+      while (!queue.isEmpty()) {
+          int[] cell = queue.poll();
+          for (int d = 0; d < 4; d++) {
+              int nx = cell[0] + dx[d], ny = cell[1] + dy[d];
+              if (nx >= 0 && nx < rows && ny >= 0 && ny < cols
+                  && !visited[nx][ny]) {
+                  visited[nx][ny] = true;
+                  queue.offer(new int[]{nx, ny});
+              }
+          }
+      }
+    difficulty: MEDIUM
+    tags: [matrix, traversal, bfs, spiral]

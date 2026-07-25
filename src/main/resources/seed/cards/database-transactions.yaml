@@ -1,0 +1,77 @@
+topic: "Database/Transactions"
+cards:
+  - front: "What are savepoints and how do they differ from full transaction rollback?"
+    back: "A savepoint marks a point within a transaction you can roll back to without aborting the entire transaction. SAVEPOINT creates the marker, ROLLBACK TO undoes work back to that point, RELEASE discards it. Unlike full ROLLBACK, the transaction remains active and prior work before the savepoint is preserved. Use cases: batch processing where individual items may fail, nested logical operations, and retry logic within a single transaction."
+    code_snippet: |
+      Connection conn = dataSource.getConnection();
+      conn.setAutoCommit(false);
+      Savepoint sp = conn.setSavepoint("before_update");
+      try {
+          stmt.executeUpdate("UPDATE accounts SET balance = balance - 100 WHERE id = 1");
+          stmt.executeUpdate("UPDATE accounts SET balance = balance + 100 WHERE id = 2");
+      } catch (SQLException e) {
+          conn.rollback(sp);  // only undo since savepoint
+      }
+      conn.commit();
+    difficulty: EASY
+    tags: [savepoints, rollback, jdbc]
+
+  - front: "Explain MVCC and how it enables readers to never block writers."
+    back: "Multi-Version Concurrency Control maintains multiple versions of each row, tagged with transaction IDs. Readers see a consistent snapshot based on their transaction start time, ignoring uncommitted or newer changes. Writers create new row versions rather than overwriting in place. This eliminates read-write locks entirely — readers access their snapshot while writers append new versions. Trade-off: dead tuples accumulate and require VACUUM (PostgreSQL) or purge threads (InnoDB) to reclaim space."
+    difficulty: MEDIUM
+    tags: [mvcc, concurrency, postgresql, innodb]
+
+  - front: "What is a phantom read and which isolation levels prevent it?"
+    back: "A phantom read occurs when a transaction re-executes a range query and finds new rows inserted by another committed transaction. Example: SELECT COUNT(*) WHERE salary > 100k returns 5, then another transaction inserts a matching row, and re-query returns 6. READ COMMITTED and REPEATABLE READ (standard SQL) allow phantoms. SERIALIZABLE prevents them via predicate locking. PostgreSQL's REPEATABLE READ also prevents phantoms because it uses snapshot isolation (SSI), unlike MySQL which requires gap locks."
+    difficulty: EASY
+    tags: [phantom-read, isolation-levels, anomalies]
+
+  - front: "How does deadlock detection work in relational databases and how do you prevent deadlocks?"
+    back: "Databases maintain a wait-for graph where nodes are transactions and edges represent lock waits. A cycle in this graph indicates deadlock. Detection runs periodically (InnoDB: every few seconds) or on each wait. On detection, the DB aborts one transaction (victim chosen by cost/age). Prevention strategies: acquire locks in consistent order, keep transactions short, use lock timeouts (innodb_lock_wait_timeout), reduce isolation level, use SELECT FOR UPDATE NOWAIT to fail fast instead of waiting."
+    code_snippet: |
+      // Consistent lock ordering prevents deadlock
+      // Always lock accounts in ID order regardless of transfer direction
+      public void transfer(long fromId, long toId, BigDecimal amount) {
+          long first = Math.min(fromId, toId);
+          long second = Math.max(fromId, toId);
+          em.find(Account.class, first, LockModeType.PESSIMISTIC_WRITE);
+          em.find(Account.class, second, LockModeType.PESSIMISTIC_WRITE);
+          // now safe to update both
+      }
+    difficulty: HARD
+    tags: [deadlock, locking, prevention]
+
+  - front: "What is the difference between dirty read and non-repeatable read?"
+    back: "Dirty read: reading data written by an uncommitted transaction — if that transaction rolls back, you read data that never existed. Non-repeatable read: reading the same row twice within a transaction and getting different values because another transaction committed an UPDATE between the two reads. Key difference: dirty reads involve uncommitted data (potential rollback), non-repeatable reads involve committed changes. READ COMMITTED prevents dirty reads but allows non-repeatable reads; REPEATABLE READ prevents both."
+    difficulty: MEDIUM
+    tags: [dirty-read, non-repeatable-read, isolation-levels]
+
+  - front: "How does Spring's @Transactional propagation affect nested transaction behavior?"
+    back: "REQUIRED (default): joins existing transaction or creates new one. REQUIRES_NEW: suspends current transaction and creates a fresh one — inner commit/rollback is independent. NESTED: uses savepoint within existing transaction — inner rollback only undoes to savepoint, but outer rollback undoes everything including nested work. MANDATORY: throws if no existing transaction. Key pitfall: self-invocation bypasses the proxy, so @Transactional on a method called from the same class is ignored."
+    code_snippet: |
+      @Transactional(propagation = Propagation.REQUIRES_NEW)
+      public void auditLog(String event) {
+          // commits even if calling transaction rolls back
+          auditRepo.save(new AuditEntry(event));
+      }
+
+      @Transactional(propagation = Propagation.NESTED)
+      public void processItem(Item item) {
+          // uses savepoint; caller can catch exception and continue
+          itemRepo.save(transform(item));
+      }
+    difficulty: MEDIUM
+    tags: [spring, propagation, nested-transactions]
+
+  - front: "What is write skew and why does REPEATABLE READ not prevent it in standard SQL?"
+    back: "Write skew occurs when two transactions read overlapping data, make disjoint writes based on what they read, and both commit — leaving the database in an invalid state neither intended. Classic example: two on-call doctors both read 'two doctors on call', each decides to remove themselves, resulting in zero doctors. Standard REPEATABLE READ only locks rows actually read/written, not the predicate condition. Only SERIALIZABLE (via SSI in PostgreSQL or gap locks in MySQL) detects and aborts one transaction to prevent the anomaly."
+    code_snippet: |
+      -- Write skew example (both succeed under REPEATABLE READ)
+      -- T1: SELECT count(*) FROM oncall WHERE shift='night'; -- returns 2
+      -- T2: SELECT count(*) FROM oncall WHERE shift='night'; -- returns 2
+      -- T1: DELETE FROM oncall WHERE doctor='Alice' AND shift='night';
+      -- T2: DELETE FROM oncall WHERE doctor='Bob' AND shift='night';
+      -- Both commit -> 0 doctors on call (constraint violated)
+      -- Fix: SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+    difficulty: HARD
+    tags: [write-skew, serializable, ssi]

@@ -1,0 +1,117 @@
+topic: "Architecture/SOLID"
+cards:
+  - front: "What is the Single Responsibility Principle (SRP) and how do you identify violations?"
+    back: "SRP: a class should have only one reason to change, meaning it should have only one responsibility or job. Identify violations by asking 'who would request changes to this class?' If multiple actors (e.g., HR and Accounting) would cause changes, the class has multiple responsibilities. Signs: class name includes 'And' or 'Manager', class has methods serving different stakeholders, changes to one feature break another."
+    code_snippet: |
+      // Violation: Employee handles persistence AND business logic
+      public class Employee {
+          public double calculatePay() { /* ... */ }
+          public void save() { /* DB logic */ }
+          public String generateReport() { /* formatting */ }
+      }
+
+      // Fixed: separate responsibilities
+      public class Employee { public double calculatePay() { /* ... */ } }
+      public class EmployeeRepository { public void save(Employee e) { /* ... */ } }
+      public class EmployeeReportGenerator { public String generate(Employee e) { /* ... */ } }
+    difficulty: EASY
+    tags: [srp, solid, single-responsibility, cohesion]
+
+  - front: "Explain the Open/Closed Principle (OCP) with a practical example."
+    back: "OCP: software entities should be open for extension but closed for modification. Add new behavior by adding new code (new classes/implementations), not changing existing code. Achieved through: abstraction (interfaces), polymorphism (strategy pattern), composition. Violation sign: adding a new type requires modifying existing switch/if-else chains."
+    code_snippet: |
+      // Violation: adding new shape requires modifying this method
+      public double area(Shape shape) {
+          if (shape instanceof Circle c) return Math.PI * c.radius * c.radius;
+          if (shape instanceof Rectangle r) return r.width * r.height;
+          // Must modify for every new shape!
+      }
+
+      // Fixed: polymorphism
+      public interface Shape {
+          double area();
+      }
+      public class Circle implements Shape {
+          private final double radius;
+          public double area() { return Math.PI * radius * radius; }
+      }
+      public class Triangle implements Shape {
+          public double area() { return 0.5 * base * height; }
+      }
+      // New shapes added without modifying existing code
+    difficulty: MEDIUM
+    tags: [ocp, solid, open-closed, polymorphism]
+
+  - front: "What is the Liskov Substitution Principle (LSP) and what are common violations?"
+    back: "LSP: objects of a superclass should be replaceable with objects of a subclass without altering program correctness. Subtypes must honor the contract of the base type. Common violations: (1) Square extending Rectangle (setting width changes height — breaks Rectangle's contract). (2) Throwing UnsupportedOperationException in overridden methods. (3) Strengthening preconditions or weakening postconditions in subclass."
+    code_snippet: |
+      // Violation: Square breaks Rectangle's contract
+      public class Rectangle {
+          protected int width, height;
+          public void setWidth(int w) { this.width = w; }
+          public void setHeight(int h) { this.height = h; }
+          public int area() { return width * height; }
+      }
+      public class Square extends Rectangle {
+          public void setWidth(int w) { this.width = w; this.height = w; } // breaks LSP!
+      }
+
+      // Fixed: separate abstractions
+      public interface Shape { int area(); }
+      public record Rectangle(int width, int height) implements Shape {
+          public int area() { return width * height; }
+      }
+      public record Square(int side) implements Shape {
+          public int area() { return side * side; }
+      }
+    difficulty: MEDIUM
+    tags: [lsp, solid, liskov, substitution, contracts]
+
+  - front: "Explain the Interface Segregation Principle (ISP) and its benefits."
+    back: "ISP: clients should not be forced to depend on interfaces they don't use. Split fat interfaces into smaller, focused ones. Benefits: (1) Reduces coupling — classes only depend on methods they actually call. (2) Easier to implement — no need for empty/throwing method stubs. (3) Better testability — mock only relevant interface. Signs of violation: interfaces with many methods where most implementors throw UnsupportedOperationException."
+    code_snippet: |
+      // Violation: fat interface
+      public interface Worker {
+          void work();
+          void eat();
+          void sleep();
+      }
+      public class Robot implements Worker {
+          public void work() { /* ok */ }
+          public void eat() { throw new UnsupportedOperationException(); } // ISP violation!
+          public void sleep() { throw new UnsupportedOperationException(); }
+      }
+
+      // Fixed: segregated interfaces
+      public interface Workable { void work(); }
+      public interface Feedable { void eat(); }
+      public interface Restable { void sleep(); }
+      public class Robot implements Workable { public void work() { /* ok */ } }
+      public class Human implements Workable, Feedable, Restable { /* all methods */ }
+    difficulty: MEDIUM
+    tags: [isp, solid, interface-segregation, decoupling]
+
+  - front: "What is the Dependency Inversion Principle (DIP) and how does Spring implement it?"
+    back: "DIP: (1) High-level modules should not depend on low-level modules; both should depend on abstractions. (2) Abstractions should not depend on details; details should depend on abstractions. Spring implements DIP via IoC container: beans depend on interfaces, Spring injects concrete implementations at runtime. This inverts the traditional control flow where high-level code directly instantiates dependencies."
+    code_snippet: |
+      // Violation: high-level depends on low-level
+      public class OrderService {
+          private final MySQLOrderRepository repo = new MySQLOrderRepository(); // tight coupling!
+      }
+
+      // Fixed: depend on abstraction
+      public interface OrderRepository {
+          void save(Order order);
+      }
+      @Service
+      public class OrderService {
+          private final OrderRepository repo; // depends on interface
+          public OrderService(OrderRepository repo) { this.repo = repo; }
+      }
+      @Repository
+      public class JpaOrderRepository implements OrderRepository {
+          public void save(Order order) { /* JPA logic */ }
+      }
+      // Spring injects JpaOrderRepository into OrderService
+    difficulty: MEDIUM
+    tags: [dip, solid, dependency-inversion, ioc, spring]

@@ -1,0 +1,137 @@
+topic: "Spring Boot/Core Concepts"
+guides:
+  - title: "Dependency Injection in Spring Boot"
+    estimated_minutes: 15
+    content: |
+      # Dependency Injection in Spring Boot
+
+      Dependency Injection (DI) is the core mechanism Spring uses to manage object creation and wiring. Instead of objects creating their own dependencies, the Spring IoC container injects them.
+
+      ## Constructor Injection (Recommended)
+
+      Constructor injection is the preferred approach in modern Spring applications:
+
+      ```java
+      @Service
+      public class OrderService {
+          private final PaymentGateway paymentGateway;
+          private final InventoryService inventoryService;
+
+          // Spring auto-injects dependencies via constructor
+          // @Autowired is optional for single-constructor classes (Spring 4.3+)
+          public OrderService(PaymentGateway paymentGateway, InventoryService inventoryService) {
+              this.paymentGateway = paymentGateway;
+              this.inventoryService = inventoryService;
+          }
+      }
+      ```
+
+      **Advantages:**
+      - Dependencies can be `final` (immutable after construction)
+      - Object is never in a partially-initialized state
+      - Easy to test: just pass mocks via constructor, no Spring context needed
+      - Makes excessive dependencies obvious (too many constructor params = class does too much)
+      - Prevents circular dependencies at startup (fails fast with clear error)
+
+      ## Field Injection (Antipattern)
+
+      ```java
+      @Service
+      public class OrderService {
+          @Autowired
+          private PaymentGateway paymentGateway; // hidden dependency
+      }
+      ```
+
+      **Why it's an antipattern:**
+      - Hides dependencies from the class API
+      - Cannot make fields `final`
+      - Requires reflection or a full Spring context for testing
+      - Allows the class to be instantiated in an invalid state
+      - Circular dependencies are detected late (or not at all)
+
+      The Spring team officially recommends constructor injection as of Spring Framework 4.x.
+
+      ## @Qualifier for Disambiguation
+
+      When multiple beans of the same type exist, use `@Qualifier` to specify which one:
+
+      ```java
+      @Configuration
+      public class DataSourceConfig {
+          @Bean
+          @Qualifier("primary")
+          public DataSource primaryDataSource() {
+              return DataSourceBuilder.create().url("jdbc:postgresql://primary:5432/db").build();
+          }
+
+          @Bean
+          @Qualifier("replica")
+          public DataSource replicaDataSource() {
+              return DataSourceBuilder.create().url("jdbc:postgresql://replica:5432/db").build();
+          }
+      }
+
+      @Service
+      public class ReportService {
+          public ReportService(@Qualifier("replica") DataSource dataSource) {
+              // uses the replica for read-heavy reports
+          }
+      }
+      ```
+
+      ## @Primary as Default
+
+      `@Primary` marks a bean as the default choice when no `@Qualifier` is specified:
+
+      ```java
+      @Bean
+      @Primary
+      public ObjectMapper defaultMapper() {
+          return new ObjectMapper();
+      }
+
+      @Bean
+      @Qualifier("yaml")
+      public ObjectMapper yamlMapper() {
+          return new ObjectMapper(new YAMLFactory());
+      }
+      ```
+
+      Any injection point requesting `ObjectMapper` without a qualifier gets the `@Primary` bean. Explicit `@Qualifier("yaml")` overrides the primary selection.
+
+      ## Circular Dependencies
+
+      A circular dependency occurs when Bean A depends on Bean B, which depends on Bean A. With constructor injection, Spring detects this immediately at startup:
+
+      ```
+      BeanCurrentlyInCreationException: Error creating bean 'serviceA':
+      Requested bean is currently in creation: Is there an unresolvable circular reference?
+      ```
+
+      **Solutions:**
+      1. **Redesign** (best): Extract shared logic into a third service
+      2. **@Lazy on one dependency**: Injects a proxy that resolves the real bean on first use
+      3. **Event-driven**: Use `ApplicationEventPublisher` to decouple
+      4. **@PostConstruct setter**: Inject one dependency after construction (avoid if possible)
+
+      ```java
+      // @Lazy breaks the cycle by injecting a proxy
+      @Service
+      public class ServiceA {
+          public ServiceA(@Lazy ServiceB serviceB) {
+              this.serviceB = serviceB;
+          }
+      }
+      ```
+
+      ## Best Practices Summary
+
+      | Practice | Recommendation |
+      |----------|---------------|
+      | Injection style | Constructor injection always |
+      | Field visibility | `private final` for all dependencies |
+      | @Autowired annotation | Omit on single-constructor classes |
+      | Multiple implementations | Use @Qualifier or @Primary |
+      | Circular dependencies | Redesign to eliminate them |
+      | Optional dependencies | Use `Optional<T>` parameter or `@Nullable` |

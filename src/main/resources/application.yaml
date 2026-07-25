@@ -1,0 +1,63 @@
+server:
+  port: 5050
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5436/interviewkata
+    username: interviewkata
+    password: ${INTERVIEWKATA_DB_PASSWORD:interviewkata}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+  ai:
+    openai:
+      api-key: ${JOBHUNTER_AI_API_KEY:sk-placeholder}
+      base-url: https://generativelanguage.googleapis.com/v1beta/openai
+      chat:
+        options:
+          model: ${INTERVIEWKATA_AI_MODEL:gemini-2.0-flash}
+          max-tokens: 4096
+    anthropic:
+      api-key: ${INTERVIEWKATA_ANTHROPIC_KEY:sk-placeholder}
+      chat:
+        options:
+          model: claude-sonnet-4-20250514
+          max-tokens: 4096
+
+interviewkata:
+  auth:
+    token: ${INTERVIEWKATA_AUTH_TOKEN:dev-token}
+  sandbox:
+    timeout-ms: 5000
+    max-heap-mb: 256
+    warm-pool-size: 2
+    max-output-bytes: 10240
+    allowed-modules:
+      - java.base
+      - jdk.jshell
+  ai:
+    provider: ${INTERVIEWKATA_AI_PROVIDER:openai}
+    max-interviews-per-day: 3
+    cache-explanations: true
+    fallback:
+      api-key: ${JOBHUNTER_AI_FALLBACK_API_KEY:}
+      base-url: https://integrate.api.nvidia.com
+      model: ${INTERVIEWKATA_AI_FALLBACK_MODEL:meta/llama-3.1-8b-instruct}
+  seed:
+    enabled: true
+    path: classpath:seed/
+  review:
+    default-session-size: 20
+    graduating-interval-days: 21
+    learning-steps-minutes: 1,10
+    initial-ease-factor: 2.5
+    minimum-ease-factor: 1.3
+  progress:
+    streak-reset-hour: 4
+    weak-area-threshold: 0.6

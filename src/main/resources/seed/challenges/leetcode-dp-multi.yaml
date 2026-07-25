@@ -1,0 +1,271 @@
+topic: "DSA/Dynamic Programming"
+challenges:
+  - title: "Best Time to Buy and Sell Stock III"
+    difficulty: HARD
+    type: DSA
+    time_limit_seconds: 900
+    problem_statement: |
+      You are given an array of integers where each element represents the stock price on that day. Determine the maximum profit you can achieve by completing at most two transactions.
+
+      A transaction consists of buying one share and later selling it. You must sell the stock before you can buy again (no overlapping transactions).
+
+      If no profit can be made, return 0.
+
+      **Constraints:**
+      - 1 <= prices.length <= 10^5
+      - 0 <= prices[i] <= 10^5
+    starter_code: |
+      public class Solution {
+          public int maxProfit(int[] prices) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "prices = [3,3,5,0,0,3,1,4]"
+        expected: "6"
+        description: "Buy at 0, sell at 3, then buy at 1, sell at 4 gives 3+3=6"
+      - input: "prices = [1,2,3,4,5]"
+        expected: "4"
+        description: "Single transaction buy at 1, sell at 5 gives 4"
+      - input: "prices = [7,6,4,3,1]"
+        expected: "0"
+        description: "Prices only decrease, no profitable transaction"
+      - input: "prices = [1,2,4,2,5,7,2,4,9,0]"
+        expected: "13"
+        description: "Buy at 1, sell at 7, then buy at 2, sell at 9 gives 6+7=13"
+    hints:
+      - "Think about dividing the array into two parts at each possible split point. The answer is the max sum of best single-transaction profit from the left part and right part."
+      - "Use DP to precompute the maximum profit achievable from day 0 to day i (left pass) and from day i to the last day (right pass). Then combine them."
+      - "Alternatively, track four states: best profit after first buy, first sell, second buy, and second sell. Update these greedily as you scan prices."
+
+  - title: "Best Time to Buy and Sell Stock IV"
+    difficulty: HARD
+    type: DSA
+    time_limit_seconds: 900
+    problem_statement: |
+      You are given an integer array representing daily stock prices and an integer k. Find the maximum profit achievable with at most k transactions.
+
+      A transaction consists of buying one share and later selling it. You cannot hold multiple shares simultaneously (you must sell before buying again).
+
+      If no profit can be made, return 0.
+
+      **Constraints:**
+      - 1 <= k <= 100
+      - 1 <= prices.length <= 1000
+      - 0 <= prices[i] <= 1000
+    starter_code: |
+      public class Solution {
+          public int maxProfit(int k, int[] prices) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "k = 2, prices = [2,4,1]"
+        expected: "2"
+        description: "One transaction: buy at 2, sell at 4 gives 2"
+      - input: "k = 2, prices = [3,2,6,5,0,3]"
+        expected: "7"
+        description: "Buy at 2, sell at 6, then buy at 0, sell at 3 gives 4+3=7"
+      - input: "k = 1, prices = [5,4,3,2,1]"
+        expected: "0"
+        description: "Declining prices, no profitable transaction possible"
+      - input: "k = 3, prices = [1,5,2,8,3,10]"
+        expected: "17"
+        description: "Buy at 1 sell at 5, buy at 2 sell at 8, buy at 3 sell at 10 gives 4+6+7=17"
+    hints:
+      - "When k >= n/2, you can capture every upswing (equivalent to unlimited transactions). Handle this case separately for efficiency."
+      - "Use a 2D DP table where dp[i][j] represents the maximum profit using at most i transactions up to day j."
+      - "For each transaction i and day j, either do nothing (dp[i][j-1]) or sell on day j. If selling on day j, find the best day to have bought: max(prices[j] - prices[m] + dp[i-1][m-1]) for all m < j. Optimize with a running maximum."
+
+  - title: "Maximal Square"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an m x n binary matrix filled with characters '0' and '1', find the largest square sub-matrix that contains only '1's and return its area.
+
+      The area is the side length squared. If no square of '1's exists, return 0.
+
+      **Constraints:**
+      - 1 <= m, n <= 300
+      - matrix[i][j] is '0' or '1'
+    starter_code: |
+      public class Solution {
+          public int maximalSquare(char[][] matrix) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "matrix = [[\"1\",\"0\",\"1\",\"0\",\"0\"],[\"1\",\"0\",\"1\",\"1\",\"1\"],[\"1\",\"1\",\"1\",\"1\",\"1\"],[\"1\",\"0\",\"0\",\"1\",\"0\"]]"
+        expected: "4"
+        description: "Largest square of 1s has side length 2, area = 4"
+      - input: "matrix = [[\"0\",\"1\"],[\"1\",\"0\"]]"
+        expected: "1"
+        description: "Only individual 1s exist, largest square has area 1"
+      - input: "matrix = [[\"0\"]]"
+        expected: "0"
+        description: "Single cell with 0, no square of 1s exists"
+      - input: "matrix = [[\"1\",\"1\",\"1\"],[\"1\",\"1\",\"1\"],[\"1\",\"1\",\"1\"]]"
+        expected: "9"
+        description: "Entire 3x3 matrix is 1s, area = 9"
+    hints:
+      - "Define dp[i][j] as the side length of the largest square whose bottom-right corner is at (i, j)."
+      - "If matrix[i][j] is '1', then dp[i][j] = min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) + 1. The square is limited by the smallest adjacent square."
+      - "Track the maximum side length found and return its square as the area."
+
+  - title: "Longest Common Subsequence"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given two strings text1 and text2, return the length of their longest common subsequence. If there is no common subsequence, return 0.
+
+      A subsequence of a string is a new string formed by deleting some (or no) characters from the original string without changing the relative order of the remaining characters. For example, "ace" is a subsequence of "abcde".
+
+      **Constraints:**
+      - 1 <= text1.length, text2.length <= 1000
+      - text1 and text2 consist of lowercase English letters only
+    starter_code: |
+      public class Solution {
+          public int longestCommonSubsequence(String text1, String text2) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "text1 = \"abcde\", text2 = \"ace\""
+        expected: "3"
+        description: "LCS is \"ace\" with length 3"
+      - input: "text1 = \"abc\", text2 = \"abc\""
+        expected: "3"
+        description: "Identical strings, LCS is the entire string"
+      - input: "text1 = \"abc\", text2 = \"def\""
+        expected: "0"
+        description: "No common characters, LCS length is 0"
+      - input: "text1 = \"oxcpqrsvwf\", text2 = \"shmtulqrypy\""
+        expected: "2"
+        description: "LCS is \"qr\" with length 2"
+    hints:
+      - "Build a 2D DP table where dp[i][j] represents the LCS length of text1[0..i-1] and text2[0..j-1]."
+      - "If text1[i-1] == text2[j-1], then dp[i][j] = dp[i-1][j-1] + 1. Otherwise, dp[i][j] = max(dp[i-1][j], dp[i][j-1])."
+      - "The answer is dp[m][n] where m and n are the lengths of text1 and text2 respectively."
+
+  - title: "Edit Distance"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given two strings word1 and word2, return the minimum number of operations required to convert word1 into word2.
+
+      You have three operations available:
+      - Insert a character
+      - Delete a character
+      - Replace a character
+
+      Each operation counts as one step. Find the fewest steps to transform word1 into word2.
+
+      **Constraints:**
+      - 0 <= word1.length, word2.length <= 500
+      - word1 and word2 consist of lowercase English letters
+    starter_code: |
+      public class Solution {
+          public int minDistance(String word1, String word2) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "word1 = \"horse\", word2 = \"ros\""
+        expected: "3"
+        description: "horse -> rorse (replace h with r) -> rose (remove r) -> ros (remove e)"
+      - input: "word1 = \"intention\", word2 = \"execution\""
+        expected: "5"
+        description: "Requires 5 operations to transform"
+      - input: "word1 = \"\", word2 = \"abc\""
+        expected: "3"
+        description: "Empty to abc requires 3 insertions"
+      - input: "word1 = \"abc\", word2 = \"abc\""
+        expected: "0"
+        description: "Identical strings need zero operations"
+    hints:
+      - "Define dp[i][j] as the minimum edits to convert word1[0..i-1] to word2[0..j-1]. Base cases: dp[i][0] = i (delete all), dp[0][j] = j (insert all)."
+      - "If word1[i-1] == word2[j-1], no operation needed: dp[i][j] = dp[i-1][j-1]. Otherwise, take the minimum of insert (dp[i][j-1]+1), delete (dp[i-1][j]+1), or replace (dp[i-1][j-1]+1)."
+      - "This is the classic Levenshtein distance algorithm with O(m*n) time and space complexity."
+
+  - title: "Interleaving String"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given three strings s1, s2, and s3, determine whether s3 is formed by interleaving s1 and s2.
+
+      An interleaving of two strings s1 and s2 is a configuration where s1 and s2 are divided into substrings, and the substrings are merged in an alternating fashion while preserving the original order of characters within each string. Specifically, if s1 is split into parts [p1, p2, ..., pn] and s2 into [q1, q2, ..., qm], then one valid interleaving is p1 + q1 + p2 + q2 + ... (any of the parts can be empty).
+
+      **Constraints:**
+      - 0 <= s1.length, s2.length <= 100
+      - 0 <= s3.length <= 200
+      - s1, s2, and s3 consist of lowercase English letters
+    starter_code: |
+      public class Solution {
+          public boolean isInterleave(String s1, String s2, String s3) {
+              // Your solution here
+              return false;
+          }
+      }
+    test_cases:
+      - input: "s1 = \"aabcc\", s2 = \"dbbca\", s3 = \"aadbbcbcac\""
+        expected: "true"
+        description: "s3 can be formed by interleaving s1 and s2"
+      - input: "s1 = \"aabcc\", s2 = \"dbbca\", s3 = \"aadbbbaccc\""
+        expected: "false"
+        description: "s3 cannot be formed by any interleaving of s1 and s2"
+      - input: "s1 = \"\", s2 = \"\", s3 = \"\""
+        expected: "true"
+        description: "All empty strings, trivially interleaved"
+      - input: "s1 = \"a\", s2 = \"b\", s3 = \"ab\""
+        expected: "true"
+        description: "Simple case: a + b = ab"
+    hints:
+      - "First check if len(s1) + len(s2) == len(s3). If not, return false immediately."
+      - "Use a 2D boolean DP table where dp[i][j] means the first i characters of s1 and first j characters of s2 can form the first (i+j) characters of s3."
+      - "dp[i][j] is true if either dp[i-1][j] is true and s1[i-1] == s3[i+j-1], or dp[i][j-1] is true and s2[j-1] == s3[i+j-1]."
+
+  - title: "Distinct Subsequences"
+    difficulty: HARD
+    type: DSA
+    time_limit_seconds: 900
+    problem_statement: |
+      Given two strings s and t, return the number of distinct subsequences of s which equals t.
+
+      A subsequence of a string is formed by deleting some (possibly zero) characters without disturbing the relative positions of the remaining characters. The answer is guaranteed to fit in a 32-bit signed integer.
+
+      **Constraints:**
+      - 1 <= s.length, t.length <= 1000
+      - s and t consist of English letters
+    starter_code: |
+      public class Solution {
+          public int numDistinct(String s, String t) {
+              // Your solution here
+              return 0;
+          }
+      }
+    test_cases:
+      - input: "s = \"rabbbit\", t = \"rabbit\""
+        expected: "3"
+        description: "Three ways to choose characters from s to form rabbit"
+      - input: "s = \"babgbag\", t = \"bag\""
+        expected: "5"
+        description: "Five distinct subsequences of s equal to bag"
+      - input: "s = \"abc\", t = \"def\""
+        expected: "0"
+        description: "No subsequence of s can form t"
+      - input: "s = \"aaa\", t = \"a\""
+        expected: "3"
+        description: "Each individual 'a' is a valid subsequence"
+    hints:
+      - "Define dp[i][j] as the number of distinct subsequences of s[0..i-1] that equal t[0..j-1]. Base case: dp[i][0] = 1 (empty t can always be matched)."
+      - "If s[i-1] == t[j-1], we can either use this character (dp[i-1][j-1]) or skip it (dp[i-1][j]). So dp[i][j] = dp[i-1][j-1] + dp[i-1][j]."
+      - "If s[i-1] != t[j-1], we must skip this character: dp[i][j] = dp[i-1][j]. The answer is dp[len(s)][len(t)]."

@@ -1,0 +1,111 @@
+topic: "DSA/Graphs"
+cards:
+  - front: "Compare BFS and DFS traversal - when would you choose one over the other?"
+    back: "BFS explores level by level using a queue, O(V+E) time, O(V) space. DFS explores as deep as possible using a stack/recursion, O(V+E) time, O(V) space. BFS guarantees shortest path in unweighted graphs and is preferred for level-order problems. DFS is better for topological sorting, cycle detection, pathfinding in mazes, and problems requiring backtracking. BFS uses more memory on wide graphs; DFS uses more on deep graphs."
+    code_snippet: |
+      // BFS from source node
+      Queue<Integer> queue = new LinkedList<>();
+      boolean[] visited = new boolean[V];
+      queue.offer(src);
+      visited[src] = true;
+      while (!queue.isEmpty()) {
+          int node = queue.poll();
+          for (int neighbor : adj.get(node)) {
+              if (!visited[neighbor]) {
+                  visited[neighbor] = true;
+                  queue.offer(neighbor);
+              }
+          }
+      }
+    difficulty: EASY
+    tags: [bfs, dfs, traversal]
+
+  - front: "Explain Dijkstra's algorithm and its limitations."
+    back: "Dijkstra finds shortest paths from a single source to all vertices in a weighted graph with non-negative edges. Uses a priority queue (min-heap) to greedily select the closest unvisited vertex. Time complexity: O((V+E) log V) with a binary heap. It fails with negative edge weights because it assumes a shorter path cannot be found once a node is finalized. For negative weights, use Bellman-Ford O(VE)."
+    code_snippet: |
+      PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[1] - b[1]);
+      int[] dist = new int[V];
+      Arrays.fill(dist, Integer.MAX_VALUE);
+      dist[src] = 0;
+      pq.offer(new int[]{src, 0});
+      while (!pq.isEmpty()) {
+          int[] curr = pq.poll();
+          int u = curr[0], d = curr[1];
+          if (d > dist[u]) continue; // stale entry
+          for (int[] edge : adj.get(u)) { // {neighbor, weight}
+              int v = edge[0], w = edge[1];
+              if (dist[u] + w < dist[v]) {
+                  dist[v] = dist[u] + w;
+                  pq.offer(new int[]{v, dist[v]});
+              }
+          }
+      }
+    difficulty: MEDIUM
+    tags: [dijkstra, shortest-path, greedy]
+
+  - front: "How does Kahn's algorithm perform topological sort?"
+    back: "Kahn's algorithm uses BFS with in-degree tracking. Initialize a queue with all nodes having in-degree 0. Repeatedly dequeue a node, add to result, and decrement in-degree of its neighbors. If a neighbor's in-degree becomes 0, enqueue it. If the result size < V, the graph has a cycle. Time: O(V+E). Unlike DFS-based topological sort, Kahn's naturally detects cycles and produces a lexicographically smallest order when using a min-heap."
+    code_snippet: |
+      int[] inDegree = new int[V];
+      for (int u = 0; u < V; u++)
+          for (int v : adj.get(u)) inDegree[v]++;
+      Queue<Integer> queue = new LinkedList<>();
+      for (int i = 0; i < V; i++)
+          if (inDegree[i] == 0) queue.offer(i);
+      List<Integer> order = new ArrayList<>();
+      while (!queue.isEmpty()) {
+          int u = queue.poll();
+          order.add(u);
+          for (int v : adj.get(u))
+              if (--inDegree[v] == 0) queue.offer(v);
+      }
+      if (order.size() != V) throw new RuntimeException("Cycle detected");
+    difficulty: MEDIUM
+    tags: [topological-sort, dag, kahns-algorithm]
+
+  - front: "Explain Union-Find with path compression and union by rank."
+    back: "Union-Find (Disjoint Set Union) supports find and union operations on disjoint sets. Path compression flattens the tree during find by pointing each visited node directly to the root. Union by rank attaches the shorter tree under the taller tree's root. Together they achieve near-constant amortized time: O(alpha(n)) per operation where alpha is the inverse Ackermann function. Used in Kruskal's MST, detecting cycles in undirected graphs, and connected components."
+    code_snippet: |
+      int[] parent, rank;
+      int find(int x) {
+          if (parent[x] != x)
+              parent[x] = find(parent[x]); // path compression
+          return parent[x];
+      }
+      void union(int x, int y) {
+          int px = find(x), py = find(y);
+          if (px == py) return;
+          if (rank[px] < rank[py]) parent[px] = py;
+          else if (rank[px] > rank[py]) parent[py] = px;
+          else { parent[py] = px; rank[px]++; }
+      }
+    difficulty: MEDIUM
+    tags: [union-find, disjoint-set, path-compression]
+
+  - front: "Compare Kruskal's and Prim's MST algorithms."
+    back: "Both find Minimum Spanning Trees. Kruskal's sorts all edges by weight and greedily adds edges that don't form cycles (using Union-Find), O(E log E). Prim's grows the MST from a starting vertex using a priority queue to pick the minimum edge connecting a visited to unvisited vertex, O((V+E) log V). Kruskal's is better for sparse graphs (E ~ V) since it processes edges globally. Prim's is better for dense graphs (E ~ V^2) especially with adjacency matrix representation."
+    difficulty: MEDIUM
+    tags: [mst, kruskal, prim, greedy]
+
+  - front: "How do you detect cycles in directed vs undirected graphs?"
+    back: |
+      Directed graphs: use DFS with three states (unvisited, in-stack, done). A back edge to an in-stack node indicates a cycle. Alternatively, if topological sort doesn't include all vertices, a cycle exists. Undirected graphs: during DFS/BFS, if you encounter a visited node that isn't the immediate parent, a cycle exists. Union-Find also works: if two vertices of an edge share the same root, adding that edge creates a cycle. Both approaches are O(V+E).
+    code_snippet: |
+      // Directed cycle detection with DFS coloring
+      int[] color = new int[V]; // 0=white, 1=gray, 2=black
+      boolean hasCycle(int u) {
+          color[u] = 1; // mark in-stack
+          for (int v : adj.get(u)) {
+              if (color[v] == 1) return true;  // back edge
+              if (color[v] == 0 && hasCycle(v)) return true;
+          }
+          color[u] = 2; // done
+          return false;
+      }
+    difficulty: HARD
+    tags: [cycle-detection, dfs, directed-graph, undirected-graph]
+
+  - front: "When would you use an adjacency list vs an adjacency matrix?"
+    back: "Adjacency list: O(V+E) space, efficient for sparse graphs (most real-world graphs). Iterating neighbors is O(degree). Adjacency matrix: O(V^2) space, better for dense graphs or when O(1) edge lookup is needed. Matrix enables fast edge existence checks and works well with matrix-based algorithms (Floyd-Warshall, transitive closure). List is preferred for BFS/DFS traversal. Matrix wastes memory when E << V^2 but is cache-friendly for small dense graphs."
+    difficulty: EASY
+    tags: [adjacency-list, adjacency-matrix, graph-representation]

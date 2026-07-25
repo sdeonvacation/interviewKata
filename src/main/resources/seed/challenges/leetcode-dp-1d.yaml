@@ -1,0 +1,394 @@
+topic: "DSA/Dynamic Programming"
+challenges:
+  - title: "Climbing Stairs"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      You are climbing a staircase that has n steps to reach the top.
+      At each step, you can choose to climb either 1 step or 2 steps upward.
+
+      Determine the total number of distinct ways you can reach the top of the staircase.
+
+      Constraints:
+      - 1 <= n <= 45
+    starter_code: |
+      public class Solution {
+          public int climbStairs(int n) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "n = 2"
+        expected: "2"
+        description: "Two ways: (1+1) or (2)"
+      - input: "n = 3"
+        expected: "3"
+        description: "Three ways: (1+1+1), (1+2), (2+1)"
+      - input: "n = 5"
+        expected: "8"
+        description: "Eight distinct ways to climb 5 stairs"
+      - input: "n = 1"
+        expected: "1"
+        description: "Only one way to climb a single step"
+    hints:
+      - "Consider how you could arrive at step n. You either came from step n-1 or step n-2."
+      - "This forms a recurrence relation: ways(n) = ways(n-1) + ways(n-2). Notice the similarity to Fibonacci numbers."
+      - "Use bottom-up DP with two variables tracking the previous two values to achieve O(1) space."
+
+  - title: "House Robber"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      You are a burglar planning to rob houses along a street. Each house has a certain
+      amount of money stashed. The only constraint is that you cannot rob two adjacent
+      houses because they have connected security systems that will alert the police.
+
+      Given an integer array nums where nums[i] represents the money at house i,
+      return the maximum amount of money you can rob tonight without triggering any alarms.
+
+      Constraints:
+      - 1 <= nums.length <= 100
+      - 0 <= nums[i] <= 400
+    starter_code: |
+      public class Solution {
+          public int rob(int[] nums) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "nums = [1,2,3,1]"
+        expected: "4"
+        description: "Rob house 0 (1) and house 2 (3) for total 4"
+      - input: "nums = [2,7,9,3,1]"
+        expected: "12"
+        description: "Rob house 0 (2), house 2 (9), house 4 (1) for total 12"
+      - input: "nums = [2,1,1,2]"
+        expected: "4"
+        description: "Rob house 0 (2) and house 3 (2) for total 4"
+      - input: "nums = [0]"
+        expected: "0"
+        description: "Single house with no money"
+    hints:
+      - "At each house, you have two choices: rob it or skip it. If you rob house i, you cannot rob house i-1."
+      - "Define dp[i] as the max money obtainable considering houses 0..i. The recurrence is dp[i] = max(dp[i-1], dp[i-2] + nums[i])."
+      - "You only need the last two dp values at any time, so you can optimize to O(1) space."
+
+  - title: "Word Break"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given a string s and a list of strings wordDict representing a dictionary of words,
+      determine if s can be broken into a space-separated sequence of one or more dictionary words.
+
+      The same dictionary word may be used multiple times in the segmentation.
+
+      Constraints:
+      - 1 <= s.length <= 300
+      - 1 <= wordDict.length <= 1000
+      - 1 <= wordDict[i].length <= 20
+      - s and wordDict[i] consist of only lowercase English letters
+      - All strings in wordDict are unique
+    starter_code: |
+      public class Solution {
+          public boolean wordBreak(String s, List<String> wordDict) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "s = \"leetcode\", wordDict = [\"leet\",\"code\"]"
+        expected: "true"
+        description: "Can be segmented as 'leet' + 'code'"
+      - input: "s = \"applepenapple\", wordDict = [\"apple\",\"pen\"]"
+        expected: "true"
+        description: "Can be segmented as 'apple' + 'pen' + 'apple', reusing 'apple'"
+      - input: "s = \"catsandog\", wordDict = [\"cats\",\"dog\",\"sand\",\"and\",\"cat\"]"
+        expected: "false"
+        description: "No valid segmentation exists"
+      - input: "s = \"a\", wordDict = [\"a\"]"
+        expected: "true"
+        description: "Single character matches single word in dictionary"
+    hints:
+      - "Think of this as: can the substring s[0..i] be formed by dictionary words? Try all possible last-word splits."
+      - "Use a boolean DP array where dp[i] means s[0..i-1] can be segmented. For each position i, check all j < i where dp[j] is true and s[j..i] is in the dictionary."
+      - "Put the dictionary into a HashSet for O(1) lookup. The overall time complexity is O(n^2 * k) where k is the max word length."
+
+  - title: "Coin Change"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      You are given an array of integer coin denominations and a target amount of money.
+      Return the fewest number of coins needed to make up that amount.
+      If no combination of coins can produce the target amount, return -1.
+
+      You may assume you have an infinite supply of each coin denomination.
+
+      Constraints:
+      - 1 <= coins.length <= 12
+      - 1 <= coins[i] <= 2^31 - 1
+      - 0 <= amount <= 10^4
+    starter_code: |
+      public class Solution {
+          public int coinChange(int[] coins, int amount) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "coins = [1,5,10], amount = 12"
+        expected: "3"
+        description: "10 + 1 + 1 = 12, using 3 coins"
+      - input: "coins = [2], amount = 3"
+        expected: "-1"
+        description: "Cannot make odd amount with only even coins"
+      - input: "coins = [1], amount = 0"
+        expected: "0"
+        description: "Zero amount needs zero coins"
+      - input: "coins = [1,3,4], amount = 6"
+        expected: "2"
+        description: "3 + 3 = 6, using 2 coins (not 4+1+1)"
+    hints:
+      - "This is an unbounded knapsack variant. For each amount, try subtracting each coin and find the minimum."
+      - "Define dp[i] as the minimum coins needed for amount i. Recurrence: dp[i] = min(dp[i - coin] + 1) for each coin where coin <= i."
+      - "Initialize dp array with amount+1 (impossible value). dp[0] = 0. If dp[amount] > amount, return -1."
+
+  - title: "Longest Increasing Subsequence"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an integer array nums, find the length of the longest strictly increasing subsequence.
+
+      A subsequence is derived from the array by deleting some or no elements without
+      changing the relative order of the remaining elements.
+
+      Constraints:
+      - 1 <= nums.length <= 2500
+      - -10^4 <= nums[i] <= 10^4
+    starter_code: |
+      public class Solution {
+          public int lengthOfLIS(int[] nums) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "nums = [10,9,2,5,3,7,101,18]"
+        expected: "4"
+        description: "One LIS is [2,3,7,101], length 4"
+      - input: "nums = [0,1,0,3,2,3]"
+        expected: "4"
+        description: "One LIS is [0,1,2,3], length 4"
+      - input: "nums = [7,7,7,7,7]"
+        expected: "1"
+        description: "All elements equal, strictly increasing requires length 1"
+      - input: "nums = [1,2,3,4,5]"
+        expected: "5"
+        description: "Already sorted, entire array is the LIS"
+    hints:
+      - "For each element, consider the longest increasing subsequence ending at that element."
+      - "O(n^2) approach: dp[i] = max(dp[j] + 1) for all j < i where nums[j] < nums[i]. Answer is max of all dp values."
+      - "O(n log n) approach: maintain a 'tails' array. For each number, binary search for the position to replace or extend."
+
+  - title: "Triangle Minimum Path Sum"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given a triangle represented as a list of lists of integers, find the minimum path sum
+      from the top element to the bottom row.
+
+      At each step, you may move to an adjacent number on the row below. Specifically,
+      if you are at index i in the current row, you may move to index i or index i+1
+      in the next row.
+
+      Constraints:
+      - 1 <= triangle.length <= 200
+      - triangle[0].length == 1
+      - triangle[i].length == triangle[i-1].length + 1
+      - -10^4 <= triangle[i][j] <= 10^4
+    starter_code: |
+      public class Solution {
+          public int minimumTotal(List<List<Integer>> triangle) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "triangle = [[2],[3,4],[6,5,7],[4,1,8,3]]"
+        expected: "11"
+        description: "Path 2 -> 3 -> 5 -> 1 = 11"
+      - input: "triangle = [[-10]]"
+        expected: "-10"
+        description: "Single element triangle"
+      - input: "triangle = [[1],[2,3]]"
+        expected: "3"
+        description: "Path 1 -> 2 = 3"
+      - input: "triangle = [[2],[3,4],[6,5,7]]"
+        expected: "10"
+        description: "Path 2 -> 3 -> 5 = 10"
+    hints:
+      - "Start from the bottom row and work upward. This avoids needing to track which path you took."
+      - "For each cell, compute the minimum sum from that cell to the bottom. dp[i][j] = triangle[i][j] + min(dp[i+1][j], dp[i+1][j+1])."
+      - "You can optimize space by reusing a 1D array of size equal to the bottom row, updating in-place from left to right."
+
+  - title: "Minimum Path Sum"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an m x n grid filled with non-negative integers, find a path from the
+      top-left corner to the bottom-right corner that minimizes the sum of all numbers
+      along the path.
+
+      You can only move either right or down at each step.
+
+      Constraints:
+      - m == grid.length
+      - n == grid[i].length
+      - 1 <= m, n <= 200
+      - 0 <= grid[i][j] <= 200
+    starter_code: |
+      public class Solution {
+          public int minPathSum(int[][] grid) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "grid = [[1,3,1],[1,5,1],[4,2,1]]"
+        expected: "7"
+        description: "Path 1 -> 3 -> 1 -> 1 -> 1 = 7 (right, right, down, down)"
+      - input: "grid = [[1,2,3],[4,5,6]]"
+        expected: "12"
+        description: "Path 1 -> 2 -> 3 -> 6 = 12"
+      - input: "grid = [[5]]"
+        expected: "5"
+        description: "Single cell grid"
+      - input: "grid = [[1,2],[1,1]]"
+        expected: "3"
+        description: "Path 1 -> 1 -> 1 = 3 (down then right)"
+    hints:
+      - "Each cell can only be reached from the cell above or the cell to its left."
+      - "dp[i][j] = grid[i][j] + min(dp[i-1][j], dp[i][j-1]). Handle first row and first column as base cases (only one direction possible)."
+      - "You can modify the grid in-place to avoid extra space, or use a 1D DP array updated row by row."
+
+  - title: "Unique Paths"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      A robot is placed at the top-left corner of an m x n grid.
+      The robot can only move either right or down at each step.
+      The robot is trying to reach the bottom-right corner of the grid.
+
+      Count the total number of unique paths the robot can take.
+
+      Constraints:
+      - 1 <= m, n <= 100
+    starter_code: |
+      public class Solution {
+          public int uniquePaths(int m, int n) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "m = 3, n = 7"
+        expected: "28"
+        description: "3x7 grid has 28 unique paths"
+      - input: "m = 3, n = 2"
+        expected: "3"
+        description: "3x2 grid: right-down-down, down-right-down, down-down-right"
+      - input: "m = 1, n = 1"
+        expected: "1"
+        description: "Already at destination"
+      - input: "m = 3, n = 3"
+        expected: "6"
+        description: "3x3 grid has 6 unique paths"
+    hints:
+      - "The robot must make exactly (m-1) down moves and (n-1) right moves. The answer is the number of ways to arrange these moves."
+      - "DP approach: dp[i][j] = dp[i-1][j] + dp[i][j-1]. First row and first column are all 1s (only one way to reach them)."
+      - "Math approach: the answer is C(m+n-2, m-1) = (m+n-2)! / ((m-1)! * (n-1)!)."
+
+  - title: "Unique Paths II"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      A robot is placed at the top-left corner of an m x n grid.
+      The robot can only move right or down at each step and wants to reach
+      the bottom-right corner.
+
+      Some cells in the grid contain obstacles. A cell with value 1 represents
+      an obstacle and 0 represents an empty cell. The robot cannot pass through obstacles.
+
+      Return the number of unique paths from top-left to bottom-right.
+
+      Constraints:
+      - m == obstacleGrid.length
+      - n == obstacleGrid[i].length
+      - 1 <= m, n <= 100
+      - obstacleGrid[i][j] is 0 or 1
+    starter_code: |
+      public class Solution {
+          public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "obstacleGrid = [[0,0,0],[0,1,0],[0,0,0]]"
+        expected: "2"
+        description: "Obstacle in center blocks middle paths, leaving 2 ways"
+      - input: "obstacleGrid = [[0,1],[0,0]]"
+        expected: "1"
+        description: "Only path is down then right"
+      - input: "obstacleGrid = [[1,0]]"
+        expected: "0"
+        description: "Starting cell is blocked, no paths exist"
+      - input: "obstacleGrid = [[0,0],[0,0]]"
+        expected: "2"
+        description: "No obstacles, same as Unique Paths for 2x2 grid"
+    hints:
+      - "Same DP as Unique Paths, but set dp[i][j] = 0 whenever obstacleGrid[i][j] == 1."
+      - "Be careful with base cases: if the start or end cell is an obstacle, immediately return 0. First row/column cells become 0 once an obstacle is encountered."
+      - "Use a 1D DP array. For each row, if current cell is obstacle set dp[j] = 0, otherwise dp[j] += dp[j-1]."
+
+  - title: "Decode Ways"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      A message containing letters A-Z is encoded using the mapping:
+      'A' -> "1", 'B' -> "2", ..., 'Z' -> "26".
+
+      Given a string s containing only digits, determine the total number of ways
+      to decode it back into letters.
+
+      Note that groupings like "06" are invalid because "06" is not a valid code
+      (leading zeros are not allowed). However "6" alone maps to 'F'.
+
+      Constraints:
+      - 1 <= s.length <= 100
+      - s contains only digits and may contain leading zeros
+    starter_code: |
+      public class Solution {
+          public int numDecodings(String s) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "s = \"12\""
+        expected: "2"
+        description: "Can decode as 'AB' (1,2) or 'L' (12)"
+      - input: "s = \"226\""
+        expected: "3"
+        description: "Can decode as 'BZ' (2,26), 'VF' (22,6), or 'BBF' (2,2,6)"
+      - input: "s = \"06\""
+        expected: "0"
+        description: "Leading zero makes '06' invalid, no valid decodings"
+      - input: "s = \"10\""
+        expected: "1"
+        description: "Only 'J' (10) is valid; '1','0' is invalid since 0 has no mapping"
+    hints:
+      - "Similar to climbing stairs, but some steps are invalid. A '0' digit cannot be decoded alone."
+      - "dp[i] = number of ways to decode s[0..i-1]. If s[i-1] != '0', add dp[i-1]. If s[i-2..i-1] forms a number between 10 and 26, add dp[i-2]."
+      - "Handle edge cases: if s starts with '0', return 0 immediately. Two consecutive zeros also yield 0 ways."

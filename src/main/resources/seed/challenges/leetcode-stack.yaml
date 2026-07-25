@@ -1,0 +1,333 @@
+topic: "DSA/Arrays"
+challenges:
+  - title: "Valid Parentheses"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given a string containing only the characters '(', ')', '{', '}', '[' and ']',
+      determine if the input string has valid bracket pairing.
+
+      A string is valid if:
+      - Every opening bracket has a corresponding closing bracket of the same type.
+      - Brackets are closed in the correct order (innermost first).
+      - Every closing bracket has a matching opening bracket of the same type.
+
+      Constraints:
+      - 1 <= s.length <= 10^4
+      - s consists of parentheses characters only: '(){}[]'
+    starter_code: |
+      public class Solution {
+          public boolean isValid(String s) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "s = \"()\""
+        expected: "true"
+        description: "Simple matched pair"
+      - input: "s = \"()[]{}\""
+        expected: "true"
+        description: "Multiple different bracket types all properly closed"
+      - input: "s = \"(]\""
+        expected: "false"
+        description: "Mismatched bracket types"
+      - input: "s = \"([)]\""
+        expected: "false"
+        description: "Incorrect nesting order"
+    hints:
+      - "Think about what data structure naturally handles nested matching."
+      - "Use a stack. Push opening brackets and pop when you encounter a closing one. Check if the popped bracket matches."
+      - "For each closing bracket, if the stack is empty or the top doesn't match, return false. At the end, the stack must be empty."
+
+  - title: "Simplify Path"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given an absolute Unix-style file path, simplify it to its canonical form.
+
+      Rules for canonical path:
+      - Starts with a single slash '/'.
+      - Directories are separated by a single slash '/'.
+      - Does not end with a trailing slash '/' (unless it is the root directory).
+      - Does not contain '.' (current directory) or '..' (parent directory) as path components.
+
+      Note that '..' moves up one directory level. If you are already at the root, '..' has no effect.
+      Multiple consecutive slashes are treated as a single slash.
+
+      Constraints:
+      - 1 <= path.length <= 3000
+      - path consists of English letters, digits, '.', '/' or '_'
+      - path is a valid absolute Unix path
+    starter_code: |
+      public class Solution {
+          public String simplifyPath(String path) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "path = \"/home/\""
+        expected: "\"/home\""
+        description: "Remove trailing slash"
+      - input: "path = \"/home//foo/\""
+        expected: "\"/home/foo\""
+        description: "Multiple consecutive slashes treated as one"
+      - input: "path = \"/home/user/Documents/../Pictures\""
+        expected: "\"/home/user/Pictures\""
+        description: "Double dot navigates to parent directory"
+      - input: "path = \"/../\""
+        expected: "\"/\""
+        description: "Cannot go above root directory"
+    hints:
+      - "Split the path by '/' and process each component individually."
+      - "Use a stack (or deque). Push valid directory names. Pop on '..'. Ignore '.' and empty strings."
+      - "After processing all components, join the stack contents with '/' and prepend a leading slash."
+
+  - title: "Min Stack"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Design a stack that supports the following operations, each in O(1) time complexity:
+      - push(val): Push an element onto the stack.
+      - pop(): Remove the element on top of the stack.
+      - top(): Retrieve the top element.
+      - getMin(): Retrieve the minimum element currently in the stack.
+
+      You must implement all four operations with constant time complexity.
+
+      Constraints:
+      - -2^31 <= val <= 2^31 - 1
+      - pop, top, and getMin will always be called on non-empty stacks
+      - At most 3 * 10^4 calls will be made to push, pop, top, and getMin
+    starter_code: |
+      public class Solution {
+          // Implement the MinStack class
+          static class MinStack {
+              public MinStack() {
+                  // Initialize your data structure here
+              }
+
+              public void push(int val) {
+                  // Your solution here
+              }
+
+              public void pop() {
+                  // Your solution here
+              }
+
+              public int top() {
+                  // Your solution here
+              }
+
+              public int getMin() {
+                  // Your solution here
+              }
+          }
+      }
+    test_cases:
+      - input: "push(-2), push(0), push(-3), getMin(), pop(), top(), getMin()"
+        expected: "getMin()=-3, top()=0, getMin()=-2"
+        description: "Basic operations showing min updates after pop"
+      - input: "push(0), push(1), push(0), getMin(), pop(), getMin()"
+        expected: "getMin()=0, getMin()=0"
+        description: "Duplicate minimum values handled correctly"
+      - input: "push(2), push(1), push(3), top(), getMin()"
+        expected: "top()=3, getMin()=1"
+        description: "Top and min are different elements"
+    hints:
+      - "How can you track the minimum as elements are pushed and popped?"
+      - "Consider maintaining a second stack that tracks the minimum at each level of the main stack."
+      - "Each time you push, also push the current minimum (min of new value and previous min) onto the auxiliary stack. Pop both stacks together."
+
+  - title: "Evaluate Reverse Polish Notation"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Evaluate an arithmetic expression given in Reverse Polish Notation (postfix notation).
+
+      Valid operators are +, -, *, and /. Each operand may be an integer or another expression.
+      Division between two integers truncates toward zero.
+
+      The expression is guaranteed to be valid and will always produce a result without division by zero.
+
+      Constraints:
+      - 1 <= tokens.length <= 10^4
+      - Each token is either an operator (+, -, *, /) or an integer in the range [-200, 200]
+      - The input is a valid RPN expression
+      - The answer and all intermediate results fit in a 32-bit integer
+    starter_code: |
+      public class Solution {
+          public int evalRPN(String[] tokens) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "tokens = [\"2\",\"1\",\"+\",\"3\",\"*\"]"
+        expected: "9"
+        description: "((2 + 1) * 3) = 9"
+      - input: "tokens = [\"4\",\"13\",\"5\",\"/\",\"+\"]"
+        expected: "6"
+        description: "(4 + (13 / 5)) = 4 + 2 = 6"
+      - input: "tokens = [\"10\",\"6\",\"9\",\"3\",\"+\",\"-11\",\"*\",\"/\",\"*\",\"17\",\"+\",\"5\",\"+\"]"
+        expected: "22"
+        description: "Complex expression with multiple operations"
+      - input: "tokens = [\"3\",\"4\",\"-\"]"
+        expected: "-1"
+        description: "Subtraction order: 3 - 4 = -1 (second popped is left operand)"
+    hints:
+      - "Think about how a stack naturally processes postfix expressions."
+      - "Push numbers onto the stack. When you encounter an operator, pop two operands, apply the operator, and push the result back."
+      - "Be careful with operand order: the first popped value is the right operand, the second popped is the left operand. Use integer division that truncates toward zero."
+
+  - title: "Basic Calculator"
+    difficulty: HARD
+    type: DSA
+    time_limit_seconds: 900
+    problem_statement: |
+      Implement a basic calculator to evaluate a string expression containing:
+      - Digits (0-9)
+      - Plus sign '+'
+      - Minus sign '-'
+      - Parentheses '(' and ')'
+      - Spaces ' '
+
+      The expression is always valid. No unary positive operator exists, but unary minus
+      can appear (e.g., "(-2 + 3)").
+
+      Constraints:
+      - 1 <= s.length <= 3 * 10^5
+      - s consists of digits, '+', '-', '(', ')', and spaces
+      - s represents a valid expression
+      - Unary '-' will always be inside parentheses, e.g., "(-2 + 3)"
+    starter_code: |
+      public class Solution {
+          public int calculate(String s) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "s = \"1 + 1\""
+        expected: "2"
+        description: "Simple addition"
+      - input: "s = \" 2-1 + 2 \""
+        expected: "3"
+        description: "Mixed addition and subtraction with spaces"
+      - input: "s = \"(1+(4+5+2)-3)+(6+8)\""
+        expected: "23"
+        description: "Nested parentheses"
+      - input: "s = \"-(3-(4+5))\""
+        expected: "6"
+        description: "Unary minus with nested parentheses: -(3-9) = 6"
+    hints:
+      - "Parentheses change the sign context. How can you track what sign applies when you enter and exit parentheses?"
+      - "Use a stack to save the current result and sign before entering a parenthesis group. Evaluate inside, then combine with saved state on closing paren."
+      - "Track a running result and a current sign (+1 or -1). On '(', push result and sign to stack, reset. On ')', pop sign and previous result, combine: result = popped_result + popped_sign * current_result."
+
+  - title: "Basic Calculator II"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Implement a calculator to evaluate a string expression containing:
+      - Digits (0-9)
+      - Plus '+', Minus '-', Multiply '*', Divide '/'
+      - Spaces ' '
+
+      There are no parentheses. Standard operator precedence applies: multiplication and
+      division are evaluated before addition and subtraction. Division truncates toward zero.
+
+      The expression is always valid and all intermediate results fit in a 32-bit integer.
+
+      Constraints:
+      - 1 <= s.length <= 3 * 10^5
+      - s consists of digits, '+', '-', '*', '/', and spaces
+      - s represents a valid expression
+      - Every number in the expression is a non-negative integer fitting in a 32-bit signed integer
+    starter_code: |
+      public class Solution {
+          public int calculate(String s) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "s = \"3+2*2\""
+        expected: "7"
+        description: "Multiplication takes precedence over addition"
+      - input: "s = \" 3/2 \""
+        expected: "1"
+        description: "Integer division truncates toward zero"
+      - input: "s = \" 3+5 / 2 \""
+        expected: "5"
+        description: "Division before addition: 3 + (5/2) = 3 + 2 = 5"
+      - input: "s = \"14-3/2\""
+        expected: "13"
+        description: "Division first: 14 - (3/2) = 14 - 1 = 13"
+    hints:
+      - "How can you handle operator precedence without parentheses? Think about when to immediately compute vs. defer."
+      - "Use a stack. For + and -, push the number (with sign) to the stack. For * and /, pop the top, compute immediately, and push the result."
+      - "Keep track of the previous operator. When you finish reading a number, apply the previous operator. At the end, sum all values in the stack."
+
+  - title: "Implement Stack using Queues"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Implement a last-in-first-out (LIFO) stack using only two queues.
+
+      The stack should support the following operations:
+      - push(x): Push element x onto the stack.
+      - pop(): Remove and return the element on top of the stack.
+      - top(): Return the top element without removing it.
+      - empty(): Return true if the stack is empty.
+
+      You may only use standard queue operations: enqueue to back, dequeue from front,
+      peek front, size, and isEmpty.
+
+      Constraints:
+      - 1 <= x <= 9
+      - At most 100 calls will be made to push, pop, top, and empty
+      - All calls to pop and top are valid (stack is non-empty)
+
+      Follow up: Can you implement it using only one queue?
+    starter_code: |
+      public class Solution {
+          // Implement the MyStack class
+          static class MyStack {
+              public MyStack() {
+                  // Initialize your data structure here
+              }
+
+              public void push(int x) {
+                  // Your solution here
+              }
+
+              public int pop() {
+                  // Your solution here
+              }
+
+              public int top() {
+                  // Your solution here
+              }
+
+              public boolean empty() {
+                  // Your solution here
+              }
+          }
+      }
+    test_cases:
+      - input: "push(1), push(2), top(), pop(), empty()"
+        expected: "top()=2, pop()=2, empty()=false"
+        description: "Basic LIFO behavior: last pushed is first out"
+      - input: "push(1), push(2), pop(), push(3), top()"
+        expected: "pop()=2, top()=3"
+        description: "Push after pop maintains correct order"
+      - input: "push(5), pop(), empty()"
+        expected: "pop()=5, empty()=true"
+        description: "Single element push and pop leaves empty stack"
+    hints:
+      - "A queue is FIFO but you need LIFO. How can you rearrange elements to reverse the order?"
+      - "On push, enqueue to a secondary queue, then move all elements from the primary queue into the secondary, then swap the queues. This makes the newest element always at the front."
+      - "Alternatively with one queue: after pushing x, rotate the queue by dequeuing and re-enqueuing all elements except x. This moves x to the front."

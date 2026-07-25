@@ -1,0 +1,89 @@
+topic: "Java Core/OOP"
+cards:
+  - front: "When should you prefer composition over inheritance?"
+    back: |
+      Prefer composition when you need flexible behavior reuse without coupling to a parent's implementation.
+      Inheritance creates a rigid is-a relationship and breaks encapsulation (subclass depends on parent internals).
+      Composition allows swapping strategies at runtime, avoids fragile base class problem, and keeps classes focused.
+    code_snippet: |
+      // Composition: delegate to a strategy
+      class OrderProcessor {
+          private final PricingStrategy pricing; // inject behavior
+          OrderProcessor(PricingStrategy pricing) { this.pricing = pricing; }
+          double calculate(Order o) { return pricing.apply(o); }
+      }
+    difficulty: EASY
+    tags: [oop, composition, inheritance]
+
+  - front: "How do default methods in interfaces differ from abstract class methods?"
+    back: |
+      Interfaces support multiple inheritance of type and behavior (a class can implement many interfaces with defaults).
+      Abstract classes provide single inheritance but can hold state (instance fields) and constructors.
+      Default methods cannot access instance state and are meant for backward-compatible API evolution, not shared implementation logic.
+    difficulty: EASY
+    tags: [interfaces, abstract-class, java8]
+
+  - front: "How does Java resolve the diamond problem with default methods?"
+    back: |
+      If a class inherits the same default method from two interfaces, the compiler forces an explicit override.
+      Rules: class methods win over interface defaults; more-specific interface wins (sub-interface over parent).
+      If neither rule resolves ambiguity, the class must override and can delegate via InterfaceName.super.method().
+    code_snippet: |
+      interface A { default void greet() { System.out.println("A"); } }
+      interface B extends A { default void greet() { System.out.println("B"); } }
+      interface C extends A { default void greet() { System.out.println("C"); } }
+      class D implements B, C {
+          public void greet() { B.super.greet(); } // must resolve explicitly
+      }
+    difficulty: MEDIUM
+    tags: [diamond-problem, default-methods, interfaces]
+
+  - front: "Explain runtime polymorphism and how the JVM dispatches virtual method calls."
+    back: |
+      Runtime polymorphism uses dynamic dispatch: the JVM resolves the method to invoke based on the actual object type,
+      not the declared reference type. Each object's class has a vtable (virtual method table) mapping method signatures
+      to implementations. At call sites, invokevirtual looks up the receiver's class vtable to find the correct target method.
+    code_snippet: |
+      Animal a = new Dog(); // reference type: Animal, actual type: Dog
+      a.speak(); // invokevirtual dispatches to Dog.speak()
+    difficulty: MEDIUM
+    tags: [polymorphism, dynamic-dispatch, jvm]
+
+  - front: "Explain the Liskov Substitution Principle with a common Java violation."
+    back: |
+      LSP states subtypes must be substitutable for their base type without altering program correctness.
+      Classic violation: making Square extend Rectangle and overriding setWidth/setHeight to keep sides equal
+      breaks clients that expect independent width/height mutations. Fix: use immutable value objects or separate
+      the hierarchy into a Shape interface with area() rather than mutable dimension setters.
+    difficulty: MEDIUM
+    tags: [solid, lsp, inheritance]
+
+  - front: "What are sealed classes in Java 17 and when would you use them?"
+    back: |
+      Sealed classes restrict which classes may extend them using the permits clause.
+      Permitted subclasses must be final, sealed, or non-sealed. This enables exhaustive pattern matching
+      in switch expressions and models closed domain hierarchies (e.g., AST nodes, command types)
+      where the set of subtypes is known at compile time.
+    code_snippet: |
+      public sealed interface Shape permits Circle, Rectangle, Triangle {}
+      public record Circle(double radius) implements Shape {}
+      public record Rectangle(double w, double h) implements Shape {}
+      public final class Triangle implements Shape { /*...*/ }
+
+      // Exhaustive switch (no default needed)
+      double area = switch (shape) {
+          case Circle c    -> Math.PI * c.radius() * c.radius();
+          case Rectangle r -> r.w() * r.h();
+          case Triangle t  -> computeTriangle(t);
+      };
+    difficulty: HARD
+    tags: [sealed-classes, java17, pattern-matching]
+
+  - front: "How does encapsulation interact with the Open/Closed Principle in Java design?"
+    back: |
+      Encapsulation hides internal state behind well-defined interfaces, enabling OCP: classes are open for extension
+      (new behavior via new implementations or decorators) but closed for modification (existing code unchanged).
+      In practice, program to interfaces, use package-private visibility for internals, and extend behavior
+      through composition/strategy rather than modifying existing classes.
+    difficulty: HARD
+    tags: [encapsulation, solid, ocp]

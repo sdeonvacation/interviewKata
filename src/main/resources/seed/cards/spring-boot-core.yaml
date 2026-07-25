@@ -1,0 +1,113 @@
+topic: "Spring Boot/Core Concepts"
+cards:
+  - front: "What is the Spring IoC container and how does it manage beans?"
+    back: "The IoC (Inversion of Control) container manages object creation, wiring, and lifecycle. It uses dependency injection instead of objects creating their own dependencies. The container is represented by ApplicationContext (eager initialization) or BeanFactory (lazy). It reads configuration from annotations (@Component, @Configuration), XML, or Java config, creates beans as singletons (default), resolves dependencies, and calls lifecycle callbacks (@PostConstruct, @PreDestroy)."
+    difficulty: EASY
+    tags: [ioc, container, beans, dependency-injection]
+
+  - front: "Why is constructor injection preferred over field injection in Spring?"
+    back: "Constructor injection advantages: 1) Immutability - fields can be final. 2) Required dependencies are explicit - cannot create an instance without them. 3) Testability - easy to pass mocks without reflection or Spring context. 4) Prevents circular dependencies at startup (fails fast). Field injection (@Autowired on fields) hides dependencies, allows partial initialization, requires reflection for testing, and can mask design smells (too many dependencies)."
+    code_snippet: |
+      // Preferred: constructor injection
+      @Service
+      public class OrderService {
+          private final PaymentGateway payment;
+          private final InventoryService inventory;
+          
+          public OrderService(PaymentGateway payment, InventoryService inventory) {
+              this.payment = payment;
+              this.inventory = inventory;
+          }
+      }
+      
+      // Avoid: field injection
+      @Service
+      public class OrderService {
+          @Autowired private PaymentGateway payment; // hidden dependency
+      }
+    difficulty: EASY
+    tags: [constructor-injection, field-injection, best-practices]
+
+  - front: "What is the difference between @Configuration and @Component?"
+    back: "@Configuration classes use CGLIB proxying so that @Bean method calls between beans in the same class return the SAME singleton instance (inter-bean references). @Component classes do NOT get this proxying - calling a @Bean method directly creates a NEW instance each time. @Configuration(proxyBeanMethods=false) disables proxying for performance (lite mode) but loses inter-bean reference guarantee."
+    code_snippet: |
+      @Configuration
+      public class AppConfig {
+          @Bean
+          public DataSource dataSource() { return new HikariDataSource(); }
+          
+          @Bean
+          public JdbcTemplate jdbcTemplate() {
+              // Calls dataSource() but returns SAME singleton due to CGLIB proxy
+              return new JdbcTemplate(dataSource());
+          }
+      }
+      
+      @Component // No CGLIB proxy!
+      public class LiteConfig {
+          @Bean
+          public Foo foo() { return new Foo(bar()); } // bar() creates NEW instance!
+          @Bean
+          public Bar bar() { return new Bar(); }
+      }
+    difficulty: HARD
+    tags: [configuration, component, cglib, proxy]
+
+  - front: "What are the Spring bean lifecycle callbacks and their order?"
+    back: "Creation order: 1) Constructor. 2) Dependency injection (setters/@Autowired). 3) BeanPostProcessor.postProcessBeforeInitialization. 4) @PostConstruct. 5) InitializingBean.afterPropertiesSet(). 6) Custom init-method. 7) BeanPostProcessor.postProcessAfterInitialization. Destruction order: 1) @PreDestroy. 2) DisposableBean.destroy(). 3) Custom destroy-method. @PostConstruct/@PreDestroy are JSR-250 annotations, preferred over interfaces."
+    difficulty: MEDIUM
+    tags: [bean-lifecycle, postconstruct, predestroy]
+
+  - front: "How do Spring profiles work and how do you activate them?"
+    back: "Profiles allow conditional bean registration and configuration. Beans annotated with @Profile('dev') are only created when that profile is active. Activation: 1) spring.profiles.active=dev in application.properties. 2) SPRING_PROFILES_ACTIVE env variable. 3) Programmatically via SpringApplication.setAdditionalProfiles(). Profile-specific config files: application-{profile}.yaml override application.yaml. Multiple profiles can be active simultaneously. @Profile supports expressions: @Profile('!prod'), @Profile({'dev','test'})."
+    difficulty: EASY
+    tags: [profiles, environment, configuration]
+
+  - front: "What is @ConditionalOnProperty and other @Conditional annotations?"
+    back: "@ConditionalOnProperty creates a bean only if a property has a specific value. Part of Spring Boot's auto-configuration system. Other conditionals: @ConditionalOnClass (class on classpath), @ConditionalOnMissingBean (no existing bean of type), @ConditionalOnBean (bean exists), @ConditionalOnExpression (SpEL), @ConditionalOnWebApplication. Custom conditions implement the Condition interface. These enable Boot's opinionated defaults that back off when you provide your own config."
+    code_snippet: |
+      @Configuration
+      @ConditionalOnProperty(name = "feature.cache.enabled", havingValue = "true")
+      public class CacheConfig {
+          @Bean
+          @ConditionalOnMissingBean
+          public CacheManager cacheManager() {
+              return new ConcurrentMapCacheManager();
+          }
+      }
+    difficulty: MEDIUM
+    tags: [conditional, auto-configuration, property]
+
+  - front: "How does Spring Boot auto-configuration work?"
+    back: "Auto-configuration classes are listed in META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports (Boot 3.x) or spring.factories (Boot 2.x). On startup, Spring loads all listed classes but @Conditional annotations filter which actually apply. @EnableAutoConfiguration (part of @SpringBootApplication) triggers this. Auto-config backs off via @ConditionalOnMissingBean - if you define your own DataSource bean, Boot's auto-configured one won't be created. Use --debug flag to see what was applied/excluded."
+    difficulty: HARD
+    tags: [auto-configuration, spring-factories, boot-internals]
+
+  - front: "What is the property resolution order in Spring Boot?"
+    back: "Highest to lowest priority: 1) Command-line args. 2) SPRING_APPLICATION_JSON. 3) OS environment variables. 4) application-{profile}.properties (outside jar). 5) application-{profile}.properties (inside jar). 6) application.properties (outside jar). 7) application.properties (inside jar). 8) @PropertySource annotations. 9) Default properties. Profile-specific always beats non-profile. Outside jar beats inside jar. .properties and .yaml are equivalent priority."
+    difficulty: MEDIUM
+    tags: [property-resolution, externalized-config, precedence]
+
+  - front: "What is the difference between @Value and @ConfigurationProperties?"
+    back: "@Value: injects individual properties, supports SpEL expressions, no type safety, no validation, no IDE auto-completion for custom props. @ConfigurationProperties: binds a prefix to a POJO, type-safe, supports @Validated with JSR-303 annotations, relaxed binding (kebab-case maps to camelCase), IDE metadata support, immutable via @ConstructorBinding. Prefer @ConfigurationProperties for groups of related properties."
+    code_snippet: |
+      // @Value - individual properties
+      @Value("${server.port:8080}")
+      private int port;
+      
+      // @ConfigurationProperties - structured binding
+      @ConfigurationProperties(prefix = "app.mail")
+      @Validated
+      public record MailProperties(
+          @NotBlank String host,
+          int port,
+          @Email String from,
+          Duration timeout
+      ) {}
+    difficulty: MEDIUM
+    tags: [value, configuration-properties, type-safety]
+
+  - front: "What are the key Spring Boot Actuator endpoints and their purpose?"
+    back: "Key endpoints: /health - application health (DB, disk, custom indicators). /info - build info, git info. /metrics - Micrometer metrics (JVM, HTTP, custom). /env - environment properties (sanitized). /beans - all Spring beans. /mappings - all @RequestMapping endpoints. /loggers - view/change log levels at runtime. /threaddump - JVM thread dump. Security: expose selectively via management.endpoints.web.exposure.include. Health details: management.endpoint.health.show-details=when-authorized."
+    difficulty: EASY
+    tags: [actuator, monitoring, health, metrics]

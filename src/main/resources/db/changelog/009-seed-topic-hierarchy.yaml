@@ -1,0 +1,372 @@
+databaseChangeLog:
+  - changeSet:
+      id: 009-seed-root-topics
+      author: interviewkata
+      comment: Seed root topic areas
+      changes:
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a1000000-0000-0000-0000-000000000001"}
+              - column: {name: name, value: "Java Core"}
+              - column: {name: area, value: "JAVA_CORE"}
+              - column: {name: sort_order, valueNumeric: 1}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a2000000-0000-0000-0000-000000000001"}
+              - column: {name: name, value: "Spring Boot"}
+              - column: {name: area, value: "SPRING_BOOT"}
+              - column: {name: sort_order, valueNumeric: 2}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a3000000-0000-0000-0000-000000000001"}
+              - column: {name: name, value: "System Design"}
+              - column: {name: area, value: "SYSTEM_DESIGN"}
+              - column: {name: sort_order, valueNumeric: 3}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a4000000-0000-0000-0000-000000000001"}
+              - column: {name: name, value: "DSA"}
+              - column: {name: area, value: "DSA"}
+              - column: {name: sort_order, valueNumeric: 4}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a5000000-0000-0000-0000-000000000001"}
+              - column: {name: name, value: "Database"}
+              - column: {name: area, value: "DATABASE"}
+              - column: {name: sort_order, valueNumeric: 5}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a6000000-0000-0000-0000-000000000001"}
+              - column: {name: name, value: "Architecture"}
+              - column: {name: area, value: "ARCHITECTURE"}
+              - column: {name: sort_order, valueNumeric: 6}
+
+  - changeSet:
+      id: 009-seed-java-core-children
+      author: interviewkata
+      comment: Seed Java Core subtopics
+      changes:
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a1000000-0000-0000-0000-000000000011"}
+              - column: {name: name, value: "Language Basics"}
+              - column: {name: area, value: "JAVA_CORE"}
+              - column: {name: parent_id, value: "a1000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 1}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a1000000-0000-0000-0000-000000000012"}
+              - column: {name: name, value: "Collections"}
+              - column: {name: area, value: "JAVA_CORE"}
+              - column: {name: parent_id, value: "a1000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 2}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a1000000-0000-0000-0000-000000000013"}
+              - column: {name: name, value: "Concurrency"}
+              - column: {name: area, value: "JAVA_CORE"}
+              - column: {name: parent_id, value: "a1000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 3}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a1000000-0000-0000-0000-000000000014"}
+              - column: {name: name, value: "Streams"}
+              - column: {name: area, value: "JAVA_CORE"}
+              - column: {name: parent_id, value: "a1000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 4}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a1000000-0000-0000-0000-000000000015"}
+              - column: {name: name, value: "OOP"}
+              - column: {name: area, value: "JAVA_CORE"}
+              - column: {name: parent_id, value: "a1000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 5}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a1000000-0000-0000-0000-000000000016"}
+              - column: {name: name, value: "Exception Handling"}
+              - column: {name: area, value: "JAVA_CORE"}
+              - column: {name: parent_id, value: "a1000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 6}
+
+  - changeSet:
+      id: 009-seed-spring-boot-children
+      author: interviewkata
+      comment: Seed Spring Boot subtopics
+      changes:
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a2000000-0000-0000-0000-000000000011"}
+              - column: {name: name, value: "Core Concepts"}
+              - column: {name: area, value: "SPRING_BOOT"}
+              - column: {name: parent_id, value: "a2000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 1}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a2000000-0000-0000-0000-000000000012"}
+              - column: {name: name, value: "Web MVC"}
+              - column: {name: area, value: "SPRING_BOOT"}
+              - column: {name: parent_id, value: "a2000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 2}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a2000000-0000-0000-0000-000000000013"}
+              - column: {name: name, value: "Data Access"}
+              - column: {name: area, value: "SPRING_BOOT"}
+              - column: {name: parent_id, value: "a2000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 3}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a2000000-0000-0000-0000-000000000014"}
+              - column: {name: name, value: "Security"}
+              - column: {name: area, value: "SPRING_BOOT"}
+              - column: {name: parent_id, value: "a2000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 4}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a2000000-0000-0000-0000-000000000015"}
+              - column: {name: name, value: "Testing"}
+              - column: {name: area, value: "SPRING_BOOT"}
+              - column: {name: parent_id, value: "a2000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 5}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a2000000-0000-0000-0000-000000000016"}
+              - column: {name: name, value: "Actuator"}
+              - column: {name: area, value: "SPRING_BOOT"}
+              - column: {name: parent_id, value: "a2000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 6}
+
+  - changeSet:
+      id: 009-seed-system-design-children
+      author: interviewkata
+      comment: Seed System Design subtopics
+      changes:
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a3000000-0000-0000-0000-000000000011"}
+              - column: {name: name, value: "Scalability"}
+              - column: {name: area, value: "SYSTEM_DESIGN"}
+              - column: {name: parent_id, value: "a3000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 1}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a3000000-0000-0000-0000-000000000012"}
+              - column: {name: name, value: "Caching"}
+              - column: {name: area, value: "SYSTEM_DESIGN"}
+              - column: {name: parent_id, value: "a3000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 2}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a3000000-0000-0000-0000-000000000013"}
+              - column: {name: name, value: "Load Balancing"}
+              - column: {name: area, value: "SYSTEM_DESIGN"}
+              - column: {name: parent_id, value: "a3000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 3}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a3000000-0000-0000-0000-000000000014"}
+              - column: {name: name, value: "Message Queues"}
+              - column: {name: area, value: "SYSTEM_DESIGN"}
+              - column: {name: parent_id, value: "a3000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 4}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a3000000-0000-0000-0000-000000000015"}
+              - column: {name: name, value: "Microservices"}
+              - column: {name: area, value: "SYSTEM_DESIGN"}
+              - column: {name: parent_id, value: "a3000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 5}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a3000000-0000-0000-0000-000000000016"}
+              - column: {name: name, value: "API Design"}
+              - column: {name: area, value: "SYSTEM_DESIGN"}
+              - column: {name: parent_id, value: "a3000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 6}
+
+  - changeSet:
+      id: 009-seed-dsa-children
+      author: interviewkata
+      comment: Seed DSA subtopics
+      changes:
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a4000000-0000-0000-0000-000000000011"}
+              - column: {name: name, value: "Arrays"}
+              - column: {name: area, value: "DSA"}
+              - column: {name: parent_id, value: "a4000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 1}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a4000000-0000-0000-0000-000000000012"}
+              - column: {name: name, value: "Strings"}
+              - column: {name: area, value: "DSA"}
+              - column: {name: parent_id, value: "a4000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 2}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a4000000-0000-0000-0000-000000000013"}
+              - column: {name: name, value: "Trees"}
+              - column: {name: area, value: "DSA"}
+              - column: {name: parent_id, value: "a4000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 3}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a4000000-0000-0000-0000-000000000014"}
+              - column: {name: name, value: "Graphs"}
+              - column: {name: area, value: "DSA"}
+              - column: {name: parent_id, value: "a4000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 4}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a4000000-0000-0000-0000-000000000015"}
+              - column: {name: name, value: "Dynamic Programming"}
+              - column: {name: area, value: "DSA"}
+              - column: {name: parent_id, value: "a4000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 5}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a4000000-0000-0000-0000-000000000016"}
+              - column: {name: name, value: "Sorting"}
+              - column: {name: area, value: "DSA"}
+              - column: {name: parent_id, value: "a4000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 6}
+
+  - changeSet:
+      id: 009-seed-database-children
+      author: interviewkata
+      comment: Seed Database subtopics
+      changes:
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a5000000-0000-0000-0000-000000000011"}
+              - column: {name: name, value: "SQL Fundamentals"}
+              - column: {name: area, value: "DATABASE"}
+              - column: {name: parent_id, value: "a5000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 1}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a5000000-0000-0000-0000-000000000012"}
+              - column: {name: name, value: "Indexing"}
+              - column: {name: area, value: "DATABASE"}
+              - column: {name: parent_id, value: "a5000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 2}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a5000000-0000-0000-0000-000000000013"}
+              - column: {name: name, value: "Transactions"}
+              - column: {name: area, value: "DATABASE"}
+              - column: {name: parent_id, value: "a5000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 3}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a5000000-0000-0000-0000-000000000014"}
+              - column: {name: name, value: "Normalization"}
+              - column: {name: area, value: "DATABASE"}
+              - column: {name: parent_id, value: "a5000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 4}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a5000000-0000-0000-0000-000000000015"}
+              - column: {name: name, value: "Query Optimization"}
+              - column: {name: area, value: "DATABASE"}
+              - column: {name: parent_id, value: "a5000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 5}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a5000000-0000-0000-0000-000000000016"}
+              - column: {name: name, value: "NoSQL"}
+              - column: {name: area, value: "DATABASE"}
+              - column: {name: parent_id, value: "a5000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 6}
+
+  - changeSet:
+      id: 009-seed-architecture-children
+      author: interviewkata
+      comment: Seed Architecture subtopics
+      changes:
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a6000000-0000-0000-0000-000000000011"}
+              - column: {name: name, value: "Design Patterns"}
+              - column: {name: area, value: "ARCHITECTURE"}
+              - column: {name: parent_id, value: "a6000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 1}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a6000000-0000-0000-0000-000000000012"}
+              - column: {name: name, value: "SOLID"}
+              - column: {name: area, value: "ARCHITECTURE"}
+              - column: {name: parent_id, value: "a6000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 2}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a6000000-0000-0000-0000-000000000013"}
+              - column: {name: name, value: "Clean Architecture"}
+              - column: {name: area, value: "ARCHITECTURE"}
+              - column: {name: parent_id, value: "a6000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 3}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a6000000-0000-0000-0000-000000000014"}
+              - column: {name: name, value: "DDD"}
+              - column: {name: area, value: "ARCHITECTURE"}
+              - column: {name: parent_id, value: "a6000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 4}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a6000000-0000-0000-0000-000000000015"}
+              - column: {name: name, value: "Event-Driven"}
+              - column: {name: area, value: "ARCHITECTURE"}
+              - column: {name: parent_id, value: "a6000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 5}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a6000000-0000-0000-0000-000000000016"}
+              - column: {name: name, value: "REST"}
+              - column: {name: area, value: "ARCHITECTURE"}
+              - column: {name: parent_id, value: "a6000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 6}

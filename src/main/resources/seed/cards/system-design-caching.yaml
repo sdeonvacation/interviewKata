@@ -1,0 +1,60 @@
+topic: "System Design/Caching"
+cards:
+  - front: "Compare write-through, write-back, and write-around caching strategies."
+    back: "Write-through: write to cache and DB simultaneously. Ensures consistency but adds write latency. Write-back (write-behind): write to cache only, asynchronously persist to DB. Low write latency but risk of data loss. Write-around: write directly to DB, bypassing cache. Avoids cache pollution for infrequently read data but causes cache misses on recent writes."
+    difficulty: MEDIUM
+    tags: [caching, write-through, write-back, write-around]
+
+  - front: "Explain LRU and LFU cache eviction policies and their trade-offs."
+    back: "LRU (Least Recently Used): evicts the item not accessed for the longest time. Good for temporal locality. Implemented with a HashMap + doubly-linked list for O(1) operations. LFU (Least Frequently Used): evicts the item with the lowest access count. Better for frequency-based access patterns but can retain stale popular items. LFU needs a frequency counter and is more complex to implement efficiently."
+    code_snippet: |
+      // LRU Cache using LinkedHashMap
+      class LRUCache<K, V> extends LinkedHashMap<K, V> {
+          private final int capacity;
+          LRUCache(int capacity) {
+              super(capacity, 0.75f, true); // accessOrder=true
+              this.capacity = capacity;
+          }
+          @Override
+          protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+              return size() > capacity;
+          }
+      }
+    difficulty: MEDIUM
+    tags: [lru, lfu, eviction, cache-policy]
+
+  - front: "When would you choose Redis over Memcached and vice versa?"
+    back: "Choose Redis when you need: data structures (lists, sets, sorted sets, hashes), persistence (RDB/AOF), pub/sub, Lua scripting, clustering with automatic partitioning, or TTL on individual fields. Choose Memcached when you need: simple key-value caching, multi-threaded performance for high-throughput reads, lower memory overhead per key, or slab-based memory management for predictable allocation."
+    difficulty: MEDIUM
+    tags: [redis, memcached, comparison, in-memory]
+
+  - front: "How does CDN caching work and what are cache control headers?"
+    back: "CDNs cache content at edge locations close to users. Key headers: Cache-Control (max-age, s-maxage, no-cache, no-store, private, public), ETag (content hash for conditional requests), Last-Modified/If-Modified-Since (time-based validation), Vary (cache by request header variants). CDN invalidation strategies: TTL expiry, purge API, versioned URLs (cache busting)."
+    difficulty: EASY
+    tags: [cdn, cache-control, http-caching, headers]
+
+  - front: "What is cache invalidation and why is it considered hard?"
+    back: "Cache invalidation ensures cached data reflects the latest source of truth. It's hard because: (1) Timing — stale data served between update and invalidation. (2) Distributed systems — invalidating across multiple cache nodes/layers. (3) Thundering herd — many requests hit DB simultaneously after invalidation. (4) Consistency — ensuring all related cached entries are invalidated together. Strategies: TTL-based expiry, event-driven invalidation, versioned keys."
+    explanation: "Phil Karlton's quote: 'There are only two hard things in CS: cache invalidation and naming things.' In practice, prefer short TTLs with background refresh over complex invalidation logic."
+    difficulty: HARD
+    tags: [cache-invalidation, consistency, distributed-cache]
+
+  - front: "What is a cache stampede (thundering herd) and how do you prevent it?"
+    back: "Cache stampede occurs when a popular cache key expires and many concurrent requests simultaneously hit the database to regenerate it. Prevention strategies: (1) Lock/mutex — only one request regenerates, others wait. (2) Early expiration — refresh before actual TTL expires (probabilistic early expiration). (3) Never expire — background thread refreshes cache, keys never truly expire. (4) Request coalescing — deduplicate identical in-flight requests."
+    code_snippet: |
+      // Probabilistic early expiration
+      double expiry = cachedExpiry;
+      double now = System.currentTimeMillis();
+      double delta = computeTime; // time to regenerate
+      double beta = 1.0; // tuning parameter
+      // Recompute if: now - delta * beta * ln(random()) >= expiry
+      if (now - delta * beta * Math.log(Math.random()) >= expiry) {
+          recompute();
+      }
+    difficulty: HARD
+    tags: [cache-stampede, thundering-herd, concurrency]
+
+  - front: "Describe a multi-layer caching architecture for a web application."
+    back: "Layers (closest to user first): (1) Browser cache — static assets via Cache-Control headers. (2) CDN — edge-cached static and semi-dynamic content. (3) API Gateway/Reverse proxy — response caching for common queries. (4) Application cache — in-process cache (Caffeine/Guava) for hot data. (5) Distributed cache — Redis/Memcached for shared state across app instances. (6) Database cache — query cache, buffer pool. Each layer reduces load on the next."
+    difficulty: MEDIUM
+    tags: [multi-layer-cache, architecture, cdn, redis]

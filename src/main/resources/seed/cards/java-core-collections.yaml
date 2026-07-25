@@ -1,0 +1,111 @@
+topic: "Java Core/Collections"
+cards:
+  - front: "How does HashMap handle collisions internally in Java 8+?"
+    back: "HashMap uses an array of Node buckets. On collision (same bucket index), entries form a linked list. When a bucket exceeds 8 entries (TREEIFY_THRESHOLD) and the table has at least 64 buckets, the linked list converts to a red-black tree (TreeNode) for O(log n) lookup. Below 6 entries (UNTREEIFY_THRESHOLD), it converts back to a linked list."
+    code_snippet: |
+      // Simplified internal structure
+      Node<K,V>[] table; // array of buckets
+      
+      static class Node<K,V> {
+          final int hash;
+          final K key;
+          V value;
+          Node<K,V> next; // linked list
+      }
+      
+      // TreeNode extends LinkedHashMap.Entry<K,V>
+      // which extends HashMap.Node<K,V>
+    explanation: "The treeification optimization was added in Java 8 to handle worst-case scenarios where many keys hash to the same bucket, improving from O(n) to O(log n)."
+    difficulty: MEDIUM
+    tags: [hashmap, internals, collision-handling]
+
+  - front: "What is the difference between ArrayList and LinkedList in terms of time complexity for common operations?"
+    back: "ArrayList: get/set O(1), add at end amortized O(1), add/remove at index O(n) due to shifting. LinkedList: get/set O(n) due to traversal, add/remove at head/tail O(1), add/remove at arbitrary position O(n) for traversal + O(1) for the actual link manipulation. ArrayList generally outperforms LinkedList due to CPU cache locality."
+    difficulty: MEDIUM
+    tags: [arraylist, linkedlist, time-complexity]
+
+  - front: "How does ConcurrentHashMap achieve thread safety without locking the entire map?"
+    back: "In Java 8+, ConcurrentHashMap uses CAS (Compare-And-Swap) operations for insertions into empty buckets and synchronized blocks on the first node of each bucket for updates. It no longer uses segment-based locking (pre-Java 8 approach with 16 segments). Read operations are generally lock-free using volatile reads. The size is tracked using a distributed counter (baseCount + CounterCell[])."
+    difficulty: HARD
+    tags: [concurrency, concurrenthashmap, cas]
+
+  - front: "What is the difference between TreeMap and HashMap?"
+    back: "HashMap: unordered, O(1) average for get/put, allows one null key. TreeMap: sorted by natural ordering or Comparator, O(log n) for get/put, does NOT allow null keys (needs comparison). TreeMap implements NavigableMap providing methods like floorKey(), ceilingKey(), subMap(). TreeMap is backed by a red-black tree."
+    difficulty: EASY
+    tags: [treemap, hashmap, sorted-collections]
+
+  - front: "What are the key differences between HashSet, LinkedHashSet, and TreeSet?"
+    back: "HashSet: backed by HashMap, unordered, O(1) operations, allows null. LinkedHashSet: maintains insertion order via doubly-linked list, slightly slower than HashSet. TreeSet: backed by TreeMap, sorted order, O(log n) operations, no null allowed. All guarantee uniqueness using equals()/hashCode() (HashSet/LinkedHashSet) or Comparator/Comparable (TreeSet)."
+    difficulty: EASY
+    tags: [set, hashset, treeset, linkedhashset]
+
+  - front: "What is the difference between Iterator's fail-fast and fail-safe behavior?"
+    back: "Fail-fast iterators (ArrayList, HashMap) throw ConcurrentModificationException if the collection is structurally modified during iteration (detected via modCount). Fail-safe iterators (ConcurrentHashMap, CopyOnWriteArrayList) work on a snapshot or tolerate concurrent modification without throwing exceptions. Fail-safe iterators may not reflect the latest state of the collection."
+    code_snippet: |
+      // Fail-fast: throws ConcurrentModificationException
+      List<String> list = new ArrayList<>(List.of("a", "b", "c"));
+      for (String s : list) {
+          list.remove(s); // throws!
+      }
+      
+      // Safe removal via Iterator
+      Iterator<String> it = list.iterator();
+      while (it.hasNext()) {
+          if (it.next().equals("b")) it.remove(); // OK
+      }
+    difficulty: MEDIUM
+    tags: [iterator, fail-fast, concurrency]
+
+  - front: "What does Collections.unmodifiableList() return and what are its limitations?"
+    back: "Returns an unmodifiable VIEW of the original list. Calling add/remove/set on the wrapper throws UnsupportedOperationException. However, if the backing list is modified directly, changes ARE visible through the unmodifiable view. For a truly immutable copy, use List.copyOf() (Java 10+) or new ArrayList<>(original) wrapped in unmodifiableList. The returned list also does not support structural operations via its listIterator."
+    code_snippet: |
+      List<String> original = new ArrayList<>(List.of("a", "b"));
+      List<String> unmod = Collections.unmodifiableList(original);
+      // unmod.add("c"); // throws UnsupportedOperationException
+      original.add("c");
+      System.out.println(unmod.size()); // prints 3!
+      
+      // Truly immutable:
+      List<String> immutable = List.copyOf(original);
+    difficulty: MEDIUM
+    tags: [immutability, collections-utility, unmodifiable]
+
+  - front: "How does PriorityQueue work internally and what is its time complexity?"
+    back: "PriorityQueue is backed by a binary min-heap (array-based). Elements are ordered by natural ordering or a provided Comparator. offer/add: O(log n) - sift up. poll/remove: O(log n) - sift down. peek: O(1). remove(Object): O(n) - linear search + sift. It is NOT thread-safe; use PriorityBlockingQueue for concurrent access. Does NOT guarantee order of iteration."
+    code_snippet: |
+      PriorityQueue<Integer> pq = new PriorityQueue<>();
+      pq.offer(5); pq.offer(1); pq.offer(3);
+      pq.poll(); // returns 1 (smallest)
+      pq.poll(); // returns 3
+      
+      // Max-heap via Comparator
+      PriorityQueue<Integer> maxPQ = new PriorityQueue<>(
+          Comparator.reverseOrder()
+      );
+    difficulty: MEDIUM
+    tags: [priorityqueue, heap, data-structures]
+
+  - front: "What is LinkedHashMap and how does it maintain ordering?"
+    back: "LinkedHashMap extends HashMap and maintains a doubly-linked list connecting all entries in insertion order (default) or access order (with accessOrder=true in constructor). Access-order mode moves entries to the tail on get/put, making it suitable for LRU cache implementations. Override removeEldestEntry() to auto-evict the oldest entry when the map exceeds a certain size."
+    code_snippet: |
+      // LRU Cache using LinkedHashMap
+      LinkedHashMap<String, String> lru = new LinkedHashMap<>(16, 0.75f, true) {
+          @Override
+          protected boolean removeEldestEntry(Map.Entry<String, String> eldest) {
+              return size() > 100; // max 100 entries
+          }
+      };
+    difficulty: HARD
+    tags: [linkedhashmap, lru-cache, ordering]
+
+  - front: "What happens when you put a key into a HashMap that already exists?"
+    back: "The existing value is replaced with the new value, and the OLD value is returned from put(). The key's hashCode() and equals() determine whether it's the 'same' key. The key object itself is NOT replaced - only the value. If the key is new, put() returns null. putIfAbsent() only inserts if the key is absent or mapped to null, returning the existing value otherwise."
+    code_snippet: |
+      Map<String, Integer> map = new HashMap<>();
+      Integer prev1 = map.put("a", 1); // returns null (new key)
+      Integer prev2 = map.put("a", 2); // returns 1 (old value)
+      
+      map.putIfAbsent("a", 3); // returns 2, map unchanged
+      map.putIfAbsent("b", 3); // returns null, "b"->3 inserted
+    difficulty: EASY
+    tags: [hashmap, put, basics]

@@ -1,0 +1,83 @@
+topic: "Database/Normalization"
+cards:
+  - front: "Explain 1NF, 2NF, and 3NF with a concrete example of a table that violates each."
+    back: "1NF: all columns atomic, no repeating groups. Violation: storing 'Java,Python' in a single skills column. 2NF: 1NF + no partial dependencies on composite keys. Violation: (student_id, course_id) -> student_name depends only on student_id. 3NF: 2NF + no transitive dependencies. Violation: employee table with zip_code -> city; city depends on zip_code, not on employee_id. Each normal form eliminates a specific type of update anomaly."
+    difficulty: EASY
+    tags: [normalization, 1nf, 2nf, 3nf]
+
+  - front: "What is BCNF and how does it differ from 3NF? Give a scenario where a table is in 3NF but not BCNF."
+    back: "BCNF (Boyce-Codd Normal Form) requires that every determinant is a candidate key. 3NF allows a non-key attribute to determine part of a candidate key. Classic example: a table (student, subject, professor) where each professor teaches only one subject, and each subject has multiple professors. {student, subject} is the PK, but professor -> subject is a functional dependency where professor is not a superkey. This is 3NF (no transitive dependency on non-prime attributes) but violates BCNF."
+    difficulty: HARD
+    tags: [bcnf, normalization, functional-dependencies]
+
+  - front: "What is a functional dependency and how do you identify them when designing a schema?"
+    back: "A functional dependency X -> Y means that for every valid instance, if two tuples agree on X they must agree on Y. Identification: ask 'given a value of X, is Y uniquely determined?' For example, employee_id -> email (one email per employee) but department_id -/-> employee_name (many employees per department). Functional dependencies drive normalization: partial dependencies violate 2NF, transitive dependencies violate 3NF, non-candidate-key determinants violate BCNF."
+    code_snippet: |
+      // JPA entity showing transitive dependency violation (3NF)
+      @Entity
+      public class Employee {
+          @Id private Long id;
+          private String zipCode;
+          private String city;  // city depends on zipCode, not on id directly
+      }
+      // Fix: extract Address or use zipCode lookup
+    difficulty: MEDIUM
+    tags: [functional-dependencies, schema-design, normalization]
+
+  - front: "When should you denormalize a database, and what are the tradeoffs?"
+    back: "Denormalize when: read-heavy workloads where JOINs are the bottleneck, pre-computed aggregates needed for dashboards, microservice boundaries require data locality, or caching hot paths. Tradeoffs: faster reads but slower writes (must update multiple places), risk of data inconsistency (update anomalies), increased storage, and more complex application code to maintain consistency. Always measure first with EXPLAIN ANALYZE before denormalizing. Common patterns: materialized views, summary tables, embedding frequently-joined columns."
+    code_snippet: |
+      // Denormalized order with embedded customer name
+      @Entity
+      public class Order {
+          @Id private Long id;
+          private Long customerId;
+          private String customerName;  // denormalized for read performance
+          private BigDecimal totalAmount;  // pre-computed aggregate
+      }
+      // Trade: must update customerName if customer renames
+    difficulty: MEDIUM
+    tags: [denormalization, performance, tradeoffs]
+
+  - front: "What is a star schema and why is it preferred for analytics/data warehousing?"
+    back: "Star schema has a central fact table (measurable events like sales) surrounded by dimension tables (descriptive context like customer, product, time). Fact tables store foreign keys to dimensions plus numeric measures. Benefits: simple queries (few JOINs, always fact-to-dimension), excellent query performance (dimension tables are small, bitmap indexes effective), intuitive for business users and BI tools. Deliberately denormalized dimensions (no snowflaking) trade storage for query speed. Contrast with OLTP normalized schemas optimized for writes."
+    code_snippet: |
+      -- Star schema example
+      CREATE TABLE fact_sales (
+          sale_id BIGINT PRIMARY KEY,
+          customer_key INT REFERENCES dim_customer(key),
+          product_key INT REFERENCES dim_product(key),
+          date_key INT REFERENCES dim_date(key),
+          quantity INT,
+          revenue DECIMAL(12,2)
+      );
+      -- Query: revenue by product category and quarter
+      SELECT d.quarter, p.category, SUM(f.revenue)
+      FROM fact_sales f
+      JOIN dim_date d ON f.date_key = d.key
+      JOIN dim_product p ON f.product_key = p.key
+      GROUP BY d.quarter, p.category;
+    difficulty: MEDIUM
+    tags: [star-schema, data-warehouse, analytics]
+
+  - front: "How do you decide the right level of normalization for a Java/Spring application with both OLTP and reporting needs?"
+    back: "Use normalized schema (3NF/BCNF) for OLTP tables handling writes via JPA entities. For reporting, create materialized views or a separate read model (CQRS pattern). Spring approach: primary DataSource with normalized schema for transactional operations, secondary read-only DataSource pointing to denormalized views or a data warehouse. Use @Transactional(readOnly=true) on reporting queries to route to read replicas. Event-driven sync (Debezium CDC or domain events) keeps the read model eventually consistent with OLTP source."
+    code_snippet: |
+      @Configuration
+      public class DataSourceConfig {
+          @Bean @Primary
+          DataSource oltpDataSource() { /* normalized 3NF schema */ }
+
+          @Bean @Qualifier("reporting")
+          DataSource reportingDataSource() { /* denormalized star schema */ }
+      }
+
+      @Service
+      public class SalesReportService {
+          @Transactional(readOnly = true)
+          public Report getQuarterlySales(int quarter) {
+              // queries denormalized materialized view
+          }
+      }
+    difficulty: HARD
+    tags: [cqrs, normalization, spring, architecture]

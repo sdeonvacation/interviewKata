@@ -1,0 +1,122 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-card-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: card
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: topic_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_card_topic
+                    references: topic(id)
+              - column:
+                  name: front
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: back
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: code_snippet
+                  type: text
+              - column:
+                  name: explanation
+                  type: text
+              - column:
+                  name: difficulty
+                  type: varchar(20)
+                  defaultValue: MEDIUM
+              - column:
+                  name: tags
+                  type: jsonb
+                  defaultValue: '[]'
+              - column:
+                  name: status
+                  type: varchar(20)
+                  defaultValue: NEW
+              - column:
+                  name: ease_factor
+                  type: double
+                  defaultValueNumeric: 2.5
+              - column:
+                  name: interval_days
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: repetitions
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: next_review
+                  type: timestamp without time zone
+              - column:
+                  name: created_at
+                  type: timestamp without time zone
+                  defaultValueComputed: now()
+
+  - changeSet:
+      id: 002-create-card-review-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: card_review
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: card_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_card_review_card
+                    references: card(id)
+              - column:
+                  name: session_id
+                  type: uuid
+              - column:
+                  name: grade
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: previous_interval
+                  type: int
+              - column:
+                  name: new_interval
+                  type: int
+              - column:
+                  name: previous_ease
+                  type: double
+              - column:
+                  name: new_ease
+                  type: double
+              - column:
+                  name: reviewed_at
+                  type: timestamp without time zone
+                  defaultValueComputed: now()
+
+  - changeSet:
+      id: 002-add-card-review-grade-check
+      author: interviewkata
+      changes:
+        - sql:
+            sql: ALTER TABLE card_review ADD CONSTRAINT chk_card_review_grade CHECK (grade >= 1 AND grade <= 5);

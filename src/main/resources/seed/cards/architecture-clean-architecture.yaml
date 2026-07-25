@@ -1,0 +1,98 @@
+topic: "Architecture/Clean Architecture"
+cards:
+  - front: "What is the Dependency Rule in Clean Architecture?"
+    back: |
+      All source code dependencies must point inward, toward higher-level policies.
+      Inner layers cannot know anything about outer layers — no name, class, or function
+      from an outer circle can be mentioned in an inner circle. Data crossing boundaries
+      must be in the form that is most convenient for the inner layer.
+    difficulty: EASY
+    tags: [clean-architecture, dependency-rule]
+
+  - front: "Name the four layers of Clean Architecture from innermost to outermost."
+    back: |
+      1) Entities — enterprise-wide business rules and objects.
+      2) Use Cases — application-specific business rules orchestrating entity interactions.
+      3) Interface Adapters — controllers, presenters, gateways that convert data between
+         use case format and external format (DB, web).
+      4) Frameworks & Drivers — web frameworks, databases, UI, external tools.
+    difficulty: EASY
+    tags: [clean-architecture, layers, software-design]
+
+  - front: "How does Dependency Inversion enable the Dependency Rule in practice?"
+    back: |
+      Inner layers define interfaces (ports) that outer layers implement. The use case
+      layer declares a repository interface; the infrastructure layer provides the
+      implementation. At runtime, dependency injection wires the concrete class, so
+      source-code dependency points inward while control flow can go outward.
+    code_snippet: |
+      // Use Case layer defines the port
+      public interface OrderRepository {
+          Order findById(OrderId id);
+          void save(Order order);
+      }
+
+      // Infrastructure layer implements it
+      @Repository
+      public class JpaOrderRepository implements OrderRepository {
+          private final SpringDataOrderRepo springRepo;
+          // delegates to JPA, depends on use case interface
+      }
+    difficulty: MEDIUM
+    tags: [dependency-inversion, ports-and-adapters, DIP]
+
+  - front: "What is the difference between Ports and Adapters (Hexagonal) and Clean Architecture?"
+    back: |
+      Hexagonal Architecture defines a core with ports (interfaces) and adapters
+      (implementations) — primary/driving adapters invoke the core, secondary/driven
+      adapters are invoked by the core. Clean Architecture adds explicit concentric
+      layers with stricter separation between entities and use cases. In practice
+      they are complementary: hexagonal focuses on the boundary shape, Clean Architecture
+      on the layering and dependency direction within the application.
+    difficulty: MEDIUM
+    tags: [hexagonal-architecture, ports-and-adapters, clean-architecture]
+
+  - front: "How does Clean Architecture improve testability? Show a use case test."
+    back: |
+      Use cases depend only on interfaces, so tests substitute in-memory fakes with
+      zero framework setup. No Spring context, no database, no HTTP — pure unit tests
+      that run in milliseconds. Each layer can be tested in isolation against its
+      own boundary interfaces.
+    code_snippet: |
+      @Test
+      void shouldPlaceOrder() {
+          // In-memory fake — no Spring, no DB
+          OrderRepository repo = new InMemoryOrderRepository();
+          PlaceOrderUseCase useCase = new PlaceOrderUseCase(repo);
+
+          OrderRequest request = new OrderRequest("SKU-1", 2);
+          OrderResponse response = useCase.execute(request);
+
+          assertThat(response.status()).isEqualTo("CONFIRMED");
+          assertThat(repo.findById(response.orderId())).isNotNull();
+      }
+    difficulty: MEDIUM
+    tags: [testing, clean-architecture, use-cases]
+
+  - front: "How do you handle cross-cutting concerns (transactions, security) without violating the Dependency Rule?"
+    back: |
+      Use decorators or aspect-oriented proxies at the interface adapter layer that
+      wrap use case implementations. The use case remains unaware of transactions or
+      security annotations. Alternatively, define a UseCase interface and apply a
+      transactional decorator in the composition root — the domain stays pure while
+      infrastructure concerns compose around it.
+    code_snippet: |
+      // Composition root wires the decorator
+      public class TransactionalPlaceOrder implements PlaceOrderUseCase {
+          private final PlaceOrderUseCase delegate;
+          private final TransactionManager txManager;
+
+          @Override
+          public OrderResponse execute(OrderRequest req) {
+              return txManager.executeInTransaction(
+                  () -> delegate.execute(req)
+              );
+          }
+      }
+    difficulty: HARD
+    tags: [cross-cutting-concerns, decorator-pattern, clean-architecture]

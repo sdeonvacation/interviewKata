@@ -1,0 +1,262 @@
+topic: "System Design/Scalability"
+exercises:
+  - title: "Design an E-commerce Service"
+    difficulty: MEDIUM
+    estimated_minutes: 55
+    prompt: |
+      Design the backend for an e-commerce platform handling product catalog, shopping cart, checkout, and order management at scale.
+
+      ## Requirements
+
+      ### Functional
+      - Product catalog with search, filtering, and categories
+      - Shopping cart with add/remove/update quantities
+      - Checkout flow with inventory reservation and payment processing
+      - Order tracking with status updates
+      - Flash sales with limited inventory (handle thundering herd)
+      - Seller dashboard for inventory and order management
+
+      ### Non-Functional
+      - Product search under 100ms
+      - Cart operations under 50ms
+      - Handle 100K concurrent checkouts during flash sales
+      - Strong consistency for inventory (no overselling)
+      - 99.99% availability for browse and cart
+
+      ## Topics to Cover
+      - Inventory management and reservation patterns
+      - Handling flash sales and high-concurrency checkout
+      - Payment processing and idempotency
+      - Event-driven order state machine
+      - Search and catalog service separation
+    constraints: |
+      - 50M products, 10M DAU
+      - Flash sales: 100K concurrent checkout attempts for 1000 items
+      - Cart: 200M active carts, average 5 items each
+      - Orders: 2M per day, peak 50K/minute during sales
+      - Payment: 99.99% success rate required
+      - Search: 50K queries/second
+    evaluation_rubric:
+      inventory_management: 25
+      scalability: 25
+      data_model: 20
+      payment_flow: 15
+      flash_sale_handling: 15
+    reference_approach: |
+      - Catalog: Elasticsearch for search; PostgreSQL for source of truth; CDC to sync
+      - Cart: Redis hash per user (fast reads/writes); persist to DB on checkout
+      - Inventory: Pessimistic lock on checkout — decrement with WHERE qty >= requested
+      - Flash sale: Queue-based — accept into waiting queue; process sequentially; reject when sold out
+      - Payment: Idempotency key per order; two-phase — reserve → confirm after fulfillment
+      - Order state machine: CREATED → PAID → PROCESSING → SHIPPED → DELIVERED (event-driven)
+      - Separation: Catalog Service, Cart Service, Order Service, Payment Service, Inventory Service
+      - Flash sale optimization: Pre-warm inventory count in Redis; atomic decrement; async DB sync
+      - API: GET /products/search; POST /cart/items; POST /checkout; GET /orders/{id}
+
+  - title: "Design an Online Payment Service"
+    difficulty: MEDIUM
+    estimated_minutes: 50
+    prompt: |
+      Design a payment processing platform like Stripe that handles transactions between merchants and customers with multiple payment methods.
+
+      ## Requirements
+
+      ### Functional
+      - Process payments (credit card, bank transfer, digital wallets)
+      - Support refunds (full and partial)
+      - Merchant onboarding with KYC verification
+      - Transaction ledger with double-entry bookkeeping
+      - Webhook notifications for payment events
+      - Multi-currency support with exchange rates
+
+      ### Non-Functional
+      - Payment processing under 2 seconds end-to-end
+      - 99.999% availability for payment API
+      - Strong consistency for financial transactions (no double-charge)
+      - PCI-DSS compliance for card data handling
+      - Idempotent API to handle network retries safely
+
+      ## Topics to Cover
+      - Idempotency and exactly-once payment processing
+      - Double-entry ledger design
+      - Distributed transaction handling
+      - Security and PCI compliance architecture
+      - Reconciliation and settlement processes
+    constraints: |
+      - 10M transactions per day, peak 5K TPS
+      - Transaction value: $0.50 to $50,000
+      - Availability: 99.999% (5 minutes downtime/year)
+      - Latency: payment confirmation under 2 seconds
+      - Idempotency window: 24 hours
+      - Reconciliation: daily settlement with 100% accuracy
+    evaluation_rubric:
+      consistency_guarantees: 25
+      ledger_design: 25
+      security: 20
+      scalability: 15
+      api_design: 15
+    reference_approach: |
+      - Idempotency: Client provides idempotency_key; server deduplicates within 24h window
+      - Ledger: Double-entry — every transaction creates debit + credit entries; sum always zero
+      - Payment flow: Create intent → Authorize (hold funds) → Capture (settle) — two-phase
+      - Refund: Reverse entries in ledger; initiate refund with payment processor
+      - State machine: CREATED → AUTHORIZED → CAPTURED → SETTLED (or FAILED/REFUNDED)
+      - Security: Tokenize card data immediately; store tokens not PANs; vault service for sensitive data
+      - Multi-currency: Lock exchange rate at authorization time; settle in merchant's currency
+      - Webhooks: Reliable delivery with retry; signing for authenticity; idempotent event IDs
+      - Reconciliation: Nightly batch compares internal ledger with processor settlement reports
+
+  - title: "Design a Distributed Counter"
+    difficulty: MEDIUM
+    estimated_minutes: 40
+    prompt: |
+      Design a distributed counting system that can handle millions of increments per second while providing accurate reads, used for likes, views, and inventory counts.
+
+      ## Requirements
+
+      ### Functional
+      - Increment/decrement a named counter by any amount
+      - Read current counter value (exact or approximate)
+      - Support millions of independent counters
+      - Batch increment (update multiple counters atomically)
+      - Counter reset and deletion
+      - Historical counter values (time-series of changes)
+
+      ### Non-Functional
+      - Write throughput: 1M increments/second per hot counter
+      - Read latency under 10ms
+      - No lost increments (durability guarantee)
+      - Tunable consistency (strong for inventory, eventual for likes)
+      - Horizontal scaling without coordination bottleneck
+
+      ## Topics to Cover
+      - Sharded counter pattern for write throughput
+      - Consistency vs availability trade-offs for counters
+      - Aggregation strategies (read-time merge vs periodic rollup)
+      - Conflict-free replicated data types (CRDTs)
+    constraints: |
+      - 100M active counters
+      - Hot counters: 1M writes/second (viral content)
+      - Read latency: under 10ms for approximate, under 100ms for exact
+      - Durability: zero lost increments after acknowledgment
+      - Storage: 100 bytes per counter shard
+    evaluation_rubric:
+      sharding_strategy: 30
+      consistency_model: 25
+      scalability: 20
+      read_aggregation: 15
+      trade_offs: 10
+    reference_approach: |
+      - Sharded counters: Split hot counter into N shards; writers pick random shard; readers sum all shards
+      - Write path: Hash(counter_id + random) → shard; atomic increment on shard (Redis INCRBY)
+      - Read path (approximate): Cache aggregated value with short TTL (5s); serve from cache
+      - Read path (exact): Sum all shards on demand; more expensive but accurate
+      - Durability: Write-ahead log before acknowledging; async flush to persistent store
+      - Adaptive sharding: Monitor write rate; split shards when hot; merge when cold
+      - CRDT approach: G-Counter (grow-only) per node; merge by taking max per node
+      - Batch: Multi-key atomic increment via Redis pipeline or DB transaction
+      - History: Append delta events to time-series store; rollup hourly/daily
+
+  - title: "Design a Distributed Unique ID Generator"
+    difficulty: MEDIUM
+    estimated_minutes: 40
+    prompt: |
+      Design a system that generates globally unique, roughly time-ordered IDs at high throughput across multiple data centers without coordination.
+
+      ## Requirements
+
+      ### Functional
+      - Generate unique 64-bit IDs (fits in a long/bigint)
+      - IDs are roughly sortable by generation time
+      - Support multiple data centers generating IDs independently
+      - No single point of failure or coordination required
+      - Expose as a service with batch ID generation support
+
+      ### Non-Functional
+      - Generate 10K+ IDs per second per node
+      - Zero collisions guaranteed (not probabilistic)
+      - IDs should not leak internal infrastructure details
+      - Sub-millisecond generation latency
+      - Clock skew tolerance across nodes
+
+      ## Topics to Cover
+      - Snowflake ID structure and bit allocation
+      - Clock synchronization and drift handling
+      - Multi-datacenter coordination-free generation
+      - Comparison with UUID, database sequences, and other approaches
+    constraints: |
+      - 64-bit ID space
+      - 5 data centers, 100 nodes per data center
+      - Generation rate: 10K IDs/ms per node (10M/second total)
+      - Clock skew tolerance: up to 5ms between nodes
+      - Zero collision guarantee over system lifetime
+      - Rough time ordering (within same millisecond, order not guaranteed)
+    evaluation_rubric:
+      id_structure: 30
+      uniqueness_guarantee: 25
+      scalability: 20
+      clock_handling: 15
+      trade_offs: 10
+    reference_approach: |
+      - Structure (Snowflake-style): [1 bit unused][41 bits timestamp][5 bits datacenter][5 bits machine][12 bits sequence]
+      - Timestamp: Milliseconds since custom epoch; gives ~69 years of IDs
+      - Sequence: 12 bits = 4096 IDs per millisecond per machine before waiting
+      - Uniqueness: Combination of (timestamp + datacenter + machine + sequence) is globally unique
+      - Clock skew: If clock moves backward, reject requests until caught up; or use logical clock
+      - Allocation: Datacenter ID from config; machine ID from ZooKeeper lease or static assignment
+      - Batch: Pre-generate batch of IDs; return array in single call for bulk inserts
+      - Comparison: vs UUID (128-bit, not sortable); vs DB sequence (coordination required, SPOF)
+      - API: GET /ids?count=100 → [id1, id2, ...]; single node, no network call needed for generation
+
+  - title: "Design a Food Delivery Service"
+    difficulty: MEDIUM
+    estimated_minutes: 55
+    prompt: |
+      Design the backend for a food delivery platform like DoorDash or Uber Eats, handling restaurant discovery, ordering, real-time delivery tracking, and driver dispatch.
+
+      ## Requirements
+
+      ### Functional
+      - Browse nearby restaurants with menus and ratings
+      - Place orders with customization options
+      - Real-time order status tracking (placed, preparing, picked up, en route, delivered)
+      - Driver matching and dispatch optimization
+      - ETA estimation for delivery
+      - Rating system for restaurants and drivers
+
+      ### Non-Functional
+      - Restaurant search under 200ms
+      - Order placement under 1 second
+      - Real-time location updates every 5 seconds
+      - Handle dinner rush (10x normal traffic)
+      - 99.9% order completion rate
+
+      ## Topics to Cover
+      - Geospatial indexing for restaurant and driver discovery
+      - Real-time location tracking and ETA computation
+      - Driver dispatch and matching algorithms
+      - Order state machine and event-driven architecture
+      - Handling peak load and surge pricing
+    constraints: |
+      - 500K restaurants, 2M drivers, 50M users
+      - Peak orders: 50K per minute during dinner rush
+      - Driver location updates: 2M updates every 5 seconds
+      - Delivery radius: 10km from restaurant
+      - ETA accuracy: within 5 minutes of actual
+      - Average delivery time: 30 minutes
+    evaluation_rubric:
+      geospatial_design: 25
+      dispatch_algorithm: 25
+      scalability: 20
+      real_time_tracking: 15
+      order_management: 15
+    reference_approach: |
+      - Restaurant discovery: Geospatial index (PostGIS/Redis GEO) — find restaurants within radius of user
+      - Driver matching: Find available drivers near restaurant; score by distance, rating, acceptance rate
+      - Dispatch: Assign order to best driver; timeout after 30s → reassign to next best
+      - Location tracking: Drivers push GPS every 5s → Kafka → update in Redis GEO; push to customer via WebSocket
+      - ETA: Graph-based routing (OSRM) + ML model trained on historical delivery times
+      - Order state: Event-sourced — PLACED → CONFIRMED → PREPARING → READY → PICKED_UP → DELIVERED
+      - Peak handling: Queue orders; dynamic pricing to attract more drivers; pre-position drivers in hot zones
+      - Services: Restaurant Service, Order Service, Driver Service, Location Service, Pricing Service
+      - API: GET /restaurants?lat=&lng=&radius=; POST /orders; GET /orders/{id}/track; POST /drivers/{id}/location

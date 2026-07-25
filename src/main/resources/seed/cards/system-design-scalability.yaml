@@ -1,0 +1,56 @@
+topic: "System Design/Scalability"
+cards:
+  - front: "What is the difference between horizontal and vertical scaling?"
+    back: "Vertical scaling (scale up) adds more resources (CPU, RAM) to a single machine. Horizontal scaling (scale out) adds more machines to distribute load. Horizontal scaling provides better fault tolerance and theoretically unlimited capacity, while vertical scaling is simpler but has hardware limits."
+    difficulty: EASY
+    tags: [scaling, horizontal, vertical, fundamentals]
+
+  - front: "Explain database sharding and its common strategies."
+    back: "Sharding partitions data across multiple database instances. Common strategies: (1) Range-based — partition by key ranges (e.g., user IDs 1-1M on shard 1). (2) Hash-based — hash the partition key to determine shard. (3) Directory-based — a lookup table maps keys to shards. Hash-based provides even distribution; range-based supports range queries efficiently."
+    explanation: "Sharding introduces complexity: cross-shard joins, rebalancing when adding shards, and maintaining referential integrity. Choose partition keys carefully to avoid hotspots."
+    difficulty: MEDIUM
+    tags: [sharding, database, partitioning]
+
+  - front: "What is the CAP theorem and what trade-offs does it impose?"
+    back: "CAP theorem states a distributed system can guarantee at most two of three properties: Consistency (all nodes see the same data), Availability (every request gets a response), and Partition tolerance (system works despite network failures). Since network partitions are inevitable, the real choice is between CP (consistent but may reject requests) and AP (available but may serve stale data)."
+    explanation: "Examples: CP systems — HBase, MongoDB (with majority write concern). AP systems — Cassandra, DynamoDB. The PACELC theorem extends CAP: even without partitions, there's a latency vs. consistency trade-off."
+    difficulty: MEDIUM
+    tags: [cap-theorem, distributed-systems, consistency, availability]
+
+  - front: "How does consistent hashing work and why is it used?"
+    back: "Consistent hashing maps both keys and nodes onto a circular hash ring. A key is assigned to the first node clockwise from its position on the ring. When a node is added/removed, only keys between the affected node and its predecessor need remapping — O(K/N) keys instead of O(K). Virtual nodes (multiple positions per physical node) improve load distribution."
+    code_snippet: |
+      // Simplified consistent hashing
+      TreeMap<Integer, String> ring = new TreeMap<>();
+      // Add node with virtual nodes
+      for (int i = 0; i < virtualNodes; i++) {
+          int hash = hash(node + "#" + i);
+          ring.put(hash, node);
+      }
+      // Find node for key
+      int keyHash = hash(key);
+      Map.Entry<Integer, String> entry = ring.ceilingEntry(keyHash);
+      return entry != null ? entry.getValue() : ring.firstEntry().getValue();
+    difficulty: MEDIUM
+    tags: [consistent-hashing, load-balancing, distributed-systems]
+
+  - front: "What are the main data partitioning strategies and when to use each?"
+    back: "Key strategies: (1) Horizontal partitioning (sharding) — split rows across databases by partition key. (2) Vertical partitioning — split columns into separate tables/services (e.g., user profile vs. user activity). (3) Functional partitioning — split by business domain (e.g., orders DB, inventory DB). Use horizontal for large tables, vertical to separate hot/cold data, functional for microservice boundaries."
+    difficulty: MEDIUM
+    tags: [partitioning, sharding, database-design]
+
+  - front: "Explain database replication strategies: master-slave vs. multi-master."
+    back: "Master-slave: one primary handles writes, replicas handle reads. Simple, good read scaling, but single write bottleneck and potential data loss on master failure. Multi-master: multiple nodes accept writes, changes propagated to all. Better write availability but introduces conflict resolution complexity (last-write-wins, vector clocks, CRDTs)."
+    explanation: "Replication lag in master-slave can cause read-after-write inconsistency. Solutions: read from master for recent writes, use monotonic reads, or implement causal consistency."
+    difficulty: HARD
+    tags: [replication, master-slave, multi-master, consistency]
+
+  - front: "What is eventual consistency and how do systems handle it?"
+    back: "Eventual consistency guarantees that if no new updates are made, all replicas will eventually converge to the same state. Systems handle it via: (1) Read repair — fix stale data on read. (2) Anti-entropy — background processes compare and sync replicas. (3) Conflict resolution — last-write-wins, vector clocks, or application-level merge. (4) Quorum reads/writes — R+W > N ensures overlap between read and write sets."
+    difficulty: HARD
+    tags: [eventual-consistency, distributed-systems, quorum]
+
+  - front: "How would you design a system to handle a 10x traffic spike?"
+    back: "Strategies: (1) Auto-scaling groups with pre-warming for predictable spikes. (2) Rate limiting and load shedding to protect core services. (3) Circuit breakers to prevent cascade failures. (4) Caching at multiple layers (CDN, application, database). (5) Async processing via message queues for non-critical work. (6) Database read replicas and connection pooling. (7) Graceful degradation — serve cached/partial responses under extreme load."
+    difficulty: HARD
+    tags: [scalability, traffic-spike, auto-scaling, resilience]

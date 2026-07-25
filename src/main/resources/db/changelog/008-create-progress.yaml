@@ -1,0 +1,134 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-create-user-progress-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: user_progress
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: topic_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    unique: true
+                    foreignKeyName: fk_user_progress_topic
+                    references: topic(id)
+              - column:
+                  name: cards_mastered
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: cards_total
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: challenges_solved
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: challenges_total
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: guides_completed
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: guides_total
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: last_activity
+                  type: timestamp without time zone
+
+  - changeSet:
+      id: 008-create-daily-activity-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: daily_activity
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: activity_date
+                  type: date
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: cards_reviewed
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: challenges_solved
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: quizzes_completed
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: interviews_done
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: study_minutes
+                  type: int
+                  defaultValueNumeric: 0
+
+  - changeSet:
+      id: 008-create-study-session-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: study_session
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: session_type
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: topic_id
+                  type: uuid
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_study_session_topic
+                    references: topic(id)
+              - column:
+                  name: started_at
+                  type: timestamp without time zone
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: now()
+              - column:
+                  name: ended_at
+                  type: timestamp without time zone
+              - column:
+                  name: items_completed
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: score
+                  type: double

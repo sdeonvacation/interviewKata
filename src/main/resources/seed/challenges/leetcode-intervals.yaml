@@ -1,0 +1,204 @@
+topic: "DSA/Arrays"
+challenges:
+  - title: "Summary Ranges"
+    difficulty: EASY
+    type: DSA
+    time_limit_seconds: 300
+    problem_statement: |
+      Given a sorted array of unique integers, produce the smallest sorted list of ranges
+      that covers every number in the array exactly once.
+
+      Each range [a, b] should be represented as:
+      - "a->b" if a != b
+      - "a" if a == b (single element)
+
+      The ranges must be sorted in order of their start value and must not overlap.
+
+      Constraints:
+      - 0 <= nums.length <= 20
+      - -2^31 <= nums[i] <= 2^31 - 1
+      - All values are unique and sorted in ascending order
+    starter_code: |
+      public class Solution {
+          public List<String> summaryRanges(int[] nums) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "nums = [0,1,2,4,5,7]"
+        expected: "[\"0->2\",\"4->5\",\"7\"]"
+        description: "Multiple ranges: 0-2 consecutive, 4-5 consecutive, 7 alone"
+      - input: "nums = [0,2,3,4,6,8,9]"
+        expected: "[\"0\",\"2->4\",\"6\",\"8->9\"]"
+        description: "Mix of single elements and ranges"
+      - input: "nums = []"
+        expected: "[]"
+        description: "Empty array returns empty list"
+      - input: "nums = [-1]"
+        expected: "[\"-1\"]"
+        description: "Single element becomes a single-value range"
+    hints:
+      - "Iterate through the array and identify where consecutive sequences break."
+      - "Track the start of each range. When the next element is not current+1, close the current range and start a new one."
+      - "Handle the last range after the loop ends. Format as 'a->b' or 'a' depending on whether start equals end."
+
+  - title: "Merge Intervals"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      You are given a collection of intervals where each interval is a pair [start, end].
+      Merge all intervals that overlap with each other and return the resulting list of
+      non-overlapping intervals.
+
+      Two intervals overlap if one starts before or when the other ends.
+
+      Constraints:
+      - 1 <= intervals.length <= 10^4
+      - intervals[i].length == 2
+      - 0 <= starti <= endi <= 10^4
+    starter_code: |
+      public class Solution {
+          public int[][] merge(int[][] intervals) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "intervals = [[1,3],[2,6],[8,10],[15,18]]"
+        expected: "[[1,6],[8,10],[15,18]]"
+        description: "[1,3] and [2,6] overlap, merge to [1,6]"
+      - input: "intervals = [[1,4],[4,5]]"
+        expected: "[[1,5]]"
+        description: "Touching intervals (end equals start) should merge"
+      - input: "intervals = [[1,4],[0,4]]"
+        expected: "[[0,4]]"
+        description: "Unsorted input, second interval starts before first"
+      - input: "intervals = [[1,4],[2,3]]"
+        expected: "[[1,4]]"
+        description: "One interval completely contained within another"
+    hints:
+      - "What if you sort intervals by their start value first?"
+      - "After sorting, iterate and compare each interval's start with the previous merged interval's end. If overlap, extend the end."
+      - "Use a result list. For each interval, either merge with the last entry or append as new. Take max of ends when merging."
+
+  - title: "Insert Interval"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      You are given a sorted array of non-overlapping intervals (sorted by start time)
+      and a new interval to insert. Insert the new interval into the array such that the
+      intervals remain sorted and non-overlapping, merging with existing intervals if necessary.
+
+      Return the resulting array of intervals.
+
+      Constraints:
+      - 0 <= intervals.length <= 10^4
+      - intervals[i].length == 2
+      - 0 <= starti <= endi <= 10^5
+      - intervals is sorted by starti in ascending order
+      - newInterval.length == 2
+      - 0 <= start <= end <= 10^5
+    starter_code: |
+      public class Solution {
+          public int[][] insert(int[][] intervals, int[] newInterval) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "intervals = [[1,3],[6,9]], newInterval = [2,5]"
+        expected: "[[1,5],[6,9]]"
+        description: "New interval overlaps with [1,3], merged to [1,5]"
+      - input: "intervals = [[1,2],[3,5],[6,7],[8,10],[12,16]], newInterval = [4,8]"
+        expected: "[[1,2],[3,10],[12,16]]"
+        description: "New interval merges multiple existing intervals"
+      - input: "intervals = [], newInterval = [5,7]"
+        expected: "[[5,7]]"
+        description: "Empty intervals, just return the new interval"
+      - input: "intervals = [[1,5]], newInterval = [6,8]"
+        expected: "[[1,5],[6,8]]"
+        description: "No overlap, new interval appended after existing"
+    hints:
+      - "Think of three phases: intervals entirely before the new one, intervals that overlap, and intervals entirely after."
+      - "Add all intervals that end before the new interval starts. Then merge all overlapping intervals with the new one. Finally add remaining intervals."
+      - "When merging, take min of starts and max of ends. An interval overlaps if its start <= newInterval's end AND its end >= newInterval's start."
+
+  - title: "Minimum Number of Arrows to Burst Balloons"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Balloons are placed on a flat wall and represented by their horizontal diameter as
+      intervals [xstart, xend]. A vertical arrow shot at position x will burst a balloon
+      if xstart <= x <= xend.
+
+      Given an array of balloon intervals, determine the minimum number of arrows that
+      must be shot to burst all balloons. Arrows travel infinitely upward and can burst
+      multiple balloons along their path.
+
+      Constraints:
+      - 1 <= points.length <= 10^5
+      - points[i].length == 2
+      - -2^31 <= xstart < xend <= 2^31 - 1
+    starter_code: |
+      public class Solution {
+          public int findMinArrowShots(int[][] points) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "points = [[10,16],[2,8],[1,6],[7,12]]"
+        expected: "2"
+        description: "One arrow at x=6 bursts [2,8] and [1,6]; another at x=11 bursts [10,16] and [7,12]"
+      - input: "points = [[1,2],[3,4],[5,6],[7,8]]"
+        expected: "4"
+        description: "No overlapping balloons, each needs its own arrow"
+      - input: "points = [[1,2],[2,3],[3,4],[4,5]]"
+        expected: "2"
+        description: "Adjacent balloons share endpoints: arrow at 2 and arrow at 4"
+      - input: "points = [[1,10],[2,5],[3,8]]"
+        expected: "1"
+        description: "All balloons overlap at x=3 to x=5, single arrow suffices"
+    hints:
+      - "This is a greedy problem. Think about which balloon constrains where you must shoot."
+      - "Sort balloons by their end coordinate. Shoot at each balloon's end. Skip balloons already burst by the previous shot."
+      - "After sorting by end, iterate: if current balloon's start is beyond the last arrow position, you need a new arrow at this balloon's end."
+
+  - title: "Non-overlapping Intervals"
+    difficulty: MEDIUM
+    type: DSA
+    time_limit_seconds: 600
+    problem_statement: |
+      Given a collection of intervals, find the minimum number of intervals you must remove
+      so that the remaining intervals do not overlap each other.
+
+      Two intervals [a, b] and [c, d] overlap if they share any point in their interior
+      (touching at endpoints like [1,2] and [2,3] is NOT considered overlapping).
+
+      Constraints:
+      - 1 <= intervals.length <= 10^5
+      - intervals[i].length == 2
+      - -5 * 10^4 <= starti < endi <= 5 * 10^4
+    starter_code: |
+      public class Solution {
+          public int eraseOverlapIntervals(int[][] intervals) {
+              // Your solution here
+          }
+      }
+    test_cases:
+      - input: "intervals = [[1,2],[2,3],[3,4],[1,3]]"
+        expected: "1"
+        description: "Remove [1,3] to leave [1,2],[2,3],[3,4] which don't overlap"
+      - input: "intervals = [[1,2],[1,2],[1,2]]"
+        expected: "2"
+        description: "Three identical intervals, keep one, remove two"
+      - input: "intervals = [[1,2],[2,3]]"
+        expected: "0"
+        description: "Adjacent intervals sharing only endpoint, no removal needed"
+      - input: "intervals = [[-52,31],[-73,-26],[82,97],[-65,-11],[33,62],[5,48]]"
+        expected: "4"
+        description: "Complex case requiring removal of 4 intervals"
+    hints:
+      - "This is equivalent to finding the maximum number of non-overlapping intervals you can keep."
+      - "Sort by end time. Greedily pick intervals that don't conflict with the last picked interval."
+      - "Count how many intervals you can keep (greedy selection). Answer is total intervals minus kept intervals."

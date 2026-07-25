@@ -1,0 +1,93 @@
+topic: "System Design/API Design"
+cards:
+  - front: "What are the six constraints of REST architecture?"
+    back: |
+      Client-Server, Stateless, Cacheable, Uniform Interface, Layered System, and Code on Demand (optional).
+      Stateless means each request contains all info needed; server stores no session state.
+      Uniform Interface is enforced via resource identification (URIs), manipulation through representations, self-descriptive messages, and HATEOAS.
+    difficulty: EASY
+    tags: [rest, architecture]
+
+  - front: "Compare URI versioning, header versioning, and query param versioning for APIs. When would you choose each?"
+    back: |
+      URI (/v1/users) - most visible, easy to cache, breaks when version changes. Best for public APIs.
+      Header (Accept: application/vnd.api.v2+json) - cleaner URIs, harder to test in browser. Best for internal APIs needing content negotiation.
+      Query param (/users?version=2) - easy to default, optional. Best for optional versioning on simple APIs.
+      URI versioning is most common in practice due to simplicity and cacheability.
+    difficulty: MEDIUM
+    tags: [versioning, rest, api-design]
+
+  - front: "Explain cursor-based vs offset-based pagination. Why is cursor-based preferred for large datasets?"
+    back: |
+      Offset-based (LIMIT 20 OFFSET 100) is simple but breaks with inserts/deletes and degrades at high offsets (DB scans skipped rows).
+      Cursor-based uses an opaque token (typically encoded last-seen ID) so the query is WHERE id > :cursor LIMIT 20.
+      Cursor-based gives stable results under concurrent writes and constant-time DB performance regardless of page depth.
+    code_snippet: |
+      // Cursor-based response
+      @GetMapping("/orders")
+      public Page<Order> list(@RequestParam(required = false) String cursor,
+                              @RequestParam(defaultValue = "20") int limit) {
+          Long afterId = cursor != null ? decodeCursor(cursor) : 0L;
+          List<Order> items = repo.findByIdGreaterThanOrderById(afterId, Limit.of(limit + 1));
+          boolean hasNext = items.size() > limit;
+          if (hasNext) items = items.subList(0, limit);
+          return new Page<>(items, hasNext ? encodeCursor(items.getLast().getId()) : null);
+      }
+    difficulty: MEDIUM
+    tags: [pagination, performance, database]
+
+  - front: "What is an idempotency key and how would you implement it for a payment API?"
+    back: |
+      An idempotency key is a client-generated unique token sent via header (Idempotency-Key: uuid) ensuring repeated requests produce the same result.
+      Server stores the key with the response; on retry, returns the stored response without re-executing.
+      Critical for non-idempotent operations (POST payments) to handle network retries safely.
+    code_snippet: |
+      @PostMapping("/payments")
+      public ResponseEntity<Payment> create(
+              @RequestHeader("Idempotency-Key") String key,
+              @RequestBody PaymentRequest req) {
+          return idempotencyStore.findByKey(key)
+              .map(cached -> ResponseEntity.status(cached.getStatus()).body(cached.getBody()))
+              .orElseGet(() -> {
+                  Payment result = paymentService.process(req);
+                  idempotencyStore.save(key, result, 201, Duration.ofHours(24));
+                  return ResponseEntity.status(201).body(result);
+              });
+      }
+    difficulty: MEDIUM
+    tags: [idempotency, payments, reliability]
+
+  - front: "Compare token bucket and sliding window rate limiting algorithms."
+    back: |
+      Token bucket: bucket holds N tokens, refills at fixed rate. Each request consumes a token; rejected if empty. Allows short bursts up to bucket capacity.
+      Sliding window log: tracks timestamps of each request in a window; counts entries. Precise but memory-intensive.
+      Sliding window counter: hybrid - splits time into sub-windows, interpolates count. Memory-efficient approximation.
+      Token bucket is best for APIs allowing bursts; sliding window for strict per-second limits.
+    difficulty: HARD
+    tags: [rate-limiting, algorithms, scalability]
+
+  - front: "What is HATEOAS and why is it rarely implemented in practice?"
+    back: |
+      HATEOAS (Hypermedia As The Engine Of Application State) means responses include links to available actions/transitions.
+      Client discovers API capabilities at runtime rather than hardcoding URLs.
+      Rarely implemented because it adds payload size, clients typically hardcode paths anyway, and tooling support is weak.
+      Spring HATEOAS provides EntityModel and Link abstractions for Java APIs.
+    code_snippet: |
+      @GetMapping("/orders/{id}")
+      public EntityModel<Order> getOrder(@PathVariable Long id) {
+          Order order = service.findById(id);
+          return EntityModel.of(order,
+              linkTo(methodOn(OrderController.class).getOrder(id)).withSelfRel(),
+              linkTo(methodOn(OrderController.class).cancel(id)).withRel("cancel"),
+              linkTo(methodOn(PaymentController.class).pay(id)).withRel("payment"));
+      }
+    difficulty: EASY
+    tags: [hateoas, rest, spring]
+
+  - front: "When would you choose GraphQL over REST? What are GraphQL's main operational challenges?"
+    back: |
+      Choose GraphQL when clients need flexible queries (mobile vs web), data is highly relational, or over-fetching is costly.
+      Stick with REST for simple CRUD, public APIs needing HTTP caching, or file uploads.
+      Operational challenges: N+1 queries (need DataLoader), no native HTTP caching (everything is POST), complex authorization per field, query complexity attacks requiring depth/cost limiting.
+    difficulty: HARD
+    tags: [graphql, rest, tradeoffs]

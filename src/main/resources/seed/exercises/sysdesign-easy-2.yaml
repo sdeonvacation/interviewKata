@@ -1,0 +1,241 @@
+topic: "System Design/Scalability"
+exercises:
+  - title: "Design a Video View Counter"
+    difficulty: EASY
+    estimated_minutes: 20
+    prompt: |
+      Design a scalable system that accurately counts video views for a platform like YouTube, handling millions of concurrent viewers.
+
+      ## Requirements
+
+      ### Functional
+      - Increment view count when a user watches a video for at least 30 seconds
+      - Display approximate real-time view count on video page
+      - Prevent duplicate counting from same user within a session
+      - Provide exact counts for analytics dashboard (eventual consistency OK)
+      - Support trending/popular video rankings based on view velocity
+
+      ### Non-Functional
+      - Handle 1M+ concurrent viewers on viral videos
+      - View count display can be slightly stale (30s delay acceptable)
+      - No view should be permanently lost
+      - Horizontal scalability for write path
+
+      ## Topics to Cover
+      - Write-heavy workload optimization
+      - Approximate vs exact counting trade-offs
+      - Deduplication strategies
+      - Batch aggregation patterns
+    constraints: |
+      - 500M video views per day
+      - Peak: 100K views/second on a single viral video
+      - Deduplication window: 1 hour per user per video
+      - Display staleness tolerance: 30 seconds
+      - Count accuracy: 99.9% within 1 hour
+    evaluation_rubric:
+      scalability: 30
+      consistency_model: 25
+      deduplication: 20
+      data_model: 15
+      trade_offs: 10
+    reference_approach: |
+      - Write path: View events → Kafka topic → Consumer aggregates in batches
+      - Deduplication: Bloom filter or Redis HyperLogLog per video per hour window
+      - Approximate count: Redis INCR for real-time display (fast, slightly lossy)
+      - Exact count: Batch job aggregates from event log every few minutes
+      - Hot videos: Dedicated counter shards — shard by video_id, merge on read
+      - Display: Read from Redis approximate counter; refresh every 30s
+      - Anti-fraud: Rate limit per IP; ignore views under 30s watch time
+      - Storage: Event log in Kafka (retention 7d); aggregated counts in Cassandra
+
+  - title: "Design a Vending Machine System"
+    difficulty: EASY
+    estimated_minutes: 20
+    prompt: |
+      Design the backend system for a network of smart vending machines that handles inventory, payments, and remote monitoring.
+
+      ## Requirements
+
+      ### Functional
+      - Process item selection and payment (card/mobile)
+      - Track real-time inventory per machine per slot
+      - Alert operators when stock is low or machine malfunctions
+      - Support dynamic pricing (time-of-day, demand-based)
+      - Remote configuration of product assignments to slots
+
+      ### Non-Functional
+      - Machine must function during network outages (offline mode)
+      - Payment processing under 3 seconds
+      - Inventory sync within 5 minutes of reconnection
+      - Support 10K machines reporting simultaneously
+
+      ## Topics to Cover
+      - Offline-first architecture
+      - State synchronization after network partition
+      - Payment processing flow
+      - Monitoring and alerting pipeline
+    constraints: |
+      - 10,000 machines, 40 slots each
+      - 50 transactions per machine per day average
+      - Network connectivity: 95% uptime per machine
+      - Inventory sync frequency: every 5 minutes when online
+      - Payment timeout: 3 seconds max
+    evaluation_rubric:
+      data_model: 25
+      offline_handling: 25
+      api_design: 20
+      payment_flow: 20
+      monitoring: 10
+    reference_approach: |
+      - Architecture: Machine (edge) ↔ Cloud Backend ↔ Operator Dashboard
+      - Offline mode: Local state machine handles transactions; queues events for sync
+      - Sync: On reconnect, push queued transactions and pull config/pricing updates
+      - Payment: Machine → Payment Gateway → Backend confirms → Dispense item
+      - Inventory: Decrement locally on dispense; batch sync to backend periodically
+      - Alerts: Machine publishes health metrics; backend applies threshold rules
+      - Data model: Machine (location, status); Slot (product_id, quantity, price); Transaction log
+      - Conflict resolution: Last-write-wins for config; additive merge for transaction logs
+
+  - title: "Design a Nested Comments System"
+    difficulty: EASY
+    estimated_minutes: 25
+    prompt: |
+      Design a threaded comment system like Reddit where comments can be nested to arbitrary depth with voting and collapsing.
+
+      ## Requirements
+
+      ### Functional
+      - Users can post comments and reply to existing comments (unlimited nesting)
+      - Upvote/downvote comments with score calculation
+      - Sort comments by best, new, or controversial
+      - Collapse/expand comment threads
+      - Load nested replies lazily (show top 3, "load more" for rest)
+
+      ### Non-Functional
+      - Fast initial page load (top-level + 2 levels deep)
+      - Efficient tree traversal for deeply nested threads
+      - Handle posts with 10K+ comments
+      - Real-time vote count updates
+
+      ## Topics to Cover
+      - Tree data structure storage in relational/document DB
+      - Efficient subtree retrieval queries
+      - Sorting algorithms for comment ranking
+      - Pagination within nested structures
+    constraints: |
+      - Posts can have up to 50K comments
+      - Maximum nesting depth: 20 levels
+      - Initial load: top 10 root comments with 2 levels of replies
+      - Vote updates visible within 5 seconds
+      - Page load time under 500ms for initial comments
+    evaluation_rubric:
+      data_model: 30
+      query_efficiency: 25
+      api_design: 20
+      sorting_strategy: 15
+      pagination: 10
+    reference_approach: |
+      - Storage: Adjacency list (comment_id, parent_id, post_id, depth, path) in PostgreSQL
+      - Materialized path: Store path as "1.5.12.34" for efficient subtree queries
+      - Initial load: WHERE post_id=? AND depth<=2 ORDER BY score DESC LIMIT 10 per level
+      - Lazy loading: GET /comments/{id}/replies?offset=3&limit=10
+      - Voting: Redis for real-time scores; periodic flush to DB
+      - Sorting: Wilson score interval for "best"; timestamp for "new"; |upvotes-downvotes| for controversial
+      - API: POST /posts/{id}/comments; POST /comments/{id}/replies; PUT /comments/{id}/vote
+      - Optimization: Denormalize reply_count and score on comment record
+
+  - title: "Design a Tagging Service"
+    difficulty: EASY
+    estimated_minutes: 20
+    prompt: |
+      Design a generic tagging service that allows any entity (posts, products, users) to be tagged with labels for categorization and search.
+
+      ## Requirements
+
+      ### Functional
+      - Add/remove tags on any entity type
+      - Search entities by one or more tags (AND/OR logic)
+      - Autocomplete tag names as user types
+      - Show tag popularity (usage count)
+      - Support tag hierarchies (e.g., "programming/java")
+
+      ### Non-Functional
+      - Tag search returns results in under 100ms
+      - Support billions of entity-tag associations
+      - Autocomplete responds in under 50ms
+      - Consistent tag counts (eventually consistent OK)
+
+      ## Topics to Cover
+      - Many-to-many relationship modeling at scale
+      - Full-text and prefix search for autocomplete
+      - Inverted index for tag-based entity lookup
+      - Tag normalization and deduplication
+    constraints: |
+      - 100M entities, average 5 tags each (500M associations)
+      - 1M unique tags
+      - Tag search: 10K queries per second
+      - Autocomplete: 50K requests per second
+      - Tag count accuracy: within 1% (eventual consistency)
+    evaluation_rubric:
+      data_model: 30
+      search_design: 25
+      api_design: 20
+      scalability: 15
+      autocomplete: 10
+    reference_approach: |
+      - Data model: Tags (id, name, parent_id, count); EntityTags (entity_type, entity_id, tag_id)
+      - Search: Inverted index — tag_id → list of entity_ids; intersect for AND, union for OR
+      - Autocomplete: Trie or prefix index in Redis (ZRANGEBYLEX); precomputed top suggestions
+      - Normalization: Lowercase, trim, deduplicate on insert
+      - Hierarchy: Materialized path ("programming/java") or closure table
+      - Counts: Increment/decrement on tag/untag; periodic recount job for drift correction
+      - API: POST /entities/{type}/{id}/tags; GET /search?tags=a,b&op=AND; GET /tags/suggest?prefix=pro
+      - Scaling: Partition entity-tag associations by entity_type; cache hot tags
+
+  - title: "Design a Weather Reporting System"
+    difficulty: EASY
+    estimated_minutes: 20
+    prompt: |
+      Design a system that collects weather data from distributed sensors and serves real-time and historical weather information to users.
+
+      ## Requirements
+
+      ### Functional
+      - Ingest data from thousands of weather stations (temperature, humidity, wind, precipitation)
+      - Serve current weather for a given location (lat/lng or city)
+      - Provide historical weather data with time-range queries
+      - Generate weather alerts when thresholds are exceeded
+      - Aggregate data at different granularities (hourly, daily, monthly)
+
+      ### Non-Functional
+      - Ingest 100K data points per second from sensors
+      - Query response under 200ms for current weather
+      - Data retention: raw data 1 year, aggregated data 10 years
+      - Sensor data loss tolerance: under 0.1%
+
+      ## Topics to Cover
+      - Time-series data storage and compression
+      - Geospatial indexing for location queries
+      - Data aggregation and rollup strategies
+      - Alerting pipeline design
+    constraints: |
+      - 50,000 weather stations reporting every 60 seconds
+      - ~50K writes/second sustained
+      - Query patterns: point-in-time current, range historical, geo-radius
+      - Raw data: 200 bytes per reading
+      - Storage: ~3TB/year raw; ~100GB/year aggregated
+    evaluation_rubric:
+      data_model: 25
+      ingestion_pipeline: 25
+      query_design: 20
+      aggregation: 15
+      alerting: 15
+    reference_approach: |
+      - Ingestion: Sensors → MQTT/Kafka → Stream processor → Time-series DB
+      - Storage: TimescaleDB or InfluxDB for time-series; geospatial index for location queries
+      - Current weather: Materialized view of latest reading per station; cached in Redis by geo-cell
+      - Historical: Partition by time (monthly); pre-aggregate hourly/daily rollups
+      - Geo-query: Map user location to nearest station(s) using geohash or R-tree index
+      - Alerts: Stream processor evaluates threshold rules in real-time; push to notification service
+      - Retention: Raw data TTL 1 year; aggregated data retained indefinitely with compression
+      - API: GET /weather/current?lat=&lng=; GET /weather/history?station=&start=&end=&granularity=
