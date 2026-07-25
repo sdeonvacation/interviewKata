@@ -1,0 +1,71 @@
+topic: "Behavioral/Conflict Resolution"
+cards:
+  - front: "Describe a situation where you disagreed with a technical decision made by your team lead."
+    back: |
+      STAR Framework:
+      **Situation:** What was the decision you disagreed with? Why did you disagree?
+      **Task:** What was at stake if the decision stood?
+      **Action:** How did you present your concerns? (data, benchmarks, alternative proposal)
+      **Result:** Was the decision changed? If not, how did you commit and support the chosen path?
+
+      Key points: Show respectful disagreement, data-driven argument, and disagree-and-commit attitude.
+      German context: German work culture respects Sachlichkeit (objectivity). Lead with technical facts, not emotions.
+    difficulty: MEDIUM
+    tags: [behavioral, conflict, disagreement]
+
+
+  - front: "Tell me about a time you had a conflict with a colleague during a code review."
+    back: |
+      STAR Framework:
+      **Situation:** What was the code review conflict about? (architecture, style, correctness)
+      **Task:** How did the conflict affect the team/timeline?
+      **Action:** How did you resolve it? (face-to-face discussion, brought data/benchmarks, involved a third party)
+      **Result:** What was the resolution? How did the working relationship evolve?
+
+      Key points: Show professional conflict resolution, willingness to compromise on style but not on correctness.
+      German context: Direct feedback is expected. Show you addressed it promptly rather than letting it fester.
+    difficulty: EASY
+    tags: [behavioral, conflict, code-review]
+
+
+  - front: "Describe a situation where a team member was not pulling their weight."
+    back: |
+      STAR Framework:
+      **Situation:** What was the project context? How did the underperformance manifest?
+      **Task:** What was your relationship to this person? Why was it your problem?
+      **Action:** Did you address it directly? Escalate? Offer support? What conversation did you have?
+      **Result:** Did performance improve? What did you learn about managing people?
+
+      Key points: Show empathy first (maybe they had blockers), then accountability.
+      German context: Address the issue directly (Direkte Kommunikation). Avoiding the conversation is seen negatively.
+    difficulty: MEDIUM
+    tags: [behavioral, conflict, team-dynamics]
+
+
+  - front: "Tell me about a time you received negative feedback and how you handled it."
+    back: |
+      STAR Framework:
+      **Situation:** Who gave the feedback? What was it about?
+      **Task:** How did you initially react internally?
+      **Action:** What did you do with the feedback? (reflected, asked clarifying questions, made a plan)
+      **Result:** How did you improve? Did you get positive follow-up feedback later?
+
+      Key points: Show growth mindset, no defensiveness, concrete change as a result.
+      German context: Receiving feedback professionally is highly valued. Show Lernfähigkeit (ability to learn).
+    difficulty: EASY
+    tags: [behavioral, conflict, feedback]
+
+
+  - front: "Describe a situation where two stakeholders had conflicting requirements."
+    back: |
+      STAR Framework:
+      **Situation:** Who were the stakeholders? What were the conflicting needs?
+      **Task:** Why were you responsible for resolving this?
+      **Action:** How did you find a compromise? (prioritization framework, data on impact, phased delivery)
+      **Result:** Were both stakeholders satisfied? What trade-offs did you make?
+
+      Key points: Show negotiation skills, ability to find win-win, and clear communication of trade-offs.
+      German context: Document the decision and rationale. German stakeholders value Nachvollziehbarkeit (traceability).
+    difficulty: HARD
+    tags: [behavioral, conflict, stakeholders]
+

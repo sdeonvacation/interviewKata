@@ -59,7 +59,8 @@ class DashboardControllerTest {
                 "Design Cache", Difficulty.MEDIUM, 45);
 
         DailyRecommendationDto dto = new DailyRecommendationDto(
-                List.of(card), List.of(challenge), exercise, "Day 5 streak!");
+                List.of(card), List.of(challenge), exercise, "Day 5 streak!",
+                List.of(), false);
         when(recommendationService.getDailyRecommendation()).thenReturn(dto);
 
         ResponseEntity<DailyRecommendationDto> response = controller.getRecommendations();
@@ -75,7 +76,8 @@ class DashboardControllerTest {
     @Test
     void getRecommendations_emptyRecommendations() {
         DailyRecommendationDto dto = new DailyRecommendationDto(
-                List.of(), List.of(), null, "You're making great progress. Keep it up!");
+                List.of(), List.of(), null, "You're making great progress. Keep it up!",
+                List.of(), false);
         when(recommendationService.getDailyRecommendation()).thenReturn(dto);
 
         ResponseEntity<DailyRecommendationDto> response = controller.getRecommendations();

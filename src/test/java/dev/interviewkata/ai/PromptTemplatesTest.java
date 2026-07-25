@@ -65,6 +65,36 @@ class PromptTemplatesTest {
     }
 
     @Test
+    void behavioralInterviewPrompt_formatsCorrectly() {
+        String formatted = String.format(PromptTemplates.BEHAVIORAL_INTERVIEW_PROMPT,
+                "Leadership", "PROBE", "Interviewer: Tell me...\nCandidate: I led a team...");
+        assertTrue(formatted.contains("Leadership"));
+        assertTrue(formatted.contains("PROBE"));
+        assertTrue(formatted.contains("I led a team"));
+        assertTrue(formatted.contains("STAR"));
+        assertTrue(formatted.contains("Situation"));
+        assertTrue(formatted.contains("Action"));
+        assertTrue(formatted.contains("Result"));
+    }
+
+    @Test
+    void behavioralInterviewPrompt_containsBehavioralPhases() {
+        String prompt = PromptTemplates.BEHAVIORAL_INTERVIEW_PROMPT;
+        assertTrue(prompt.contains("INTRO"));
+        assertTrue(prompt.contains("QUESTION"));
+        assertTrue(prompt.contains("PROBE"));
+        assertTrue(prompt.contains("FOLLOW_UP"));
+        assertTrue(prompt.contains("WRAP_UP"));
+    }
+
+    @Test
+    void behavioralInterviewPrompt_containsGermanContext() {
+        String prompt = PromptTemplates.BEHAVIORAL_INTERVIEW_PROMPT;
+        assertTrue(prompt.contains("German"));
+        assertTrue(prompt.contains("directness"));
+    }
+
+    @Test
     void promptTemplates_cannotBeInstantiated() {
         // Verify it's a utility class with private constructor
         var constructors = PromptTemplates.class.getDeclaredConstructors();

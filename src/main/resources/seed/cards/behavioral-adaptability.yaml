@@ -1,0 +1,71 @@
+topic: "Behavioral/Adaptability"
+cards:
+  - front: "Tell me about a time you had to learn a new technology quickly for a project."
+    back: |
+      STAR Framework:
+      **Situation:** What technology? Why was it needed? What was the timeline?
+      **Task:** What level of proficiency was required?
+      **Action:** What was your learning strategy? (official docs, POC, pair with expert, courses)
+      **Result:** How quickly did you become productive? What did you deliver with the new technology?
+
+      Key points: Show structured learning approach and ability to become productive quickly.
+      German context: Show Weiterbildung (continuous learning) attitude — it's valued in German tech culture.
+    difficulty: EASY
+    tags: [behavioral, adaptability, learning]
+
+
+  - front: "Describe a time you had to adapt to a major change in project direction."
+    back: |
+      STAR Framework:
+      **Situation:** What changed? (requirements pivot, reorg, technology change)
+      **Task:** How did the change affect your work?
+      **Action:** How did you adapt? Did you help others adapt? What did you preserve/discard?
+      **Result:** Was the transition successful? How quickly did the team stabilize?
+
+      Key points: Show resilience, pragmatism about sunk costs, and forward-looking mindset.
+      German context: Show you adapted systematically — new plan, new milestones, clear communication of impact.
+    difficulty: MEDIUM
+    tags: [behavioral, adaptability, change-management]
+
+
+  - front: "Tell me about a significant professional failure and what you learned."
+    back: |
+      STAR Framework:
+      **Situation:** What was the failure? What went wrong?
+      **Task:** What was your responsibility in the failure?
+      **Action:** How did you respond? What did you change in your approach?
+      **Result:** How has the lesson influenced your subsequent work?
+
+      Key points: Show genuine vulnerability, ownership, and concrete behavioral change as a result.
+      German context: Be factual about the failure. Show Selbstreflexion (self-reflection) and concrete Verbesserungsmaßnahmen (improvement measures).
+    difficulty: HARD
+    tags: [behavioral, adaptability, failure]
+
+
+  - front: "Describe a situation where you had to work outside your comfort zone."
+    back: |
+      STAR Framework:
+      **Situation:** What was unfamiliar territory? (new domain, new role, new technology)
+      **Task:** Why couldn't you stay in your comfort zone?
+      **Action:** How did you prepare? What support did you seek? How did you manage the discomfort?
+      **Result:** What did you achieve? How did it expand your capabilities?
+
+      Key points: Show growth mindset, willingness to be uncomfortable, and effective self-management.
+      German context: Show Eigeninitiative (self-initiative) in seeking knowledge and support.
+    difficulty: MEDIUM
+    tags: [behavioral, adaptability, growth]
+
+
+  - front: "Tell me about a time shifting priorities forced you to reprioritize your work."
+    back: |
+      STAR Framework:
+      **Situation:** What caused the priority shift? (business need, emergency, strategy change)
+      **Task:** What work was in progress that needed deprioritization?
+      **Action:** How did you decide what to pause/stop? How did you communicate the change?
+      **Result:** Was the new priority delivered? What happened to the deprioritized work?
+
+      Key points: Show pragmatic prioritization, clear communication, and no resentment about changing plans.
+      German context: Show Flexibilität combined with Transparenz — adapt but communicate impact to all stakeholders.
+    difficulty: EASY
+    tags: [behavioral, adaptability, prioritization]
+

@@ -86,6 +86,19 @@ public class AiService {
         return callAi(prompt, generateFallbackQuestion(topic, phase));
     }
 
+    /**
+     * Conduct a behavioral interview with STAR method probing.
+     * Uses a specialized prompt that evaluates answers for Situation, Task, Action, Result completeness.
+     */
+    public String conductBehavioralInterview(String transcript, String category, String phase) {
+        String effectiveTranscript = (transcript == null || transcript.isBlank())
+                ? "(No prior conversation)"
+                : transcript;
+        String prompt = String.format(PromptTemplates.BEHAVIORAL_INTERVIEW_PROMPT,
+                category, phase, effectiveTranscript);
+        return callAi(prompt, generateBehavioralFallbackQuestion(category, phase));
+    }
+
     private String callAi(String prompt, String fallback) {
         try {
             String response = chatClient.prompt()
@@ -138,6 +151,19 @@ public class AiService {
             case "DEEP_DIVE" -> "Let's go deeper. Can you walk me through a complex scenario involving " + topic + "?";
             case "WRAP_UP" -> "What areas of " + topic + " would you like to improve, and how would you approach that?";
             default -> "Tell me more about your understanding of " + topic + ".";
+        };
+    }
+
+    private String generateBehavioralFallbackQuestion(String category, String phase) {
+        return switch (phase) {
+            case "INTRO" -> "Welcome! Before we begin, tell me briefly about your current role and team.";
+            case "QUESTION" -> "Tell me about a time when you faced a challenge related to " + category +
+                    ". What was the situation?";
+            case "PROBE" -> "That's interesting. Can you be more specific about what YOU personally did in that situation?";
+            case "FOLLOW_UP" -> "What was the measurable outcome? How did you know your approach was successful?";
+            case "WRAP_UP" -> "Thank you for sharing. Let me summarize: focus on being specific about your individual " +
+                    "contributions and always quantify results when possible.";
+            default -> "Tell me about a specific situation where you demonstrated " + category + ".";
         };
     }
 }

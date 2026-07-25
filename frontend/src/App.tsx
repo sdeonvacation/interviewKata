@@ -10,6 +10,7 @@ import ChallengeWorkspace from '@/pages/ChallengeWorkspace';
 import DesignExerciseList from '@/pages/DesignExerciseList';
 import DesignWorkspace from '@/pages/DesignWorkspace';
 import MockInterviewSession from '@/pages/MockInterviewSession';
+import BehavioralPage from '@/pages/BehavioralPage';
 import Progress from '@/pages/Progress';
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
           <Route path="/exercises" element={<DesignExerciseList />} />
           <Route path="/exercises/:id" element={<DesignWorkspace />} />
           <Route path="/interviews/:id" element={<MockInterviewSession />} />
+          <Route path="/behavioral" element={<BehavioralPage />} />
           <Route path="/progress" element={<Progress />} />
         </Routes>
       </Layout>

@@ -41,19 +41,22 @@ public class RecommendationService {
     private final DesignExerciseRepository designExerciseRepository;
     private final DesignSubmissionRepository designSubmissionRepository;
     private final ProgressService progressService;
+    private final ChallengePracticeService challengePracticeService;
 
     public RecommendationService(CardRepository cardRepository,
                                  ChallengeRepository challengeRepository,
                                  SubmissionRepository submissionRepository,
                                  DesignExerciseRepository designExerciseRepository,
                                  DesignSubmissionRepository designSubmissionRepository,
-                                 ProgressService progressService) {
+                                 ProgressService progressService,
+                                 ChallengePracticeService challengePracticeService) {
         this.cardRepository = cardRepository;
         this.challengeRepository = challengeRepository;
         this.submissionRepository = submissionRepository;
         this.designExerciseRepository = designExerciseRepository;
         this.designSubmissionRepository = designSubmissionRepository;
         this.progressService = progressService;
+        this.challengePracticeService = challengePracticeService;
     }
 
     public DailyRecommendationDto getDailyRecommendation() {
@@ -61,8 +64,17 @@ public class RecommendationService {
         List<ChallengeDto> dsaChallenges = getProgressiveChallenges();
         DesignExerciseDto designExercise = getProgressiveDesignExercise();
         String message = generateMotivationalMessage(reviewCards, dsaChallenges, designExercise);
+        boolean behavioralRecommended = shouldRecommendBehavioralPractice();
 
-        return new DailyRecommendationDto(reviewCards, dsaChallenges, designExercise, message);
+        // Include up to 1 challenge due for spaced repetition re-practice
+        List<ChallengeDto> revisionChallenges = challengePracticeService.getDuePracticeChallenges(1)
+                .stream()
+                .map(c -> DtoMapper.toDto(c, true))
+                .toList();
+
+        return new DailyRecommendationDto(
+                reviewCards, dsaChallenges, designExercise, message,
+                revisionChallenges, behavioralRecommended);
     }
 
     /**
@@ -247,5 +259,14 @@ public class RecommendationService {
             case MEDIUM -> 1;
             case HARD -> 2;
         };
+    }
+
+    /**
+     * Recommend behavioral practice every 3 days based on day-of-year.
+     * Ensures regular behavioral interview preparation without overwhelming the user.
+     */
+    boolean shouldRecommendBehavioralPractice() {
+        int dayOfYear = java.time.LocalDate.now().getDayOfYear();
+        return dayOfYear % 3 == 0;
     }
 }

@@ -16,6 +16,7 @@ public record ChallengeDetailDto(
         String starterCode,
         List<String> hints,
         int timeLimitSeconds,
-        List<SubmissionResultDto> submissions
+        List<SubmissionResultDto> submissions,
+        String referenceSolution
 ) {
 }

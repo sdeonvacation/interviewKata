@@ -1,0 +1,71 @@
+topic: "Behavioral/Communication"
+cards:
+  - front: "Tell me about a time you explained a complex technical concept to a non-technical person."
+    back: |
+      STAR Framework:
+      **Situation:** Who was the audience? What did they need to understand? Why?
+      **Task:** What was at stake if they didn't understand? (budget approval, prioritization)
+      **Action:** What analogies/visualizations did you use? How did you check understanding?
+      **Result:** Did they make an informed decision? Did they feel confident in the direction?
+
+      Key points: Show ability to adapt language to audience, use analogies, and verify comprehension.
+      German context: Non-technical stakeholders often have engineering backgrounds. Don't oversimplify — be precise but accessible.
+    difficulty: EASY
+    tags: [behavioral, communication, simplification]
+
+
+  - front: "Describe a time you gave difficult feedback to a peer."
+    back: |
+      STAR Framework:
+      **Situation:** What behavior/output needed feedback? What was the impact?
+      **Task:** Why was it your responsibility to give this feedback?
+      **Action:** How did you deliver it? (private, specific examples, impact statements, suggestions)
+      **Result:** How did the person respond? Did behavior change?
+
+      Key points: Show courage, specificity, and care for the person's growth. Use SBI model (Situation-Behavior-Impact).
+      German context: Direct feedback is normal and expected. Show Sachlichkeit — focus on behavior, not personality.
+    difficulty: MEDIUM
+    tags: [behavioral, communication, feedback]
+
+
+  - front: "Tell me about a time you had to present a technical proposal to senior leadership."
+    back: |
+      STAR Framework:
+      **Situation:** What was the proposal? Who was the audience?
+      **Task:** What decision did you need from them?
+      **Action:** How did you structure the presentation? (problem → solution → cost → timeline → risks)
+      **Result:** Was the proposal approved? What questions challenged your thinking?
+
+      Key points: Show ability to communicate at executive level — business impact, not technical details.
+      German context: German leadership values Entscheidungsvorlagen (decision templates). Present options with clear recommendation.
+    difficulty: HARD
+    tags: [behavioral, communication, stakeholder-management]
+
+
+  - front: "Describe a situation where miscommunication caused a project problem."
+    back: |
+      STAR Framework:
+      **Situation:** What was miscommunicated? Between whom?
+      **Task:** What was the project impact?
+      **Action:** How did you identify the miscommunication? How did you resolve it? What did you put in place to prevent recurrence?
+      **Result:** Was the project recovered? What communication improvement stuck?
+
+      Key points: Show ownership of communication failures, even if you weren't the root cause.
+      German context: Show you implemented structural fixes (written specs, ADRs, meeting minutes) not just "we'll talk more."
+    difficulty: MEDIUM
+    tags: [behavioral, communication, miscommunication]
+
+
+  - front: "Tell me about a time you successfully managed stakeholder expectations."
+    back: |
+      STAR Framework:
+      **Situation:** Who were the stakeholders? What were their expectations?
+      **Task:** Why were expectations misaligned with reality?
+      **Action:** How did you reset expectations? (data, timeline, regular updates, scope negotiation)
+      **Result:** Were stakeholders satisfied with the outcome despite changed expectations?
+
+      Key points: Show proactive communication, transparency about risks, and regular status updates.
+      German context: Underpromise and overdeliver. Manage expectations through Regelmäßige Updates (regular updates).
+    difficulty: EASY
+    tags: [behavioral, communication, expectations]
+

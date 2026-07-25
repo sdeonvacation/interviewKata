@@ -1,0 +1,71 @@
+topic: "Behavioral/Problem Solving"
+cards:
+  - front: "Tell me about the most complex production bug you've debugged."
+    back: |
+      STAR Framework:
+      **Situation:** What was the system? What were the symptoms? What was the business impact?
+      **Task:** Why were you responsible for fixing it?
+      **Action:** What was your debugging approach? (logs, metrics, reproduction, bisect, hypothesis testing)
+      **Result:** What was the root cause? How long did it take? What prevention measures did you implement?
+
+      Key points: Show systematic debugging methodology, not trial-and-error. Mention monitoring improvements.
+      German context: Show Gründlichkeit — systematic approach to root cause analysis, not just fixing symptoms.
+    difficulty: MEDIUM
+    tags: [behavioral, problem-solving, debugging]
+
+
+  - front: "Describe a time you delivered a project under a very tight deadline."
+    back: |
+      STAR Framework:
+      **Situation:** What was the deadline? Why was it tight? What was at stake?
+      **Task:** What was your specific deliverable?
+      **Action:** How did you prioritize? What did you cut? How did you communicate scope changes?
+      **Result:** Did you deliver on time? What was the quality trade-off?
+
+      Key points: Show scope negotiation, priority setting, and transparency about trade-offs.
+      German context: Show you communicated risks early (Frühwarnung). Surprises at deadline are worse than early scope negotiation.
+    difficulty: EASY
+    tags: [behavioral, problem-solving, deadlines]
+
+
+  - front: "Tell me about a time you worked with ambiguous requirements."
+    back: |
+      STAR Framework:
+      **Situation:** What was ambiguous? Why were requirements unclear?
+      **Task:** What did you need to deliver despite the ambiguity?
+      **Action:** How did you clarify? (stakeholder interviews, prototypes, iterative delivery, assumptions doc)
+      **Result:** Was the final delivery aligned with stakeholder expectations?
+
+      Key points: Show proactive clarification, iterative validation, and comfort with uncertainty.
+      German context: Document your assumptions. Create a Pflichtenheft (specification) or lightweight equivalent.
+    difficulty: MEDIUM
+    tags: [behavioral, problem-solving, ambiguity]
+
+
+  - front: "Describe a time your initial approach to a problem was wrong."
+    back: |
+      STAR Framework:
+      **Situation:** What problem were you solving? What was your initial approach?
+      **Task:** How did you discover the approach was wrong?
+      **Action:** How quickly did you pivot? What did you do differently?
+      **Result:** Was the final solution better? What did you learn about validation?
+
+      Key points: Show intellectual humility, quick course-correction, and learning from mistakes.
+      German context: Admitting mistakes is respected if you show Lösungsorientierung (solution-orientation) immediately after.
+    difficulty: MEDIUM
+    tags: [behavioral, problem-solving, pivoting]
+
+
+  - front: "Tell me about a time you optimized a system's performance significantly."
+    back: |
+      STAR Framework:
+      **Situation:** What was the performance problem? What metrics were affected?
+      **Task:** Why was optimization needed? What was the target?
+      **Action:** How did you profile/measure? What changes did you make? How did you validate?
+      **Result:** What improvement did you achieve? (latency reduced by X%, throughput increased by Y)
+
+      Key points: Show measurement-first approach. Never optimize without profiling first.
+      German context: Quantify everything. "Made it faster" is insufficient — provide exact numbers and methodology.
+    difficulty: HARD
+    tags: [behavioral, problem-solving, optimization]
+

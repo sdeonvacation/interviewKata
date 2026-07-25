@@ -62,6 +62,20 @@ public class Challenge {
     @Builder.Default
     private int timeLimitSeconds = 300;
 
+    @Column(name = "next_practice_date")
+    private LocalDateTime nextPracticeDate;
+
+    @Column(name = "practice_interval_days")
+    @Builder.Default
+    private int practiceIntervalDays = 0;
+
+    @Column(name = "practice_count")
+    @Builder.Default
+    private int practiceCount = 0;
+
+    @Column(name = "reference_solution", columnDefinition = "TEXT")
+    private String referenceSolution;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

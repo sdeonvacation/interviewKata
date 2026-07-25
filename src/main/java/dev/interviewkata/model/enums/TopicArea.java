@@ -6,5 +6,6 @@ public enum TopicArea {
     SYSTEM_DESIGN,
     DSA,
     DATABASE,
-    ARCHITECTURE
+    ARCHITECTURE,
+    BEHAVIORAL
 }

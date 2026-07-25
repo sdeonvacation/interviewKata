@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 013-add-challenge-reference-solution
+      author: interviewkata
+      changes:
+        - addColumn:
+            tableName: challenge
+            columns:
+              - column:
+                  name: reference_solution
+                  type: text

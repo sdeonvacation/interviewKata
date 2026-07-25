@@ -60,8 +60,8 @@ public class MockInterviewEngine {
                 .build();
         MockInterview saved = mockInterviewRepository.save(interview);
 
-        // Generate first question using AI
-        String firstQuestion = aiService.conductInterview("", topicArea.name(), InterviewPhase.INTRO.name());
+        // Generate first question using appropriate prompt for topic type
+        String firstQuestion = generateQuestion("", topicArea, InterviewPhase.INTRO);
 
         InterviewTurn firstTurn = InterviewTurn.builder()
                 .interview(saved)
@@ -91,14 +91,15 @@ public class MockInterviewEngine {
         lastTurn.setAnsweredAt(LocalDateTime.now());
         interviewTurnRepository.save(lastTurn);
 
-        // Generate next question (placeholder AI logic)
+        // Determine next phase based on topic type
         int nextTurnNumber = turns.size() + 1;
-        InterviewPhase nextPhase = determinePhase(nextTurnNumber);
+        InterviewPhase nextPhase = interview.getTopicArea() == TopicArea.BEHAVIORAL
+                ? determineBehavioralPhase(nextTurnNumber)
+                : determinePhase(nextTurnNumber);
 
         // Build transcript from all turns for context
         String transcript = buildTranscript(turns);
-        String nextQuestion = aiService.conductInterview(
-                transcript, interview.getTopicArea().name(), nextPhase.name());
+        String nextQuestion = generateQuestion(transcript, interview.getTopicArea(), nextPhase);
 
         InterviewTurn nextTurn = InterviewTurn.builder()
                 .interview(interview)
@@ -133,6 +134,21 @@ public class MockInterviewEngine {
         if (turnNumber <= 5) return InterviewPhase.TECHNICAL;
         if (turnNumber <= 8) return InterviewPhase.DEEP_DIVE;
         return InterviewPhase.WRAP_UP;
+    }
+
+    private InterviewPhase determineBehavioralPhase(int turnNumber) {
+        if (turnNumber <= 1) return InterviewPhase.INTRO;
+        if (turnNumber <= 3) return InterviewPhase.QUESTION;
+        if (turnNumber <= 5) return InterviewPhase.PROBE;
+        if (turnNumber <= 7) return InterviewPhase.FOLLOW_UP;
+        return InterviewPhase.WRAP_UP;
+    }
+
+    private String generateQuestion(String transcript, TopicArea topicArea, InterviewPhase phase) {
+        if (topicArea == TopicArea.BEHAVIORAL) {
+            return aiService.conductBehavioralInterview(transcript, topicArea.name(), phase.name());
+        }
+        return aiService.conductInterview(transcript, topicArea.name(), phase.name());
     }
 
     private String buildTranscript(List<InterviewTurn> turns) {

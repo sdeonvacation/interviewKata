@@ -6,6 +6,8 @@ const mockHook: {
   state: string;
   session: any;
   currentCard: any;
+  currentIndex: number;
+  completedCards: number;
   error: string | null;
   startSession: ReturnType<typeof vi.fn>;
   showAnswer: ReturnType<typeof vi.fn>;
@@ -14,6 +16,8 @@ const mockHook: {
   state: 'idle',
   session: null,
   currentCard: null,
+  currentIndex: 0,
+  completedCards: 0,
   error: null,
   startSession: vi.fn(),
   showAnswer: vi.fn(),
@@ -30,6 +34,8 @@ describe('ReviewSession', () => {
     mockHook.state = 'idle';
     mockHook.session = null;
     mockHook.currentCard = null;
+    mockHook.currentIndex = 0;
+    mockHook.completedCards = 0;
     mockHook.error = null;
   });
 
@@ -102,5 +108,95 @@ describe('ReviewSession', () => {
     } as any;
     render(<ReviewSession />);
     expect(screen.getByText('Card 3 of 10')).toBeInTheDocument();
+  });
+
+  // Keyboard shortcut tests
+  it('Space bar calls showAnswer when reviewing', () => {
+    mockHook.state = 'reviewing';
+    mockHook.session = { id: '1', cards: [], currentIndex: 0, totalCards: 5 } as any;
+    mockHook.currentCard = {
+      id: 'c1', topicId: 't1', front: 'Q', back: 'A',
+      status: 'REVIEW', difficulty: 'EASY',
+    } as any;
+    render(<ReviewSession />);
+
+    fireEvent.keyDown(window, { code: 'Space', key: ' ' });
+    expect(mockHook.showAnswer).toHaveBeenCalled();
+  });
+
+  it('keys 1-5 call gradeCard when grading', () => {
+    mockHook.state = 'grading';
+    mockHook.session = { id: '1', cards: [], currentIndex: 0, totalCards: 5 } as any;
+    mockHook.currentCard = {
+      id: 'c1', topicId: 't1', front: 'Q', back: 'A',
+      status: 'REVIEW', difficulty: 'EASY',
+    } as any;
+    render(<ReviewSession />);
+
+    fireEvent.keyDown(window, { key: '3' });
+    expect(mockHook.gradeCard).toHaveBeenCalledWith(3);
+  });
+
+  it('keys 1-5 do NOT call gradeCard when reviewing (not grading)', () => {
+    mockHook.state = 'reviewing';
+    mockHook.session = { id: '1', cards: [], currentIndex: 0, totalCards: 5 } as any;
+    mockHook.currentCard = {
+      id: 'c1', topicId: 't1', front: 'Q', back: 'A',
+      status: 'REVIEW', difficulty: 'EASY',
+    } as any;
+    render(<ReviewSession />);
+
+    fireEvent.keyDown(window, { key: '3' });
+    expect(mockHook.gradeCard).not.toHaveBeenCalled();
+  });
+
+  it('Space does NOT call showAnswer when grading', () => {
+    mockHook.state = 'grading';
+    mockHook.session = { id: '1', cards: [], currentIndex: 0, totalCards: 5 } as any;
+    mockHook.currentCard = {
+      id: 'c1', topicId: 't1', front: 'Q', back: 'A',
+      status: 'REVIEW', difficulty: 'EASY',
+    } as any;
+    render(<ReviewSession />);
+
+    fireEvent.keyDown(window, { code: 'Space', key: ' ' });
+    expect(mockHook.showAnswer).not.toHaveBeenCalled();
+  });
+
+  it('invalid keys (6, 0, a) do NOT call gradeCard', () => {
+    mockHook.state = 'grading';
+    mockHook.session = { id: '1', cards: [], currentIndex: 0, totalCards: 5 } as any;
+    mockHook.currentCard = {
+      id: 'c1', topicId: 't1', front: 'Q', back: 'A',
+      status: 'REVIEW', difficulty: 'EASY',
+    } as any;
+    render(<ReviewSession />);
+
+    fireEvent.keyDown(window, { key: '6' });
+    fireEvent.keyDown(window, { key: '0' });
+    fireEvent.keyDown(window, { key: 'a' });
+    expect(mockHook.gradeCard).not.toHaveBeenCalled();
+  });
+
+  it('shows Space hint near show answer button', () => {
+    mockHook.state = 'reviewing';
+    mockHook.session = { id: '1', cards: [], currentIndex: 0, totalCards: 5 } as any;
+    mockHook.currentCard = {
+      id: 'c1', topicId: 't1', front: 'Q', back: 'A',
+      status: 'REVIEW', difficulty: 'EASY',
+    } as any;
+    render(<ReviewSession />);
+    expect(screen.getByText('Space')).toBeInTheDocument();
+  });
+
+  it('shows (press 1-5) hint in grading state', () => {
+    mockHook.state = 'grading';
+    mockHook.session = { id: '1', cards: [], currentIndex: 0, totalCards: 5 } as any;
+    mockHook.currentCard = {
+      id: 'c1', topicId: 't1', front: 'Q', back: 'A',
+      status: 'REVIEW', difficulty: 'EASY',
+    } as any;
+    render(<ReviewSession />);
+    expect(screen.getByText('(press 1-5)')).toBeInTheDocument();
   });
 });

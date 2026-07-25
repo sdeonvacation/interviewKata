@@ -19,3 +19,9 @@ databaseChangeLog:
       file: db/changelog/009-seed-topic-hierarchy.yaml
   - include:
       file: db/changelog/010-create-indexes.yaml
+  - include:
+      file: db/changelog/011-add-behavioral-topic.yaml
+  - include:
+      file: db/changelog/012-challenge-spaced-repetition.yaml
+  - include:
+      file: db/changelog/013-challenge-reference-solution.yaml

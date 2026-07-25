@@ -13,7 +13,7 @@ class EnumsTest {
     void topicArea_hasAllValues() {
         assertThat(TopicArea.values()).containsExactly(
                 TopicArea.JAVA_CORE, TopicArea.SPRING_BOOT, TopicArea.SYSTEM_DESIGN,
-                TopicArea.DSA, TopicArea.DATABASE, TopicArea.ARCHITECTURE
+                TopicArea.DSA, TopicArea.DATABASE, TopicArea.ARCHITECTURE, TopicArea.BEHAVIORAL
         );
     }
 
@@ -66,7 +66,8 @@ class EnumsTest {
     void interviewPhase_hasAllValues() {
         assertThat(InterviewPhase.values()).containsExactly(
                 InterviewPhase.INTRO, InterviewPhase.TECHNICAL,
-                InterviewPhase.DEEP_DIVE, InterviewPhase.WRAP_UP
+                InterviewPhase.DEEP_DIVE, InterviewPhase.WRAP_UP,
+                InterviewPhase.QUESTION, InterviewPhase.PROBE, InterviewPhase.FOLLOW_UP
         );
     }
 

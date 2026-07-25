@@ -1,0 +1,71 @@
+topic: "Behavioral/Teamwork"
+cards:
+  - front: "Tell me about a successful cross-functional collaboration."
+    back: |
+      STAR Framework:
+      **Situation:** What teams were involved? What was the project goal?
+      **Task:** What was your specific role in the collaboration?
+      **Action:** How did you bridge different team cultures/priorities? What communication patterns did you establish?
+      **Result:** What was delivered? How did you measure collaboration success?
+
+      Key points: Show you can work outside your comfort zone, adapt communication style, and align different priorities.
+      German context: Cross-team collaboration often requires formal Abstimmung (alignment meetings). Show structure.
+    difficulty: EASY
+    tags: [behavioral, teamwork, collaboration]
+
+
+  - front: "Describe a time you helped improve your team's development process."
+    back: |
+      STAR Framework:
+      **Situation:** What was the current process pain point?
+      **Task:** Why did you take responsibility for improving it?
+      **Action:** What change did you propose? How did you implement it? (retrospective, RFC, pilot)
+      **Result:** What metric improved? (velocity, bug rate, deployment frequency, lead time)
+
+      Key points: Show continuous improvement mindset and data-driven process changes.
+      German context: Show Prozessdenken (process thinking). Germans value systematic process improvement over ad-hoc fixes.
+    difficulty: MEDIUM
+    tags: [behavioral, teamwork, process-improvement]
+
+
+  - front: "Tell me about a time you onboarded a new team member effectively."
+    back: |
+      STAR Framework:
+      **Situation:** Who was joining? What was the project state?
+      **Task:** What was your role in their onboarding?
+      **Action:** What did you do specifically? (documentation, pair programming schedule, introductions, first-task selection)
+      **Result:** How quickly did they become productive? What feedback did they give?
+
+      Key points: Show empathy for new joiners, structured approach, and measurement of ramp-up time.
+      German context: Einarbeitung (onboarding) is taken seriously. Show you had a structured plan, not just "ask me anything."
+    difficulty: EASY
+    tags: [behavioral, teamwork, onboarding]
+
+
+  - front: "Describe a time you worked effectively in a distributed/remote team."
+    back: |
+      STAR Framework:
+      **Situation:** How was the team distributed? (timezones, cultures)
+      **Task:** What challenges did the distribution create?
+      **Action:** What practices did you establish or follow? (async communication, overlap hours, documentation)
+      **Result:** How did the team perform compared to co-located teams?
+
+      Key points: Show self-discipline, async communication skills, and proactive over-communication.
+      German context: Many German companies have distributed teams (nearshore/offshore). Show Zuverlässigkeit (reliability).
+    difficulty: MEDIUM
+    tags: [behavioral, teamwork, remote-work]
+
+
+  - front: "Tell me about a time you had to coordinate a project across multiple teams."
+    back: |
+      STAR Framework:
+      **Situation:** What was the project? How many teams were involved?
+      **Task:** What was your coordination responsibility?
+      **Action:** How did you track dependencies? Manage communication? Handle blockers?
+      **Result:** Was the project delivered on time? What coordination overhead did you manage?
+
+      Key points: Show project management skills, dependency tracking, and escalation judgment.
+      German context: Show Planbarkeit (predictability) — how you kept the project on track with clear status updates.
+    difficulty: HARD
+    tags: [behavioral, teamwork, coordination]
+

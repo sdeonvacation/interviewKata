@@ -1,0 +1,168 @@
+solutions:
+  - title: "Two Sum"
+    reference_solution: |
+      // Optimal: HashMap approach - O(n) time, O(n) space
+      public int[] twoSum(int[] nums, int target) {
+          Map<Integer, Integer> map = new HashMap<>();
+          for (int i = 0; i < nums.length; i++) {
+              int complement = target - nums[i];
+              if (map.containsKey(complement)) {
+                  return new int[]{map.get(complement), i};
+              }
+              map.put(nums[i], i);
+          }
+          throw new IllegalArgumentException("No solution");
+      }
+      // Time: O(n), Space: O(n)
+      // Key insight: Store seen values in map, check for complement
+
+  - title: "Valid Palindrome"
+    reference_solution: |
+      // Two-pointer approach - O(n) time, O(1) space
+      public boolean isPalindrome(String s) {
+          int left = 0, right = s.length() - 1;
+          while (left < right) {
+              while (left < right && !Character.isLetterOrDigit(s.charAt(left))) left++;
+              while (left < right && !Character.isLetterOrDigit(s.charAt(right))) right--;
+              if (Character.toLowerCase(s.charAt(left)) != Character.toLowerCase(s.charAt(right))) {
+                  return false;
+              }
+              left++;
+              right--;
+          }
+          return true;
+      }
+      // Time: O(n), Space: O(1)
+      // Key insight: Skip non-alphanumeric, compare from both ends
+
+  - title: "Merge Sorted Array"
+    reference_solution: |
+      // Three-pointer from end - O(m+n) time, O(1) space
+      public void merge(int[] nums1, int m, int[] nums2, int n) {
+          int p1 = m - 1, p2 = n - 1, p = m + n - 1;
+          while (p2 >= 0) {
+              if (p1 >= 0 && nums1[p1] > nums2[p2]) {
+                  nums1[p] = nums1[p1];
+                  p1--;
+              } else {
+                  nums1[p] = nums2[p2];
+                  p2--;
+              }
+              p--;
+          }
+      }
+      // Time: O(m+n), Space: O(1)
+      // Key insight: Fill from the end to avoid overwriting
+
+  - title: "Best Time to Buy and Sell Stock"
+    reference_solution: |
+      // Single pass - O(n) time, O(1) space
+      public int maxProfit(int[] prices) {
+          int minPrice = Integer.MAX_VALUE;
+          int maxProfit = 0;
+          for (int price : prices) {
+              if (price < minPrice) {
+                  minPrice = price;
+              } else {
+                  maxProfit = Math.max(maxProfit, price - minPrice);
+              }
+          }
+          return maxProfit;
+      }
+      // Time: O(n), Space: O(1)
+      // Key insight: Track minimum price seen so far, compute profit at each step
+
+  - title: "Contains Duplicate"
+    reference_solution: |
+      // HashSet approach - O(n) time, O(n) space
+      public boolean containsDuplicate(int[] nums) {
+          Set<Integer> seen = new HashSet<>();
+          for (int num : nums) {
+              if (!seen.add(num)) return true;
+          }
+          return false;
+      }
+      // Time: O(n), Space: O(n)
+      // Key insight: HashSet.add() returns false if element already exists
+
+  - title: "Valid Parentheses"
+    reference_solution: |
+      // Stack approach - O(n) time, O(n) space
+      public boolean isValid(String s) {
+          Deque<Character> stack = new ArrayDeque<>();
+          for (char c : s.toCharArray()) {
+              if (c == '(' || c == '[' || c == '{') {
+                  stack.push(c);
+              } else {
+                  if (stack.isEmpty()) return false;
+                  char top = stack.pop();
+                  if (c == ')' && top != '(') return false;
+                  if (c == ']' && top != '[') return false;
+                  if (c == '}' && top != '{') return false;
+              }
+          }
+          return stack.isEmpty();
+      }
+      // Time: O(n), Space: O(n)
+      // Key insight: Push opening brackets, pop and match on closing brackets
+
+  - title: "Linked List Cycle"
+    reference_solution: |
+      // Floyd's Tortoise and Hare - O(n) time, O(1) space
+      public boolean hasCycle(ListNode head) {
+          if (head == null || head.next == null) return false;
+          ListNode slow = head, fast = head.next;
+          while (slow != fast) {
+              if (fast == null || fast.next == null) return false;
+              slow = slow.next;
+              fast = fast.next.next;
+          }
+          return true;
+      }
+      // Time: O(n), Space: O(1)
+      // Key insight: Fast pointer catches slow pointer if cycle exists
+
+  - title: "Maximum Depth of Binary Tree"
+    reference_solution: |
+      // Recursive DFS - O(n) time, O(h) space
+      public int maxDepth(TreeNode root) {
+          if (root == null) return 0;
+          return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));
+      }
+      // Time: O(n), Space: O(h) where h = height
+      // Key insight: Depth = 1 + max(left depth, right depth)
+
+  - title: "Climbing Stairs"
+    reference_solution: |
+      // Dynamic Programming (Fibonacci) - O(n) time, O(1) space
+      public int climbStairs(int n) {
+          if (n <= 2) return n;
+          int prev2 = 1, prev1 = 2;
+          for (int i = 3; i <= n; i++) {
+              int current = prev1 + prev2;
+              prev2 = prev1;
+              prev1 = current;
+          }
+          return prev1;
+      }
+      // Time: O(n), Space: O(1)
+      // Key insight: ways(n) = ways(n-1) + ways(n-2), same as Fibonacci
+
+  - title: "Coin Change"
+    reference_solution: |
+      // Bottom-up DP - O(amount * coins.length) time, O(amount) space
+      public int coinChange(int[] coins, int amount) {
+          int[] dp = new int[amount + 1];
+          Arrays.fill(dp, amount + 1);
+          dp[0] = 0;
+          for (int i = 1; i <= amount; i++) {
+              for (int coin : coins) {
+                  if (coin <= i) {
+                      dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+                  }
+              }
+          }
+          return dp[amount] > amount ? -1 : dp[amount];
+      }
+      // Time: O(amount * n), Space: O(amount)
+      // Key insight: For each amount, try each coin and take minimum

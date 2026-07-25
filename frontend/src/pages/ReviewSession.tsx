@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Play, RotateCcw, Trophy } from 'lucide-react';
 import { FlashCard } from '@/components/FlashCard';
@@ -17,6 +17,41 @@ export function ReviewSession() {
   useEffect(() => {
     setIsFlipped(false);
   }, [currentCard?.id]);
+
+  // Keyboard shortcuts: Space to flip, 1-5 to grade
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      // Don't intercept if user is typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+      if (state === 'reviewing' && e.code === 'Space') {
+        e.preventDefault();
+        setIsFlipped(true);
+        showAnswer();
+        return;
+      }
+
+      if (state === 'grading') {
+        const key = parseInt(e.key, 10);
+        if (key >= 1 && key <= 5) {
+          e.preventDefault();
+          // Trigger flash on the button via DOM attribute
+          const btn = document.querySelector(`[data-grade="${key}"]`) as HTMLElement | null;
+          if (btn) {
+            btn.classList.add('ring-2', 'ring-white/40', 'scale-95');
+            setTimeout(() => btn.classList.remove('ring-2', 'ring-white/40', 'scale-95'), 150);
+          }
+          gradeCard(key);
+        }
+      }
+    },
+    [state, showAnswer, gradeCard]
+  );
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
 
   const progress = session
     ? ((currentIndex + 1) / session.totalCards) * 100
@@ -118,7 +153,7 @@ export function ReviewSession() {
                   Show Answer
                 </button>
                 <p className="text-[#484f58] text-xs">
-                  or click the card to flip
+                  or click the card / press <kbd className="px-1 bg-white/10 rounded text-[10px]">Space</kbd> to flip
                 </p>
               </div>
             )}
@@ -126,7 +161,7 @@ export function ReviewSession() {
             {state === 'grading' && (
               <div className="space-y-3">
                 <p className="text-center text-xs text-[#8b949e]">
-                  How well did you know this?
+                  How well did you know this? <span className="text-[#484f58]">(press 1-5)</span>
                 </p>
                 <GradeButtons onGrade={gradeCard} disabled={false} />
               </div>

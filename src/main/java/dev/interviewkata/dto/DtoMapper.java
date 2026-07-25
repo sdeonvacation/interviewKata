@@ -73,7 +73,10 @@ public final class DtoMapper {
         );
     }
 
-    public static ChallengeDetailDto toDetailDto(Challenge challenge, List<SubmissionResultDto> submissions) {
+    public static ChallengeDetailDto toDetailDto(Challenge challenge, List<SubmissionResultDto> submissions,
+                                                     boolean hasSolved) {
+        // Only expose reference solution after user has solved the challenge
+        String referenceSolution = hasSolved ? challenge.getReferenceSolution() : null;
         return new ChallengeDetailDto(
                 challenge.getId(),
                 challenge.getTitle(),
@@ -83,7 +86,8 @@ public final class DtoMapper {
                 challenge.getStarterCode(),
                 challenge.getHints(),
                 challenge.getTimeLimitSeconds(),
-                submissions
+                submissions,
+                referenceSolution
         );
     }
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { ChallengeDetail, Submission } from '@/types';
+import { ChallengeDetail, Submission, SubmissionStatus } from '@/types';
 import { get, post } from '@/api/client';
 import { CodeEditor } from '@/components/CodeEditor';
 import { TestResultPanel, TestResult } from '@/components/TestResultPanel';
@@ -8,7 +8,7 @@ import { AiFeedbackPanel } from '@/components/AiFeedbackPanel';
 import { DifficultyBadge } from '@/components/DifficultyBadge';
 import { Timer } from '@/components/Timer';
 import { useTimer } from '@/hooks/useTimer';
-import { Play, ChevronDown, ChevronRight, Lightbulb } from 'lucide-react';
+import { Play, ChevronDown, ChevronRight, Lightbulb, CheckCircle, Eye } from 'lucide-react';
 
 export function ChallengeWorkspace() {
   const { id } = useParams<{ id: string }>();
@@ -21,6 +21,7 @@ export function ChallengeWorkspace() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [bottomExpanded, setBottomExpanded] = useState(false);
+  const [showSolution, setShowSolution] = useState(false);
 
   const timer = useTimer(45 * 60);
 
@@ -62,6 +63,12 @@ export function ChallengeWorkspace() {
       }));
       setTestResults(results);
       setBottomExpanded(true);
+
+      // Re-fetch challenge detail to get referenceSolution after solving
+      if (result.status === SubmissionStatus.PASSED) {
+        const updated = await get<ChallengeDetail>(`/challenges/${id}`);
+        setChallenge(updated);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Submission failed');
     } finally {
@@ -209,6 +216,33 @@ export function ChallengeWorkspace() {
                   feedback={submission?.aiReview ?? null}
                   loading={submitting}
                 />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Reference Solution — only visible after solving */}
+      {challenge.referenceSolution && (
+        <div className="border-t border-emerald-500/20">
+          {!showSolution ? (
+            <button
+              onClick={() => setShowSolution(true)}
+              className="flex items-center gap-2 py-3 text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+            >
+              <Eye className="w-4 h-4" />
+              Show Optimal Solution
+            </button>
+          ) : (
+            <div className="py-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-400" />
+                <h3 className="text-sm font-semibold text-emerald-400">Optimal Solution</h3>
+              </div>
+              <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4 overflow-x-auto">
+                <pre className="text-sm text-[#e6edf3] whitespace-pre-wrap font-mono leading-relaxed">
+                  {challenge.referenceSolution}
+                </pre>
               </div>
             </div>
           )}

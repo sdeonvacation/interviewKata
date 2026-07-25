@@ -6,6 +6,8 @@ public record DailyRecommendationDto(
         List<CardDto> reviewCards,
         List<ChallengeDto> dsaChallenges,
         DesignExerciseDto designExercise,
-        String motivationalMessage
+        String motivationalMessage,
+        List<ChallengeDto> revisionChallenges,
+        boolean behavioralPracticeRecommended
 ) {
 }

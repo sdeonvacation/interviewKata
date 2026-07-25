@@ -32,13 +32,16 @@ public class ChallengeService {
     private final ChallengeRepository challengeRepository;
     private final SubmissionRepository submissionRepository;
     private final AiService aiService;
+    private final ChallengePracticeService practiceSer;
 
     public ChallengeService(ChallengeRepository challengeRepository,
                             SubmissionRepository submissionRepository,
-                            AiService aiService) {
+                            AiService aiService,
+                            ChallengePracticeService practiceSer) {
         this.challengeRepository = challengeRepository;
         this.submissionRepository = submissionRepository;
         this.aiService = aiService;
+        this.practiceSer = practiceSer;
     }
 
     public Page<ChallengeDto> listChallenges(ChallengeType type, Difficulty difficulty, int page) {
@@ -71,7 +74,8 @@ public class ChallengeService {
                 .map(DtoMapper::toDto)
                 .toList();
 
-        return DtoMapper.toDetailDto(challenge, submissions);
+        boolean solved = hasSolved(id);
+        return DtoMapper.toDetailDto(challenge, submissions, solved);
     }
 
     @Transactional
@@ -96,6 +100,10 @@ public class ChallengeService {
         }
 
         Submission saved = submissionRepository.save(submission);
+
+        // Schedule for spaced repetition re-practice
+        practiceSer.scheduleNextPractice(challengeId);
+
         return DtoMapper.toDto(saved);
     }
 

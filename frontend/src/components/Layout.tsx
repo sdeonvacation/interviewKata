@@ -8,6 +8,7 @@ import {
   Mic,
   TrendingUp,
   Flame,
+  Users,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -28,6 +29,7 @@ const navItems: NavItem[] = [
   { path: '/challenges', label: 'Challenges', icon: Zap },
   { path: '/exercises', label: 'Exercises', icon: Target },
   { path: '/interviews/new', label: 'Interviews', icon: Mic },
+  { path: '/behavioral', label: 'Behavioral', icon: Users },
   { path: '/progress', label: 'Progress', icon: TrendingUp },
 ];
 

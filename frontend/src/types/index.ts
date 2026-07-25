@@ -7,6 +7,7 @@ export enum TopicArea {
   DSA = 'DSA',
   DATABASE = 'DATABASE',
   ARCHITECTURE = 'ARCHITECTURE',
+  BEHAVIORAL = 'BEHAVIORAL',
 }
 
 export enum CardStatus {
@@ -119,6 +120,7 @@ export interface ChallengeDetail {
   hints: string[];
   timeLimitSeconds: number;
   submissions: Submission[];
+  referenceSolution: string | null;
 }
 
 export interface Submission {
@@ -204,4 +206,6 @@ export interface DailyRecommendation {
   dsaChallenges: Challenge[];
   designExercise: DesignExercise | null;
   motivationalMessage: string;
+  revisionChallenges: Challenge[];
+  behavioralPracticeRecommended: boolean;
 }

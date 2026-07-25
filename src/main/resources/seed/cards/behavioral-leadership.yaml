@@ -1,0 +1,71 @@
+topic: "Behavioral/Leadership"
+cards:
+  - front: "Tell me about a time you took initiative on a project without being asked."
+    back: |
+      STAR Framework:
+      **Situation:** Set context — what was happening that required someone to step up?
+      **Task:** What gap did you identify? Why was it your responsibility to act?
+      **Action:** What specifically did YOU do? (e.g., proposed a solution, built a prototype, organized the team)
+      **Result:** What measurable outcome resulted? (e.g., reduced deployment time by 40%, unblocked 3 teams)
+
+      Key points: Show self-motivation, calculated risk-taking, and ownership.
+      German context: Be factual about the gap you identified. Avoid overselling — state what you did and the metric.
+    difficulty: EASY
+    tags: [behavioral, leadership, initiative]
+
+
+  - front: "Describe a situation where you had to mentor a junior developer."
+    back: |
+      STAR Framework:
+      **Situation:** Who needed mentoring and why? (new hire, skill gap, onboarding)
+      **Task:** What was your specific mentoring responsibility?
+      **Action:** How did you structure the mentoring? (pair programming, code reviews, 1:1s, learning plan)
+      **Result:** How did the junior grow? (became independent in X weeks, delivered feature Y alone, got promoted)
+
+      Key points: Show patience, structured approach, and measurable development of others.
+      German context: German companies value Ausbildung (training) culture. Show systematic knowledge transfer.
+    difficulty: MEDIUM
+    tags: [behavioral, leadership, mentoring]
+
+
+  - front: "Tell me about a time you had to make a technical decision with incomplete information."
+    back: |
+      STAR Framework:
+      **Situation:** What decision needed to be made? What information was missing?
+      **Task:** Why was the decision time-sensitive? What were the stakes?
+      **Action:** How did you evaluate options? What framework did you use? (spike, POC, reversibility analysis)
+      **Result:** Was the decision correct? If not, how did you course-correct?
+
+      Key points: Show structured thinking under uncertainty. Mention reversibility and risk mitigation.
+      German context: Show Gründlichkeit (thoroughness) — even under pressure, demonstrate you evaluated options systematically.
+    difficulty: HARD
+    tags: [behavioral, leadership, decision-making]
+
+
+  - front: "Describe a time you drove a significant technical change in your organization."
+    back: |
+      STAR Framework:
+      **Situation:** What was the technical status quo? Why was change needed?
+      **Task:** What was your role in driving this change?
+      **Action:** How did you build consensus? What was your migration/adoption strategy?
+      **Result:** What was the adoption rate? Performance improvement? Cost savings?
+
+      Key points: Show influence without authority, stakeholder management, incremental delivery.
+      German context: Emphasize data-driven proposals and Proof of Concept results over pure advocacy.
+    difficulty: HARD
+    tags: [behavioral, leadership, influence]
+
+
+  - front: "Tell me about a time you delegated work effectively."
+    back: |
+      STAR Framework:
+      **Situation:** What was the workload/project context?
+      **Task:** Why did delegation become necessary?
+      **Action:** How did you choose who to delegate to? What support did you provide? How did you follow up?
+      **Result:** Was the work completed successfully? Did the person grow?
+
+      Key points: Show trust-building, clear communication of expectations, and appropriate oversight level.
+      German context: Show Verantwortung (responsibility) — delegation with accountability, not dumping work.
+    difficulty: MEDIUM
+    tags: [behavioral, leadership, delegation]
+

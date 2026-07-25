@@ -16,6 +16,7 @@ const AREA_LABELS: Record<TopicArea, string> = {
   [TopicArea.DSA]: 'DSA',
   [TopicArea.DATABASE]: 'Database',
   [TopicArea.ARCHITECTURE]: 'Architecture',
+  [TopicArea.BEHAVIORAL]: 'Behavioral',
 };
 
 const WEAK_THRESHOLD = 50;

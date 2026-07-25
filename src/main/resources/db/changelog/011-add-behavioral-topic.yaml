@@ -1,0 +1,67 @@
+databaseChangeLog:
+  - changeSet:
+      id: 011-seed-behavioral-root
+      author: interviewkata
+      comment: Add Behavioral root topic area
+      changes:
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a7000000-0000-0000-0000-000000000001"}
+              - column: {name: name, value: "Behavioral"}
+              - column: {name: area, value: "BEHAVIORAL"}
+              - column: {name: sort_order, valueNumeric: 7}
+
+  - changeSet:
+      id: 011-seed-behavioral-children
+      author: interviewkata
+      comment: Seed Behavioral subtopics
+      changes:
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a7000000-0000-0000-0000-000000000011"}
+              - column: {name: name, value: "Leadership"}
+              - column: {name: area, value: "BEHAVIORAL"}
+              - column: {name: parent_id, value: "a7000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 1}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a7000000-0000-0000-0000-000000000012"}
+              - column: {name: name, value: "Conflict Resolution"}
+              - column: {name: area, value: "BEHAVIORAL"}
+              - column: {name: parent_id, value: "a7000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 2}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a7000000-0000-0000-0000-000000000013"}
+              - column: {name: name, value: "Teamwork"}
+              - column: {name: area, value: "BEHAVIORAL"}
+              - column: {name: parent_id, value: "a7000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 3}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a7000000-0000-0000-0000-000000000014"}
+              - column: {name: name, value: "Problem Solving"}
+              - column: {name: area, value: "BEHAVIORAL"}
+              - column: {name: parent_id, value: "a7000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 4}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a7000000-0000-0000-0000-000000000015"}
+              - column: {name: name, value: "Communication"}
+              - column: {name: area, value: "BEHAVIORAL"}
+              - column: {name: parent_id, value: "a7000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 5}
+        - insert:
+            tableName: topic
+            columns:
+              - column: {name: id, value: "a7000000-0000-0000-0000-000000000016"}
+              - column: {name: name, value: "Adaptability"}
+              - column: {name: area, value: "BEHAVIORAL"}
+              - column: {name: parent_id, value: "a7000000-0000-0000-0000-000000000001"}
+              - column: {name: sort_order, valueNumeric: 6}

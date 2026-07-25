@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Zap, Brain, Clock, CheckCircle2, Code2, Network } from 'lucide-react';
+import { BookOpen, Zap, Brain, Clock, CheckCircle2, Code2, Network, RotateCcw } from 'lucide-react';
 import { get } from '@/api/client';
 import { DashboardData, DailyRecommendation } from '@/types';
 import { StreakBadge } from '@/components/StreakBadge';
@@ -23,8 +23,8 @@ function SkeletonCard() {
 }
 
 function TrainingPlan({ recommendations }: { recommendations: DailyRecommendation }) {
-  const { reviewCards, dsaChallenges, designExercise, motivationalMessage } = recommendations;
-  const hasRecommendations = reviewCards.length > 0 || dsaChallenges.length > 0 || designExercise;
+  const { reviewCards, dsaChallenges, designExercise, motivationalMessage, revisionChallenges } = recommendations;
+  const hasRecommendations = reviewCards.length > 0 || dsaChallenges.length > 0 || designExercise || (revisionChallenges && revisionChallenges.length > 0);
 
   if (!hasRecommendations) {
     return (
@@ -151,6 +151,29 @@ function TrainingPlan({ recommendations }: { recommendations: DailyRecommendatio
           </div>
         )}
       </div>
+
+      {/* Revision Challenges */}
+      {revisionChallenges && revisionChallenges.length > 0 && (
+        <div className="mt-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-1.5 rounded-lg bg-orange-500/10">
+              <RotateCcw className="w-4 h-4 text-orange-400" />
+            </div>
+            <h3 className="text-sm font-medium text-[#f0f6fc]">Due for Revision</h3>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {revisionChallenges.map((challenge) => (
+              <Link
+                key={challenge.id}
+                to={`/challenges/${challenge.id}`}
+                className="px-3 py-2 rounded-lg bg-orange-500/5 border border-orange-500/20 hover:border-orange-500/40 transition-colors"
+              >
+                <span className="text-sm text-orange-400">{challenge.title}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

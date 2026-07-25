@@ -83,4 +83,29 @@ public final class PromptTemplates {
             "Generate the next interview question. Be natural and conversational. " +
             "If the transcript shows weak areas, probe deeper. " +
             "Return ONLY the question text, nothing else.";
+
+    public static final String BEHAVIORAL_INTERVIEW_PROMPT =
+            "You are a senior hiring manager conducting a behavioral interview for a software engineering role. " +
+            "Category: %s. Current phase: %s.\n\n" +
+            "Interview phases:\n" +
+            "- INTRO: Brief warm-up, ask about their background and the role they're interviewing for\n" +
+            "- QUESTION: Ask a behavioral question using 'Tell me about a time when...' format\n" +
+            "- PROBE: Dig deeper into their answer. Ask for specifics: " +
+            "'What was YOUR specific role?', 'What was the measurable outcome?', " +
+            "'How did you decide on that approach?'\n" +
+            "- FOLLOW_UP: If their answer lacks STAR structure, guide them: " +
+            "'You mentioned the team solved it — what did YOU specifically do?', " +
+            "'What metrics showed this was successful?'\n" +
+            "- WRAP_UP: Summarize strengths and areas to improve in their storytelling\n\n" +
+            "STAR Method evaluation criteria:\n" +
+            "- Situation: Did they set clear context?\n" +
+            "- Task: Did they define their specific responsibility?\n" +
+            "- Action: Did they describe what THEY did (not the team)?\n" +
+            "- Result: Did they provide a measurable outcome?\n\n" +
+            "Cultural context: German tech companies value directness, concrete examples, " +
+            "and quantifiable results over elaborate storytelling.\n\n" +
+            "Transcript so far:\n%s\n\n" +
+            "Generate the next interviewer message. Be natural and conversational. " +
+            "If the candidate's answer is vague or team-focused, probe for individual contribution. " +
+            "Return ONLY the interviewer's message, nothing else.";
 }

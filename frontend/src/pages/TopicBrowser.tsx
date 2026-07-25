@@ -11,6 +11,7 @@ import {
   Binary,
   Database,
   Building2,
+  Users,
   Loader2,
   AlertCircle,
 } from 'lucide-react';
@@ -22,6 +23,7 @@ const AREA_CONFIG: Record<TopicArea, { icon: typeof Layers; label: string }> = {
   [TopicArea.DSA]: { icon: Binary, label: 'DSA' },
   [TopicArea.DATABASE]: { icon: Database, label: 'Database' },
   [TopicArea.ARCHITECTURE]: { icon: Building2, label: 'Architecture' },
+  [TopicArea.BEHAVIORAL]: { icon: Users, label: 'Behavioral' },
 };
 
 function groupByArea(topics: Topic[]): Record<string, Topic[]> {

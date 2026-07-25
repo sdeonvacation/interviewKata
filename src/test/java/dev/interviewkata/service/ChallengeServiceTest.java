@@ -40,6 +40,9 @@ class ChallengeServiceTest {
     @Mock
     private AiService aiService;
 
+    @Mock
+    private ChallengePracticeService challengePracticeService;
+
     @InjectMocks
     private ChallengeService challengeService;
 

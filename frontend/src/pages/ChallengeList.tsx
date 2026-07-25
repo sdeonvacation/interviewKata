@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Challenge, ChallengeType, Difficulty, SpringPage } from '@/types';
+import { Challenge, ChallengeType, Difficulty, DailyRecommendation, SpringPage } from '@/types';
 import { get } from '@/api/client';
 import { DifficultyBadge } from '@/components/DifficultyBadge';
-import { Zap, Check } from 'lucide-react';
+import { Zap, Check, RotateCcw } from 'lucide-react';
+
+type StatusFilter = 'all' | 'due-review';
 
 const TYPE_OPTIONS: Array<{ label: string; value: ChallengeType | null }> = [
   { label: 'All', value: null },
@@ -21,14 +23,23 @@ const DIFFICULTY_OPTIONS: Array<{ label: string; value: Difficulty | null }> = [
 
 export function ChallengeList() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [revisionIds, setRevisionIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeType, setActiveType] = useState<ChallengeType | null>(null);
   const [activeDifficulty, setActiveDifficulty] = useState<Difficulty | null>(null);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
   useEffect(() => {
-    get<SpringPage<Challenge>>('/challenges?page=0&size=200')
-      .then((res) => setChallenges(res.content ?? []))
+    Promise.all([
+      get<SpringPage<Challenge>>('/challenges?page=0&size=200'),
+      get<DailyRecommendation>('/dashboard/recommendations'),
+    ])
+      .then(([challengeRes, recRes]) => {
+        setChallenges(challengeRes.content ?? []);
+        const ids = new Set((recRes.revisionChallenges ?? []).map((c) => c.id));
+        setRevisionIds(ids);
+      })
       .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load challenges'))
       .finally(() => setLoading(false));
   }, []);
@@ -36,6 +47,7 @@ export function ChallengeList() {
   const filtered = challenges.filter((c) => {
     if (activeType && c.challengeType !== activeType) return false;
     if (activeDifficulty && c.difficulty !== activeDifficulty) return false;
+    if (statusFilter === 'due-review' && !revisionIds.has(c.id)) return false;
     return true;
   });
 
@@ -96,6 +108,20 @@ export function ChallengeList() {
               {opt.label}
             </button>
           ))}
+
+          <span className="mx-2 border-l border-white/[0.06]" />
+
+          <button
+            onClick={() => setStatusFilter(statusFilter === 'due-review' ? 'all' : 'due-review')}
+            className={`px-3 py-1.5 text-sm rounded-full border transition-colors flex items-center gap-1.5 ${
+              statusFilter === 'due-review'
+                ? 'bg-orange-500/10 text-orange-400 border-orange-500/30'
+                : 'bg-[#161b22] text-[#8b949e] border-white/[0.06] hover:border-orange-500/30'
+            }`}
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            Due for Review
+          </button>
         </div>
       </div>
 

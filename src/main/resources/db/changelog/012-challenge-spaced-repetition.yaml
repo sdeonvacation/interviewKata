@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 012-add-challenge-practice-columns
+      author: interviewkata
+      changes:
+        - addColumn:
+            tableName: challenge
+            columns:
+              - column:
+                  name: next_practice_date
+                  type: timestamp without time zone
+              - column:
+                  name: practice_interval_days
+                  type: int
+                  defaultValueNumeric: 0
+              - column:
+                  name: practice_count
+                  type: int
+                  defaultValueNumeric: 0
