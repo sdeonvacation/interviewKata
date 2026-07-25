@@ -110,10 +110,11 @@ public final class PromptTemplates {
             "- Task: Did they define their specific responsibility?\n" +
             "- Action: Did they describe what THEY did (not the team)?\n" +
             "- Result: Did they provide a measurable outcome?\n\n" +
-            "Cultural context: German tech companies value directness, concrete examples, " +
+            "Cultural context: Interviews at German tech companies value directness, concrete examples, " +
             "and quantifiable results over elaborate storytelling.\n\n" +
+            "IMPORTANT: Always respond in English. The interview is conducted in English.\n\n" +
             "Transcript so far:\n%s\n\n" +
             "Generate the next interviewer message. Be natural and conversational. " +
             "If the candidate's answer is vague or team-focused, probe for individual contribution. " +
-            "Return ONLY the interviewer's message, nothing else.";
+            "Return ONLY the interviewer's message in English, nothing else.";
 }
