@@ -1,151 +1,84 @@
-import React from 'react';
+import ReactMarkdown from 'react-markdown';
 
 interface MarkdownRendererProps {
   content: string;
 }
 
-function parseInline(text: string): React.ReactNode[] {
-  const nodes: React.ReactNode[] = [];
-  const regex = /(`[^`]+`)|(\*\*(.+?)\*\*)|(\*(.+?)\*)|(\[([^\]]+)\]\(([^)]+)\))/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-
-  while ((match = regex.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      nodes.push(text.slice(lastIndex, match.index));
-    }
-
-    if (match[1]) {
-      nodes.push(
-        <code
-          key={match.index}
-          className="bg-[#161b22] px-1.5 py-0.5 rounded text-amber-400 font-mono text-sm"
-        >
-          {match[1].slice(1, -1)}
-        </code>
-      );
-    } else if (match[2]) {
-      nodes.push(
-        <strong key={match.index} className="font-semibold text-[#f0f6fc]">
-          {match[3]}
-        </strong>
-      );
-    } else if (match[4]) {
-      nodes.push(<em key={match.index}>{match[5]}</em>);
-    } else if (match[6]) {
-      nodes.push(
-        <a
-          key={match.index}
-          href={match[8]}
-          className="text-amber-400 hover:underline"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {match[7]}
-        </a>
-      );
-    }
-
-    lastIndex = match.index + match[0].length;
-  }
-
-  if (lastIndex < text.length) {
-    nodes.push(text.slice(lastIndex));
-  }
-
-  return nodes;
-}
-
 export function MarkdownRenderer({ content }: MarkdownRendererProps) {
-  const blocks: React.ReactNode[] = [];
-  const lines = content.split('\n');
-  let i = 0;
-
-  while (i < lines.length) {
-    const line = lines[i];
-
-    // Code block
-    if (line.startsWith('```')) {
-      const codeLines: string[] = [];
-      i++;
-      while (i < lines.length && !lines[i].startsWith('```')) {
-        codeLines.push(lines[i]);
-        i++;
-      }
-      i++;
-      blocks.push(
-        <pre
-          key={blocks.length}
-          className="bg-[#0d1117] border-l-2 border-amber-500 rounded-lg p-4 font-mono text-sm text-[#f0f6fc] overflow-x-auto"
-        >
-          <code>{codeLines.join('\n')}</code>
-        </pre>
-      );
-      continue;
-    }
-
-    // Empty line
-    if (line.trim() === '') {
-      i++;
-      continue;
-    }
-
-    // Headings
-    if (line.startsWith('### ')) {
-      blocks.push(
-        <h3 key={blocks.length} className="font-['Outfit'] font-bold text-[#f0f6fc] text-lg">
-          {parseInline(line.slice(4))}
-        </h3>
-      );
-      i++;
-      continue;
-    }
-    if (line.startsWith('## ')) {
-      blocks.push(
-        <h2 key={blocks.length} className="font-['Outfit'] font-bold text-[#f0f6fc] text-xl">
-          {parseInline(line.slice(3))}
-        </h2>
-      );
-      i++;
-      continue;
-    }
-    if (line.startsWith('# ')) {
-      blocks.push(
-        <h1 key={blocks.length} className="font-['Outfit'] font-bold text-[#f0f6fc] text-2xl">
-          {parseInline(line.slice(2))}
-        </h1>
-      );
-      i++;
-      continue;
-    }
-
-    // List items
-    if (/^[-*] /.test(line)) {
-      const items: React.ReactNode[] = [];
-      while (i < lines.length && /^[-*] /.test(lines[i])) {
-        items.push(
-          <li key={items.length}>{parseInline(lines[i].slice(2))}</li>
-        );
-        i++;
-      }
-      blocks.push(
-        <ul key={blocks.length} className="text-[#8b949e] list-disc pl-5 space-y-1">
-          {items}
-        </ul>
-      );
-      continue;
-    }
-
-    // Paragraph
-    blocks.push(
-      <p key={blocks.length} className="text-[#8b949e] leading-relaxed">
-        {parseInline(line)}
-      </p>
-    );
-    i++;
-  }
-
-  return <div className="space-y-4">{blocks}</div>;
+  return (
+    <div className="prose-dark space-y-3">
+      <ReactMarkdown
+        components={{
+          h1: ({ children }) => (
+            <h1 className="font-['Outfit'] font-bold text-[#f0f6fc] text-2xl mt-4 mb-2">{children}</h1>
+          ),
+          h2: ({ children }) => (
+            <h2 className="font-['Outfit'] font-bold text-[#f0f6fc] text-xl mt-4 mb-2">{children}</h2>
+          ),
+          h3: ({ children }) => (
+            <h3 className="font-['Outfit'] font-bold text-[#f0f6fc] text-lg mt-3 mb-1">{children}</h3>
+          ),
+          h4: ({ children }) => (
+            <h4 className="font-semibold text-[#f0f6fc] text-base mt-2 mb-1">{children}</h4>
+          ),
+          p: ({ children }) => (
+            <p className="text-[#8b949e] leading-relaxed">{children}</p>
+          ),
+          strong: ({ children }) => (
+            <strong className="font-semibold text-[#f0f6fc]">{children}</strong>
+          ),
+          em: ({ children }) => (
+            <em className="italic text-[#8b949e]">{children}</em>
+          ),
+          ul: ({ children }) => (
+            <ul className="text-[#8b949e] list-disc pl-5 space-y-1">{children}</ul>
+          ),
+          ol: ({ children }) => (
+            <ol className="text-[#8b949e] list-decimal pl-5 space-y-1">{children}</ol>
+          ),
+          li: ({ children }) => (
+            <li className="text-[#8b949e]">{children}</li>
+          ),
+          code: ({ className, children }) => {
+            const isBlock = className?.includes('language-');
+            if (isBlock) {
+              return (
+                <code className="block">{children}</code>
+              );
+            }
+            return (
+              <code className="bg-[#161b22] px-1.5 py-0.5 rounded text-amber-400 font-mono text-sm">
+                {children}
+              </code>
+            );
+          },
+          pre: ({ children }) => (
+            <pre className="bg-[#0d1117] border-l-2 border-amber-500 rounded-lg p-4 font-mono text-sm text-[#f0f6fc] overflow-x-auto">
+              {children}
+            </pre>
+          ),
+          a: ({ href, children }) => (
+            <a
+              href={href}
+              className="text-amber-400 hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {children}
+            </a>
+          ),
+          hr: () => <hr className="border-white/[0.06] my-4" />,
+          blockquote: ({ children }) => (
+            <blockquote className="border-l-2 border-amber-500/50 pl-4 italic text-[#8b949e]">
+              {children}
+            </blockquote>
+          ),
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
 }
 
 export default MarkdownRenderer;
