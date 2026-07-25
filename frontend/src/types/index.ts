@@ -198,3 +198,10 @@ export interface DashboardData {
   weakAreas: string[];
   recentSessions: unknown[];
 }
+
+export interface DailyRecommendation {
+  reviewCards: Card[];
+  dsaChallenges: Challenge[];
+  designExercise: DesignExercise | null;
+  motivationalMessage: string;
+}

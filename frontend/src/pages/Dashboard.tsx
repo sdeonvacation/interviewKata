@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Zap, Brain, Clock, CheckCircle2 } from 'lucide-react';
+import { BookOpen, Zap, Brain, Clock, CheckCircle2, Code2, Network } from 'lucide-react';
 import { get } from '@/api/client';
-import { DashboardData } from '@/types';
+import { DashboardData, DailyRecommendation } from '@/types';
 import { StreakBadge } from '@/components/StreakBadge';
 
 function getGreeting(): string {
@@ -22,16 +22,156 @@ function SkeletonCard() {
   );
 }
 
+function TrainingPlan({ recommendations }: { recommendations: DailyRecommendation }) {
+  const { reviewCards, dsaChallenges, designExercise, motivationalMessage } = recommendations;
+  const hasRecommendations = reviewCards.length > 0 || dsaChallenges.length > 0 || designExercise;
+
+  if (!hasRecommendations) {
+    return (
+      <section>
+        <h2 className="text-lg font-semibold text-[#f0f6fc] mb-4">Today's Training Plan</h2>
+        <div className="card flex flex-col items-center justify-center py-8 gap-3">
+          <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+          <p className="text-[#f0f6fc] font-medium">All caught up!</p>
+          <p className="text-[#8b949e] text-sm">No pending items. Great discipline!</p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-[#f0f6fc]">Today's Training Plan</h2>
+        {motivationalMessage && (
+          <p className="text-sm text-[#8b949e] italic">{motivationalMessage}</p>
+        )}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Review Cards */}
+        <Link to="/review" className="card group hover:border-amber-500/30 transition-colors">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-2 rounded-lg bg-amber-500/10">
+              <Brain className="w-5 h-5 text-amber-400" />
+            </div>
+            <h3 className="text-sm font-medium text-[#f0f6fc]">Knowledge Review</h3>
+          </div>
+          {reviewCards.length > 0 ? (
+            <>
+              <p className="text-2xl font-bold text-amber-400">{reviewCards.length}</p>
+              <p className="text-xs text-[#8b949e] mt-1">
+                card{reviewCards.length !== 1 ? 's' : ''} due for review
+              </p>
+              <div className="mt-3 pt-3 border-t border-white/[0.06]">
+                <span className="text-xs font-medium text-amber-400 group-hover:text-amber-300">
+                  Start Review →
+                </span>
+              </div>
+            </>
+          ) : (
+            <p className="text-xs text-emerald-400 mt-1">✓ All reviewed</p>
+          )}
+        </Link>
+
+        {/* DSA Challenge */}
+        {dsaChallenges.length > 0 ? (
+          <Link
+            to={`/challenges/${dsaChallenges[0].id}`}
+            className="card group hover:border-amber-500/30 transition-colors"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-2 rounded-lg bg-sky-500/10">
+                <Code2 className="w-5 h-5 text-sky-400" />
+              </div>
+              <h3 className="text-sm font-medium text-[#f0f6fc]">DSA Challenge</h3>
+            </div>
+            <p className="text-sm font-medium text-[#f0f6fc] truncate">
+              {dsaChallenges[0].title}
+            </p>
+            <span className={`inline-block mt-1 px-2 py-0.5 text-xs rounded-full ${
+              dsaChallenges[0].difficulty === 'EASY'
+                ? 'bg-emerald-500/10 text-emerald-400'
+                : dsaChallenges[0].difficulty === 'MEDIUM'
+                ? 'bg-amber-500/10 text-amber-400'
+                : 'bg-rose-500/10 text-rose-400'
+            }`}>
+              {dsaChallenges[0].difficulty}
+            </span>
+            <div className="mt-3 pt-3 border-t border-white/[0.06]">
+              <span className="text-xs font-medium text-amber-400 group-hover:text-amber-300">
+                Solve →
+              </span>
+            </div>
+          </Link>
+        ) : (
+          <div className="card">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-2 rounded-lg bg-sky-500/10">
+                <Code2 className="w-5 h-5 text-sky-400" />
+              </div>
+              <h3 className="text-sm font-medium text-[#f0f6fc]">DSA Challenge</h3>
+            </div>
+            <p className="text-xs text-emerald-400 mt-1">✓ All solved</p>
+          </div>
+        )}
+
+        {/* Design Exercise */}
+        {designExercise ? (
+          <Link
+            to={`/exercises/${designExercise.id}`}
+            className="card group hover:border-amber-500/30 transition-colors"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-2 rounded-lg bg-purple-500/10">
+                <Network className="w-5 h-5 text-purple-400" />
+              </div>
+              <h3 className="text-sm font-medium text-[#f0f6fc]">System Design</h3>
+            </div>
+            <p className="text-sm font-medium text-[#f0f6fc] truncate">
+              {designExercise.title}
+            </p>
+            <p className="text-xs text-[#8b949e] mt-1">
+              ~{designExercise.estimatedMinutes} min
+            </p>
+            <div className="mt-3 pt-3 border-t border-white/[0.06]">
+              <span className="text-xs font-medium text-amber-400 group-hover:text-amber-300">
+                Practice →
+              </span>
+            </div>
+          </Link>
+        ) : (
+          <div className="card">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-2 rounded-lg bg-purple-500/10">
+                <Network className="w-5 h-5 text-purple-400" />
+              </div>
+              <h3 className="text-sm font-medium text-[#f0f6fc]">System Design</h3>
+            </div>
+            <p className="text-xs text-[#8b949e] mt-1">No exercises available</p>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export function Dashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
+  const [recommendations, setRecommendations] = useState<DailyRecommendation | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchDashboard = () => {
     setLoading(true);
     setError(null);
-    get<DashboardData>('/dashboard')
-      .then(setData)
+    Promise.all([
+      get<DashboardData>('/dashboard'),
+      get<DailyRecommendation>('/dashboard/recommendations'),
+    ])
+      .then(([dashData, recData]) => {
+        setData(dashData);
+        setRecommendations(recData);
+      })
       .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load dashboard'))
       .finally(() => setLoading(false));
   };
@@ -115,6 +255,11 @@ export function Dashboard() {
           <p className="text-xs text-[#484f58] mt-1">minutes today</p>
         </div>
       </div>
+
+      {/* Today's Training Plan */}
+      {recommendations && (
+        <TrainingPlan recommendations={recommendations} />
+      )}
 
       {/* All Caught Up State */}
       {allCaughtUp && (
