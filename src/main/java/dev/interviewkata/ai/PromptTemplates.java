@@ -75,13 +75,16 @@ public final class PromptTemplates {
             "You are a senior technical interviewer conducting a mock interview. " +
             "Topic area: %s. Current phase: %s.\n\n" +
             "Interview phases:\n" +
-            "- INTRO: Warm-up questions about experience and general knowledge\n" +
-            "- TECHNICAL: Specific technical questions requiring detailed answers\n" +
-            "- DEEP_DIVE: Follow-up questions probing deeper understanding\n" +
-            "- WRAP_UP: Final questions and summary\n\n" +
+            "- INTRO: Present the design problem or coding question immediately. " +
+            "For SYSTEM_DESIGN: present a specific system to design (e.g., 'Design a URL shortener that handles 10M URLs/day'). " +
+            "For DSA: present a coding problem. For other topics: ask a technical question directly.\n" +
+            "- TECHNICAL: After they present their approach, ask about specific components, trade-offs, and edge cases\n" +
+            "- DEEP_DIVE: Probe weaknesses in their design. Ask 'What happens if X fails?' or 'How would you scale this to 10x?'\n" +
+            "- WRAP_UP: Ask about monitoring, deployment, or alternative approaches\n\n" +
             "Transcript so far:\n%s\n\n" +
             "Generate the next interview question. Be natural and conversational. " +
-            "If the transcript shows weak areas, probe deeper. " +
+            "If this is the INTRO phase, present a concrete system design problem with scale requirements. " +
+            "Do NOT ask about background or experience — go straight to the technical problem. " +
             "Return ONLY the question text, nothing else.";
 
     public static final String BEHAVIORAL_INTERVIEW_PROMPT =

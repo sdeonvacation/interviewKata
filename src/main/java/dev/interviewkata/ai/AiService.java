@@ -145,10 +145,19 @@ public class AiService {
     }
 
     private String generateFallbackQuestion(String topic, String phase) {
+        if ("SYSTEM_DESIGN".equals(topic)) {
+            return switch (phase) {
+                case "INTRO" -> "Design a URL shortening service like TinyURL. It should handle 100 million new URLs per day, redirect with less than 10ms latency, and support custom short URLs. Walk me through your high-level design.";
+                case "TECHNICAL" -> "How would you handle the data storage? What database would you choose and how would you partition the data?";
+                case "DEEP_DIVE" -> "What happens if one of your servers goes down? How do you ensure high availability and handle failover?";
+                case "WRAP_UP" -> "How would you monitor this system in production? What metrics would you track?";
+                default -> "Design a notification system that can send 10 million push notifications per day with at-most-once delivery guarantee.";
+            };
+        }
         return switch (phase) {
-            case "INTRO" -> "Tell me about your experience with " + topic + ". What concepts are you most comfortable with?";
-            case "TECHNICAL" -> "Can you explain a key concept in " + topic + " and how you've applied it?";
-            case "DEEP_DIVE" -> "Let's go deeper. Can you walk me through a complex scenario involving " + topic + "?";
+            case "INTRO" -> "Let's start with a technical question. Can you explain how " + topic + " handles concurrency or scalability in real-world systems?";
+            case "TECHNICAL" -> "Can you explain a key concept in " + topic + " and how you've applied it in production?";
+            case "DEEP_DIVE" -> "Let's go deeper. Walk me through a complex scenario involving " + topic + " where you had to make trade-offs.";
             case "WRAP_UP" -> "What areas of " + topic + " would you like to improve, and how would you approach that?";
             default -> "Tell me more about your understanding of " + topic + ".";
         };
