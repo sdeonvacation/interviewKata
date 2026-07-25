@@ -10,6 +10,7 @@ import dev.interviewkata.service.MockInterviewEngine;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -47,5 +48,10 @@ public class InterviewController {
     @GetMapping("/{id}")
     public ResponseEntity<MockInterview> getInterview(@PathVariable UUID id) {
         return ResponseEntity.ok(mockInterviewEngine.getInterview(id));
+    }
+
+    @GetMapping("/{id}/turns")
+    public ResponseEntity<List<InterviewTurnDto>> getTurns(@PathVariable UUID id) {
+        return ResponseEntity.ok(mockInterviewEngine.getTurns(id));
     }
 }

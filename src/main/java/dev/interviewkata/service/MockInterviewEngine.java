@@ -1,6 +1,7 @@
 package dev.interviewkata.service;
 
 import dev.interviewkata.ai.AiService;
+import dev.interviewkata.dto.InterviewTurnDto;
 import dev.interviewkata.model.InterviewTurn;
 import dev.interviewkata.model.MockInterview;
 import dev.interviewkata.model.enums.Difficulty;
@@ -127,6 +128,13 @@ public class MockInterviewEngine {
     public MockInterview getInterview(UUID interviewId) {
         return mockInterviewRepository.findById(interviewId)
                 .orElseThrow(() -> new EntityNotFoundException("Interview not found: " + interviewId));
+    }
+
+    public List<InterviewTurnDto> getTurns(UUID interviewId) {
+        List<InterviewTurn> turns = interviewTurnRepository.findByInterviewIdOrderByTurnNumber(interviewId);
+        return turns.stream()
+                .map(t -> new InterviewTurnDto(t.getTurnNumber(), t.getAiQuestion(), t.getEvaluation(), t.getPhase(), false))
+                .toList();
     }
 
     private InterviewPhase determinePhase(int turnNumber) {

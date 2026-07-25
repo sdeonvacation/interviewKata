@@ -23,6 +23,7 @@ export function MockInterviewSession() {
   const { state, interview, turns, error, startInterview, sendMessage, endInterview } =
     useInterviewSession();
   const [input, setInput] = useState('');
+  const [userMessages, setUserMessages] = useState<string[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<TopicArea>(TopicArea.DSA);
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>(Difficulty.MEDIUM);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -31,7 +32,7 @@ export function MockInterviewSession() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [turns]);
+  }, [turns, userMessages]);
 
   useEffect(() => {
     if (state === 'active' && !isRunning) {
@@ -44,6 +45,7 @@ export function MockInterviewSession() {
 
   const handleSend = () => {
     if (!input.trim()) return;
+    setUserMessages((prev) => [...prev, input.trim()]);
     sendMessage(input.trim());
     setInput('');
   };
@@ -218,13 +220,21 @@ export function MockInterviewSession() {
             <p className="text-[#484f58] text-sm">Waiting for interviewer...</p>
           </div>
         )}
-        {turns.map((turn) => (
-          <ChatBubble
-            key={turn.turnNumber}
-            role={turn.phase === 'QUESTION' ? 'AI' : 'USER'}
-            content={turn.aiQuestion}
-            timestamp={undefined}
-          />
+        {turns.map((turn, idx) => (
+          <div key={turn.turnNumber} className="space-y-3">
+            <ChatBubble
+              role="AI"
+              content={turn.aiQuestion}
+              timestamp={undefined}
+            />
+            {userMessages[idx] && (
+              <ChatBubble
+                role="USER"
+                content={userMessages[idx]}
+                timestamp={undefined}
+              />
+            )}
+          </div>
         ))}
         <div ref={messagesEndRef} />
       </div>

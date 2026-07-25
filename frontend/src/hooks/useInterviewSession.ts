@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { InterviewTurn, MockInterview } from '@/types';
-import { post } from '@/api/client';
+import { get, post } from '@/api/client';
 
 type InterviewState = 'idle' | 'loading' | 'active' | 'complete';
 
@@ -30,7 +30,9 @@ function useInterviewSession(): UseInterviewSessionReturn {
           difficulty,
         });
         setInterview(data);
-        setTurns([]);
+        // Fetch the initial turn (first AI question)
+        const initialTurns = await get<InterviewTurn[]>(`/interviews/${data.id}/turns`);
+        setTurns(initialTurns);
         setState('active');
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Failed to start interview');
