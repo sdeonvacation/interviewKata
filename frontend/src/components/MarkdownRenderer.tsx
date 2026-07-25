@@ -1,13 +1,22 @@
 import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 
 interface MarkdownRendererProps {
   content: string;
 }
 
+// Convert 10^5 notation to superscript HTML
+function preprocessSuperscripts(text: string): string {
+  return text.replace(/(\d+)\^(\d+)/g, '$1<sup>$2</sup>');
+}
+
 export function MarkdownRenderer({ content }: MarkdownRendererProps) {
+  const processed = preprocessSuperscripts(content);
+
   return (
     <div className="prose-dark space-y-3">
       <ReactMarkdown
+        rehypePlugins={[rehypeRaw]}
         components={{
           h1: ({ children }) => (
             <h1 className="font-['Outfit'] font-bold text-[#f0f6fc] text-2xl mt-4 mb-2">{children}</h1>
@@ -75,7 +84,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
           ),
         }}
       >
-        {content}
+        {processed}
       </ReactMarkdown>
     </div>
   );

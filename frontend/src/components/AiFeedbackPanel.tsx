@@ -1,4 +1,5 @@
 import { Sparkles } from 'lucide-react';
+import { MarkdownRenderer } from './MarkdownRenderer';
 
 interface AiFeedbackPanelProps {
   feedback: string | null;
@@ -22,9 +23,7 @@ export function AiFeedbackPanel({ feedback, loading }: AiFeedbackPanelProps) {
             <div className="h-4 bg-[#161b22] rounded animate-pulse w-4/6" />
           </div>
         ) : feedback ? (
-          <p className="text-[#8b949e] leading-relaxed whitespace-pre-wrap">
-            {feedback}
-          </p>
+          <MarkdownRenderer content={feedback} />
         ) : (
           <p className="text-[#484f58]">
             Submit your solution to receive AI feedback
