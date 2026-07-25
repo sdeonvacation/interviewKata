@@ -27,7 +27,7 @@ class AiServiceTest {
 
     @BeforeEach
     void setUp() {
-        aiService = new AiService(chatClient);
+        aiService = new AiService(chatClient, null);
     }
 
     @Test
