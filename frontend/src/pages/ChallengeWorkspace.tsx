@@ -6,6 +6,7 @@ import { CodeEditor } from '@/components/CodeEditor';
 import { TestResultPanel, TestResult } from '@/components/TestResultPanel';
 import { AiFeedbackPanel } from '@/components/AiFeedbackPanel';
 import { DifficultyBadge } from '@/components/DifficultyBadge';
+import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { Timer } from '@/components/Timer';
 import { useTimer } from '@/hooks/useTimer';
 import { Play, ChevronDown, ChevronRight, Lightbulb, CheckCircle, Eye } from 'lucide-react';
@@ -127,9 +128,9 @@ export function ChallengeWorkspace() {
         {/* Left panel - problem description */}
         <div className="w-2/5 card overflow-y-auto">
           <h2 className="text-sm font-semibold text-[#f0f6fc] mb-3">Problem Description</h2>
-          <p className="text-sm text-[#8b949e] whitespace-pre-wrap leading-relaxed">
-            {challenge.problemStatement}
-          </p>
+          <div className="text-sm">
+            <MarkdownRenderer content={challenge.problemStatement} />
+          </div>
 
           {/* Hints accordion */}
           {challenge.hints.length > 0 && (
