@@ -42,12 +42,18 @@ public class ChallengeController {
     public ResponseEntity<SubmissionResultDto> submitSolution(
             @PathVariable UUID id,
             @Valid @RequestBody SubmitCodeRequest request) {
-        return ResponseEntity.ok(challengeService.submitSolution(id, request.code()));
+        return ResponseEntity.ok(challengeService.submitSolution(id, request.code(), true));
+    }
+
+    @PostMapping("/{id}/run-tests")
+    public ResponseEntity<SubmissionResultDto> runTests(
+            @PathVariable UUID id,
+            @Valid @RequestBody SubmitCodeRequest request) {
+        return ResponseEntity.ok(challengeService.submitSolution(id, request.code(), false));
     }
 
     @PostMapping("/run")
     public ResponseEntity<Map<String, String>> runCode(@Valid @RequestBody SubmitCodeRequest request) {
-        // Placeholder: echo back the code (real JShell execution in Phase 4)
         return ResponseEntity.ok(Map.of("output", "// Code received (" + request.code().length() + " chars). Execution not yet implemented."));
     }
 }

@@ -85,7 +85,7 @@ public class ChallengeService {
     }
 
     @Transactional
-    public SubmissionResultDto submitSolution(UUID challengeId, String code) {
+    public SubmissionResultDto submitSolution(UUID challengeId, String code, boolean withAiReview) {
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new EntityNotFoundException("Challenge not found: " + challengeId));
 
@@ -108,12 +108,14 @@ public class ChallengeService {
                 .executionTimeMs((int) testResult.totalDurationMs())
                 .build();
 
-        // Generate AI code review (non-blocking failure)
-        try {
-            String aiReview = aiService.reviewCode(code, challenge.getProblemStatement());
-            submission.setAiReview(aiReview);
-        } catch (Exception e) {
-            log.warn("Failed to generate AI code review for challenge {}: {}", challengeId, e.getMessage());
+        // Generate AI code review only if requested
+        if (withAiReview) {
+            try {
+                String aiReview = aiService.reviewCode(code, challenge.getProblemStatement());
+                submission.setAiReview(aiReview);
+            } catch (Exception e) {
+                log.warn("Failed to generate AI code review for challenge {}: {}", challengeId, e.getMessage());
+            }
         }
 
         Submission saved = submissionRepository.save(submission);

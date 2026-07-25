@@ -9,7 +9,7 @@ import { DifficultyBadge } from '@/components/DifficultyBadge';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { Timer } from '@/components/Timer';
 import { useTimer } from '@/hooks/useTimer';
-import { Play, ChevronDown, ChevronRight, Lightbulb, CheckCircle, Eye } from 'lucide-react';
+import { Play, ChevronDown, ChevronRight, Lightbulb, CheckCircle, Eye, Sparkles } from 'lucide-react';
 
 export function ChallengeWorkspace() {
   const { id } = useParams<{ id: string }>();
@@ -56,6 +56,31 @@ export function ChallengeWorkspace() {
     setSubmitting(true);
     setError(null);
     try {
+      const result = await post<Submission>(`/challenges/${id}/run-tests`, { code });
+      setSubmission(result);
+      const results: TestResult[] = (result.testResults ?? []).map((tr, i) => ({
+        name: `Test ${i + 1}`,
+        passed: (tr as Record<string, unknown>).passed === true,
+      }));
+      setTestResults(results);
+      setBottomExpanded(true);
+
+      if (result.status === SubmissionStatus.PASSED) {
+        const updated = await get<ChallengeDetail>(`/challenges/${id}`);
+        setChallenge(updated);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Submission failed');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSubmitForReview = async () => {
+    if (!id) return;
+    setSubmitting(true);
+    setError(null);
+    try {
       const result = await post<Submission>(`/challenges/${id}/submit`, { code });
       setSubmission(result);
       const results: TestResult[] = (result.testResults ?? []).map((tr, i) => ({
@@ -65,13 +90,12 @@ export function ChallengeWorkspace() {
       setTestResults(results);
       setBottomExpanded(true);
 
-      // Re-fetch challenge detail to get referenceSolution after solving
       if (result.status === SubmissionStatus.PASSED) {
         const updated = await get<ChallengeDetail>(`/challenges/${id}`);
         setChallenge(updated);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Submission failed');
+      setError(e instanceof Error ? e.message : 'Submit failed');
     } finally {
       setSubmitting(false);
     }
@@ -179,14 +203,24 @@ export function ChallengeWorkspace() {
               language={challenge.challengeType === 'SQL' ? 'sql' : 'java'}
             />
           </div>
-          <button
-            onClick={handleRunTests}
-            disabled={submitting}
-            className="btn-primary flex items-center justify-center gap-2 self-end disabled:opacity-50"
-          >
-            <Play className="w-4 h-4" />
-            {submitting ? 'Running...' : 'Run Tests'}
-          </button>
+          <div className="flex gap-2 self-end">
+            <button
+              onClick={handleRunTests}
+              disabled={submitting}
+              className="btn-secondary flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <Play className="w-4 h-4" />
+              {submitting ? 'Running...' : 'Run Tests'}
+            </button>
+            <button
+              onClick={handleSubmitForReview}
+              disabled={submitting}
+              className="btn-primary flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <Sparkles className="w-4 h-4" />
+              Submit for AI Review
+            </button>
+          </div>
           {error && (
             <p className="text-sm text-red-400">{error}</p>
           )}
