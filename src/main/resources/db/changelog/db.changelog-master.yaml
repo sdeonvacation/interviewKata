@@ -25,3 +25,5 @@ databaseChangeLog:
       file: db/changelog/012-challenge-spaced-repetition.yaml
   - include:
       file: db/changelog/013-challenge-reference-solution.yaml
+  - include:
+      file: db/changelog/014-add-card-version.yaml

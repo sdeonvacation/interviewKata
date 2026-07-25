@@ -12,6 +12,10 @@ import dev.interviewkata.model.enums.Difficulty;
 import dev.interviewkata.model.enums.SubmissionStatus;
 import dev.interviewkata.repository.ChallengeRepository;
 import dev.interviewkata.repository.SubmissionRepository;
+import dev.interviewkata.sandbox.JShellSandbox;
+import dev.interviewkata.sandbox.TestCase;
+import dev.interviewkata.sandbox.TestCaseResult;
+import dev.interviewkata.sandbox.TestResult;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Transactional(readOnly = true)

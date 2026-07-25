@@ -3,9 +3,11 @@ package dev.interviewkata.controller;
 import dev.interviewkata.dto.ChallengeDetailDto;
 import dev.interviewkata.dto.ChallengeDto;
 import dev.interviewkata.dto.SubmissionResultDto;
+import dev.interviewkata.dto.SubmitCodeRequest;
 import dev.interviewkata.model.enums.ChallengeType;
 import dev.interviewkata.model.enums.Difficulty;
 import dev.interviewkata.service.ChallengeService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,15 +41,13 @@ public class ChallengeController {
     @PostMapping("/{id}/submit")
     public ResponseEntity<SubmissionResultDto> submitSolution(
             @PathVariable UUID id,
-            @RequestBody Map<String, String> body) {
-        String code = body.get("code");
-        return ResponseEntity.ok(challengeService.submitSolution(id, code));
+            @Valid @RequestBody SubmitCodeRequest request) {
+        return ResponseEntity.ok(challengeService.submitSolution(id, request.code()));
     }
 
     @PostMapping("/run")
-    public ResponseEntity<Map<String, String>> runCode(@RequestBody Map<String, String> body) {
+    public ResponseEntity<Map<String, String>> runCode(@Valid @RequestBody SubmitCodeRequest request) {
         // Placeholder: echo back the code (real JShell execution in Phase 4)
-        String code = body.get("code");
-        return ResponseEntity.ok(Map.of("output", "// Code received (" + code.length() + " chars). Execution not yet implemented."));
+        return ResponseEntity.ok(Map.of("output", "// Code received (" + request.code().length() + " chars). Execution not yet implemented."));
     }
 }

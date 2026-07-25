@@ -13,4 +13,6 @@ public interface CardReviewRepository extends JpaRepository<CardReview, UUID> {
     List<CardReview> findByCardIdOrderByReviewedAtDesc(UUID cardId);
 
     List<CardReview> findBySessionId(UUID sessionId);
+
+    boolean existsBySessionIdAndCardId(UUID sessionId, UUID cardId);
 }

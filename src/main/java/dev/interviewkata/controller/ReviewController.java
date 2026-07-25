@@ -4,12 +4,12 @@ import dev.interviewkata.dto.GradeRequestDto;
 import dev.interviewkata.dto.GradeResultDto;
 import dev.interviewkata.dto.ReviewSessionDto;
 import dev.interviewkata.dto.SessionSummaryDto;
+import dev.interviewkata.dto.StartReviewRequest;
 import dev.interviewkata.service.ReviewSessionService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -23,12 +23,9 @@ public class ReviewController {
     }
 
     @PostMapping("/start")
-    public ResponseEntity<ReviewSessionDto> startSession(@RequestBody Map<String, Object> body) {
-        UUID topicId = body.containsKey("topicId") && body.get("topicId") != null
-                ? UUID.fromString((String) body.get("topicId"))
-                : null;
-        int limit = body.containsKey("limit") ? ((Number) body.get("limit")).intValue() : 20;
-        return ResponseEntity.ok(reviewSessionService.startSession(topicId, limit));
+    public ResponseEntity<ReviewSessionDto> startSession(@Valid @RequestBody StartReviewRequest request) {
+        int limit = request.limit() != null ? request.limit() : 20;
+        return ResponseEntity.ok(reviewSessionService.startSession(request.topicId(), limit));
     }
 
     @PostMapping("/{sessionId}/grade")

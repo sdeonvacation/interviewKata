@@ -2,16 +2,16 @@ package dev.interviewkata.controller;
 
 import dev.interviewkata.dto.DtoMapper;
 import dev.interviewkata.dto.InterviewTurnDto;
+import dev.interviewkata.dto.StartInterviewRequest;
+import dev.interviewkata.dto.SubmitAnswerRequest;
 import dev.interviewkata.model.InterviewTurn;
 import dev.interviewkata.model.MockInterview;
-import dev.interviewkata.model.enums.Difficulty;
-import dev.interviewkata.model.enums.TopicArea;
 import dev.interviewkata.service.MockInterviewEngine;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -25,18 +25,15 @@ public class InterviewController {
     }
 
     @PostMapping("/start")
-    public ResponseEntity<MockInterview> startInterview(@RequestBody Map<String, String> body) {
-        TopicArea topicArea = TopicArea.valueOf(body.get("topicArea"));
-        Difficulty difficulty = Difficulty.valueOf(body.get("difficulty"));
-        return ResponseEntity.ok(mockInterviewEngine.startInterview(topicArea, difficulty));
+    public ResponseEntity<MockInterview> startInterview(@Valid @RequestBody StartInterviewRequest request) {
+        return ResponseEntity.ok(mockInterviewEngine.startInterview(request.topicArea(), request.difficulty()));
     }
 
     @PostMapping("/{id}/answer")
     public ResponseEntity<InterviewTurnDto> submitAnswer(
             @PathVariable UUID id,
-            @RequestBody Map<String, String> body) {
-        String answer = body.get("answer");
-        InterviewTurn turn = mockInterviewEngine.submitAnswer(id, answer);
+            @Valid @RequestBody SubmitAnswerRequest request) {
+        InterviewTurn turn = mockInterviewEngine.submitAnswer(id, request.answer());
         return ResponseEntity.ok(DtoMapper.toDto(turn));
     }
 

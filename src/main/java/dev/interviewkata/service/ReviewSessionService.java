@@ -87,6 +87,11 @@ public class ReviewSessionService {
 
     @Transactional
     public GradeResultDto gradeCard(UUID sessionId, UUID cardId, int grade) {
+        // Verify card hasn't already been graded in this session
+        if (cardReviewRepository.existsBySessionIdAndCardId(sessionId, cardId)) {
+            throw new IllegalStateException("Card already graded in this session");
+        }
+
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new EntityNotFoundException("Card not found: " + cardId));
 
