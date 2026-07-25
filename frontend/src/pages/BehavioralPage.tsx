@@ -55,9 +55,15 @@ export default function BehavioralPage() {
 
   async function loadCategories() {
     try {
-      const topics = await get<Topic[]>('/topics?area=BEHAVIORAL');
-      const cats: BehavioralCategory[] = topics
-        .filter((t) => t.parentId !== null)
+      const allTopics = await get<Topic[]>('/topics');
+      const behavioralRoot = allTopics.find((t) => t.area === 'BEHAVIORAL');
+      if (!behavioralRoot) {
+        setCategories([]);
+        setLoading(false);
+        return;
+      }
+      const children = await get<Topic[]>(`/topics/${behavioralRoot.id}/children`);
+      const cats: BehavioralCategory[] = children
         .map((t) => ({
           name: t.name,
           icon: CATEGORY_ICONS[t.name] || Target,
