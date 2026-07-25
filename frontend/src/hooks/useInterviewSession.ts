@@ -10,6 +10,7 @@ interface UseInterviewSessionReturn {
   turns: InterviewTurn[];
   error: string | null;
   startInterview: (topicArea: string, difficulty: string) => void;
+  loadInterview: (id: string) => void;
   sendMessage: (content: string) => void;
   endInterview: () => void;
 }
@@ -36,6 +37,24 @@ function useInterviewSession(): UseInterviewSessionReturn {
         setState('active');
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Failed to start interview');
+        setState('idle');
+      }
+    },
+    []
+  );
+
+  const loadInterview = useCallback(
+    async (id: string) => {
+      setState('loading');
+      setError(null);
+      try {
+        const data = await get<MockInterview>(`/interviews/${id}`);
+        setInterview(data);
+        const fetchedTurns = await get<InterviewTurn[]>(`/interviews/${id}/turns`);
+        setTurns(fetchedTurns);
+        setState(data.state === 'COMPLETE' ? 'complete' : 'active');
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load interview');
         setState('idle');
       }
     },
@@ -79,6 +98,7 @@ function useInterviewSession(): UseInterviewSessionReturn {
     turns,
     error,
     startInterview,
+    loadInterview,
     sendMessage,
     endInterview,
   };

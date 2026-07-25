@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { useInterviewSession } from '@/hooks/useInterviewSession';
 import { ChatBubble } from '@/components/ChatBubble';
 import { Timer } from '@/components/Timer';
@@ -20,7 +21,8 @@ const TOPIC_LABELS: Record<TopicArea, string> = {
 };
 
 export function MockInterviewSession() {
-  const { state, interview, turns, error, startInterview, sendMessage, endInterview } =
+  const { id: interviewId } = useParams<{ id: string }>();
+  const { state, interview, turns, error, startInterview, loadInterview, sendMessage, endInterview } =
     useInterviewSession();
   const [input, setInput] = useState('');
   const [userMessages, setUserMessages] = useState<string[]>([]);
@@ -29,6 +31,13 @@ export function MockInterviewSession() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const DURATION_SECONDS = 30 * 60;
   const { timeLeft, isRunning, start: startTimer, stop: stopTimer } = useTimer(DURATION_SECONDS);
+
+  // If navigated with an interview ID (e.g., from Behavioral page), load it directly
+  useEffect(() => {
+    if (interviewId && interviewId !== 'new' && state === 'idle') {
+      loadInterview(interviewId);
+    }
+  }, [interviewId, state, loadInterview]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
