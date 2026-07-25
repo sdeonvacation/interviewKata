@@ -3,6 +3,7 @@ package dev.interviewkata.dto;
 import dev.interviewkata.model.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Stateless utility for converting entities to DTOs.
@@ -102,13 +103,33 @@ public final class DtoMapper {
     }
 
     public static DesignExerciseDto toDto(DesignExercise exercise) {
+        List<String> criteria = extractCriteria(exercise.getEvaluationRubric());
         return new DesignExerciseDto(
                 exercise.getId(),
                 exercise.getTopic().getId(),
                 exercise.getTitle(),
                 exercise.getDifficulty(),
-                exercise.getEstimatedMinutes()
+                exercise.getEstimatedMinutes(),
+                exercise.getPrompt(),
+                criteria
         );
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<String> extractCriteria(Map<String, Object> rubric) {
+        if (rubric == null) return List.of();
+        Object categories = rubric.get("categories");
+        if (!(categories instanceof List<?> catList)) return List.of();
+        List<String> result = new java.util.ArrayList<>();
+        for (Object cat : catList) {
+            if (cat instanceof Map<?, ?> catMap) {
+                Object name = catMap.get("name");
+                if (name instanceof String s) {
+                    result.add(s);
+                }
+            }
+        }
+        return result;
     }
 
     public static InterviewTurnDto toDto(InterviewTurn turn) {

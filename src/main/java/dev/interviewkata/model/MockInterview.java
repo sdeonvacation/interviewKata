@@ -49,6 +49,9 @@ public class MockInterview {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
+    @Column(columnDefinition = "TEXT")
+    private String feedback;
+
     @PrePersist
     protected void onCreate() {
         startedAt = LocalDateTime.now();

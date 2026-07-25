@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { get, post } from '@/api/client';
 import { Difficulty } from '@/types';
 import { AiFeedbackPanel } from '@/components/AiFeedbackPanel';
+import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { DifficultyBadge } from '@/components/DifficultyBadge';
 import { Send } from 'lucide-react';
 
@@ -38,7 +39,7 @@ export function DesignWorkspace() {
     setSubmitting(true);
     try {
       const result = await post<{ feedback: string }>(
-        `/exercises/${id}/evaluate`,
+        `/exercises/${id}/submit`,
         { answer }
       );
       setFeedback(result.feedback);
@@ -84,9 +85,7 @@ export function DesignWorkspace() {
         {/* Left panel - prompt & criteria */}
         <div className="w-2/5 space-y-4">
           <div className="card">
-            <p className="text-[#f0f6fc] text-sm whitespace-pre-wrap leading-relaxed">
-              {exercise.prompt}
-            </p>
+            <MarkdownRenderer content={exercise.prompt} />
           </div>
 
           <div className="card">

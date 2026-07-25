@@ -18,6 +18,8 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class DashboardService {
 
+    private static final int DAILY_SESSION_LIMIT = 20;
+
     private final CardRepository cardRepository;
     private final ProgressService progressService;
     private final DailyActivityRepository dailyActivityRepository;
@@ -34,7 +36,8 @@ public class DashboardService {
     }
 
     public DashboardDto getDashboard() {
-        long dueCardCount = cardRepository.countDueCards(LocalDateTime.now());
+        long totalDue = cardRepository.countDueCards(LocalDateTime.now());
+        long dueCardCount = Math.min(DAILY_SESSION_LIMIT, totalDue);
 
         int currentStreak = progressService.getCurrentStreak();
 

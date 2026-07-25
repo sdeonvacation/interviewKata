@@ -27,3 +27,5 @@ databaseChangeLog:
       file: db/changelog/013-challenge-reference-solution.yaml
   - include:
       file: db/changelog/014-add-card-version.yaml
+  - include:
+      file: db/changelog/015-add-interview-feedback.yaml

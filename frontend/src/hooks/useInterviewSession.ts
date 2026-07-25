@@ -71,6 +71,13 @@ function useInterviewSession(): UseInterviewSessionReturn {
           { answer: content }
         );
         setTurns((prev) => [...prev, response]);
+
+        // Auto-complete if WRAP_UP phase (final assessment)
+        if (response.phase === 'WRAP_UP') {
+          const updated = await get<MockInterview>(`/interviews/${interview.id}`);
+          setInterview(updated);
+          setState('complete');
+        }
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Failed to send message');
       }

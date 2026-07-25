@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useInterviewSession } from '@/hooks/useInterviewSession';
 import { ChatBubble } from '@/components/ChatBubble';
+import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { Timer } from '@/components/Timer';
 import { useTimer } from '@/hooks/useTimer';
 import { TopicArea, Difficulty } from '@/types';
@@ -191,6 +192,14 @@ export function MockInterviewSession() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Final AI Feedback */}
+          {interview?.feedback && (
+            <div className="bg-[#161b22] rounded-xl p-5 border border-white/[0.06]">
+              <h3 className="text-sm font-medium text-amber-400 mb-3">Final Assessment</h3>
+              <MarkdownRenderer content={interview.feedback} />
             </div>
           )}
         </div>

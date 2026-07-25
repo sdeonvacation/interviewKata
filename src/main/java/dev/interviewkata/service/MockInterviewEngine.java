@@ -75,6 +75,8 @@ public class MockInterviewEngine {
         return saved;
     }
 
+    private static final int MAX_TURNS = 8;
+
     @Transactional
     public InterviewTurn submitAnswer(UUID interviewId, String answer) {
         MockInterview interview = mockInterviewRepository.findById(interviewId)
@@ -94,9 +96,16 @@ public class MockInterviewEngine {
 
         // Determine next phase based on topic type
         int nextTurnNumber = turns.size() + 1;
-        InterviewPhase nextPhase = interview.getTopicArea() == TopicArea.BEHAVIORAL
-                ? determineBehavioralPhase(nextTurnNumber)
-                : determinePhase(nextTurnNumber);
+        boolean isFinalTurn = nextTurnNumber > MAX_TURNS;
+
+        InterviewPhase nextPhase;
+        if (isFinalTurn) {
+            nextPhase = InterviewPhase.WRAP_UP;
+        } else {
+            nextPhase = interview.getTopicArea() == TopicArea.BEHAVIORAL
+                    ? determineBehavioralPhase(nextTurnNumber)
+                    : determinePhase(nextTurnNumber);
+        }
 
         // Build transcript from all turns for context
         String transcript = buildTranscript(turns);
@@ -109,10 +118,19 @@ public class MockInterviewEngine {
                 .phase(nextPhase)
                 .build();
 
-        interview.setState(InterviewState.ASKING);
+        InterviewTurn savedTurn = interviewTurnRepository.save(nextTurn);
+
+        // Auto-complete on WRAP_UP
+        if (isFinalTurn) {
+            interview.setState(InterviewState.COMPLETE);
+            interview.setCompletedAt(LocalDateTime.now());
+            interview.setFeedback(nextQuestion);
+        } else {
+            interview.setState(InterviewState.ASKING);
+        }
         mockInterviewRepository.save(interview);
 
-        return interviewTurnRepository.save(nextTurn);
+        return savedTurn;
     }
 
     @Transactional

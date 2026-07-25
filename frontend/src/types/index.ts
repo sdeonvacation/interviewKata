@@ -146,6 +146,7 @@ export interface MockInterview {
   state: string;
   overallScore: number | null;
   categoryScores: Record<string, number> | null;
+  feedback: string | null;
   startedAt: string;
   completedAt: string | null;
 }

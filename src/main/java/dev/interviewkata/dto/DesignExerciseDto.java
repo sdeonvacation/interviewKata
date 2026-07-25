@@ -2,6 +2,7 @@ package dev.interviewkata.dto;
 
 import dev.interviewkata.model.enums.Difficulty;
 
+import java.util.List;
 import java.util.UUID;
 
 public record DesignExerciseDto(
@@ -9,6 +10,8 @@ public record DesignExerciseDto(
         UUID topicId,
         String title,
         Difficulty difficulty,
-        int estimatedMinutes
+        int estimatedMinutes,
+        String prompt,
+        List<String> evaluationCriteria
 ) {
 }

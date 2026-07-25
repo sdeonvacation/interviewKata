@@ -22,9 +22,9 @@ function SkeletonCard() {
   );
 }
 
-function TrainingPlan({ recommendations }: { recommendations: DailyRecommendation }) {
-  const { reviewCards, dsaChallenges, designExercise, motivationalMessage, revisionChallenges } = recommendations;
-  const hasRecommendations = reviewCards.length > 0 || dsaChallenges.length > 0 || designExercise || (revisionChallenges && revisionChallenges.length > 0);
+function TrainingPlan({ recommendations, dueCardCount }: { recommendations: DailyRecommendation; dueCardCount: number }) {
+  const { dsaChallenges, designExercise, motivationalMessage, revisionChallenges } = recommendations;
+  const hasRecommendations = dueCardCount > 0 || dsaChallenges.length > 0 || designExercise || (revisionChallenges && revisionChallenges.length > 0);
 
   if (!hasRecommendations) {
     return (
@@ -56,11 +56,11 @@ function TrainingPlan({ recommendations }: { recommendations: DailyRecommendatio
             </div>
             <h3 className="text-sm font-medium text-[#f0f6fc]">Knowledge Review</h3>
           </div>
-          {reviewCards.length > 0 ? (
+          {dueCardCount > 0 ? (
             <>
-              <p className="text-2xl font-bold text-amber-400">{reviewCards.length}</p>
+              <p className="text-2xl font-bold text-amber-400">{dueCardCount}</p>
               <p className="text-xs text-[#8b949e] mt-1">
-                card{reviewCards.length !== 1 ? 's' : ''} due for review
+                card{dueCardCount !== 1 ? 's' : ''} due for review
               </p>
               <div className="mt-3 pt-3 border-t border-white/[0.06]">
                 <span className="text-xs font-medium text-amber-400 group-hover:text-amber-300">
@@ -281,7 +281,7 @@ export function Dashboard() {
 
       {/* Today's Training Plan */}
       {recommendations && (
-        <TrainingPlan recommendations={recommendations} />
+        <TrainingPlan recommendations={recommendations} dueCardCount={data.dueCardCount} />
       )}
 
       {/* All Caught Up State */}
