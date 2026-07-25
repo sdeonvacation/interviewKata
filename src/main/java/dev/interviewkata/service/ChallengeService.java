@@ -36,15 +36,18 @@ public class ChallengeService {
     private final SubmissionRepository submissionRepository;
     private final AiService aiService;
     private final ChallengePracticeService practiceSer;
+    private final JShellSandbox jshellSandbox;
 
     public ChallengeService(ChallengeRepository challengeRepository,
                             SubmissionRepository submissionRepository,
                             AiService aiService,
-                            ChallengePracticeService practiceSer) {
+                            ChallengePracticeService practiceSer,
+                            JShellSandbox jshellSandbox) {
         this.challengeRepository = challengeRepository;
         this.submissionRepository = submissionRepository;
         this.aiService = aiService;
         this.practiceSer = practiceSer;
+        this.jshellSandbox = jshellSandbox;
     }
 
     public Page<ChallengeDto> listChallenges(ChallengeType type, Difficulty difficulty, int page) {
@@ -86,12 +89,23 @@ public class ChallengeService {
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new EntityNotFoundException("Challenge not found: " + challengeId));
 
-        // Placeholder: persist with PASSED status (real sandbox execution in Phase 4)
+        // Execute code against test cases in JShell sandbox
+        List<TestCase> testCases = mapTestCases(challenge.getTestCases());
+        String starterCode = challenge.getStarterCode();
+        TestResult testResult = jshellSandbox.executeWithTests(code, starterCode, testCases);
+
+        // Determine submission status
+        SubmissionStatus status = determineStatus(testResult);
+
+        // Build test results for persistence
+        List<Map<String, Object>> testResultMaps = mapTestResultsToJson(testResult);
+
         Submission submission = Submission.builder()
                 .challenge(challenge)
                 .code(code)
-                .status(SubmissionStatus.PASSED)
-                .testResults(List.of())
+                .status(status)
+                .testResults(testResultMaps)
+                .executionTimeMs((int) testResult.totalDurationMs())
                 .build();
 
         // Generate AI code review (non-blocking failure)
@@ -108,6 +122,69 @@ public class ChallengeService {
         practiceSer.scheduleNextPractice(challengeId);
 
         return DtoMapper.toDto(saved);
+    }
+
+    private List<TestCase> mapTestCases(List<Map<String, Object>> rawTestCases) {
+        if (rawTestCases == null || rawTestCases.isEmpty()) {
+            return List.of();
+        }
+        return rawTestCases.stream()
+                .map(tc -> new TestCase(
+                        (String) tc.get("input"),
+                        (String) tc.get("expected"),
+                        (String) tc.getOrDefault("description", "Test case")
+                ))
+                .toList();
+    }
+
+    private SubmissionStatus determineStatus(TestResult testResult) {
+        if (testResult.isTimeout()) {
+            return SubmissionStatus.TIMEOUT;
+        }
+        if (testResult.hasCompilationError()) {
+            return SubmissionStatus.ERROR;
+        }
+        if (testResult.allPassed()) {
+            return SubmissionStatus.PASSED;
+        }
+        return SubmissionStatus.FAILED;
+    }
+
+    private List<Map<String, Object>> mapTestResultsToJson(TestResult testResult) {
+        if (testResult.details() == null || testResult.details().isEmpty()) {
+            if (testResult.hasCompilationError()) {
+                return List.of(Map.of(
+                        "description", "Compilation",
+                        "passed", false,
+                        "error", testResult.compilationError()
+                ));
+            }
+            if (testResult.isTimeout()) {
+                return List.of(Map.of(
+                        "description", "Execution",
+                        "passed", false,
+                        "error", "Execution timed out"
+                ));
+            }
+            return List.of();
+        }
+        return testResult.details().stream()
+                .map(this::testCaseResultToMap)
+                .toList();
+    }
+
+    private Map<String, Object> testCaseResultToMap(TestCaseResult tcr) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("description", tcr.description());
+        map.put("passed", tcr.passed());
+        if (tcr.actual() != null) {
+            map.put("actual", tcr.actual());
+        }
+        map.put("expected", tcr.expected());
+        if (tcr.error() != null) {
+            map.put("error", tcr.error());
+        }
+        return map;
     }
 
     private boolean hasSolved(UUID challengeId) {
