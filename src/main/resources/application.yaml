@@ -18,16 +18,16 @@ spring:
   ai:
     openai:
       api-key: ${INTERVIEWKATA_AI_API_KEY:sk-placeholder}
-      base-url: https://generativelanguage.googleapis.com/v1beta/openai
+      base-url: ${INTERVIEWKATA_AI_BASE_URL:https://integrate.api.nvidia.com}
       chat:
         options:
-          model: ${INTERVIEWKATA_AI_MODEL:gemini-2.0-flash}
+          model: ${INTERVIEWKATA_AI_MODEL:openai/gpt-oss-120b}
           max-tokens: 4096
     anthropic:
       api-key: ${INTERVIEWKATA_ANTHROPIC_KEY:sk-placeholder}
       chat:
         options:
-          model: claude-sonnet-4-20250514
+          model: ${INTERVIEWKATA_ANTHROPIC_MODEL:claude-sonnet-4-20250514}
           max-tokens: 4096
 
 interviewkata:
@@ -47,8 +47,8 @@ interviewkata:
     cache-explanations: true
     fallback:
       api-key: ${INTERVIEWKATA_AI_FALLBACK_API_KEY:}
-      base-url: https://integrate.api.nvidia.com
-      model: ${INTERVIEWKATA_AI_FALLBACK_MODEL:meta/llama-3.1-8b-instruct}
+      base-url: ${INTERVIEWKATA_AI_FALLBACK_BASE_URL:https://generativelanguage.googleapis.com/v1beta/openai}
+      model: ${INTERVIEWKATA_AI_FALLBACK_MODEL:gemini-2.0-flash}
   seed:
     enabled: true
     path: classpath:seed/

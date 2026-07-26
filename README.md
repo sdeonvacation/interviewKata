@@ -27,7 +27,7 @@ Every AI surface renders **markdown**, uses **Java** for code examples, and is h
 - **Backend:** Java 21, Spring Boot 3.3, Spring AI, Spring Data JPA, Liquibase
 - **Database:** PostgreSQL 16 (Docker)
 - **Frontend:** React 18 + TypeScript, Vite, Tailwind CSS, lucide-react, react-markdown
-- **AI:** Google Gemini (primary) with NVIDIA Llama 3.1 fallback
+- **AI:** NVIDIA-hosted openai/gpt-oss-120b (primary) with Google Gemini fallback
 - **Testing:** JUnit 5, Mockito, Testcontainers (real Postgres integration/E2E)
 
 ---
@@ -40,14 +40,24 @@ Every AI surface renders **markdown**, uses **Java** for code examples, and is h
 - **Node 18+**
 - **Docker** (via [colima](https://github.com/abiosoft/colima) or Docker Desktop) for PostgreSQL
 
-### 1. Configure AI keys (optional but recommended)
+### 1. Configure AI (env-driven)
 
-The app runs without keys (AI features degrade gracefully), but for full functionality export:
+All AI provider settings — endpoint, model, and key for both the primary and fallback — are read from the environment (`application.yaml` only holds sane defaults). The app runs without keys (AI features degrade gracefully), but for full functionality export:
 
 ```bash
-export INTERVIEWKATA_AI_API_KEY="<your-google-gemini-key>"
-export INTERVIEWKATA_AI_FALLBACK_API_KEY="<your-nvidia-api-key>"   # optional fallback
+# Primary provider (default: NVIDIA-hosted openai/gpt-oss-120b)
+export INTERVIEWKATA_AI_PROVIDER="openai"        # primary client type: openai | anthropic
+export INTERVIEWKATA_AI_API_KEY="<your-nvidia-api-key>"
+export INTERVIEWKATA_AI_BASE_URL="https://integrate.api.nvidia.com"
+export INTERVIEWKATA_AI_MODEL="openai/gpt-oss-120b"
+
+# Fallback provider (default: Google Gemini)
+export INTERVIEWKATA_AI_FALLBACK_API_KEY="<your-google-gemini-key>"
+export INTERVIEWKATA_AI_FALLBACK_BASE_URL="https://generativelanguage.googleapis.com/v1beta/openai"
+export INTERVIEWKATA_AI_FALLBACK_MODEL="gemini-2.0-flash"
 ```
+
+Any provider with an OpenAI-compatible endpoint works — just point `*_BASE_URL` / `*_MODEL` / `*_API_KEY` at it. Only the API keys are strictly required; base-url and model fall back to the defaults above if unset.
 
 ### 2. Start everything with one command
 
@@ -122,7 +132,7 @@ Unit tests run anywhere. Integration/E2E tests use **Testcontainers** (real Post
 ```bash
 DOCKER_HOST=unix://$HOME/.colima/default/docker.sock \
 TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock \
-./gradlew test --console=plain
+./mvnw test
 ```
 
 Coverage includes end-to-end flows, error paths, **AI context-leak isolation**, prompt-injection guards, and session persistence.
@@ -165,7 +175,8 @@ Key settings in `src/main/resources/application.yaml`:
 | DB URL | `jdbc:postgresql://localhost:5436/interviewkata` |
 | Sandbox timeout | `5000 ms` |
 | SM-2 graduating interval | `21 days` |
-| AI provider toggle | `INTERVIEWKATA_AI_PROVIDER=openai` (Gemini via OpenAI-compat) or `anthropic` |
+| AI provider (primary / fallback) | NVIDIA `openai/gpt-oss-120b` (OpenAI-compat) / Google Gemini |
+| AI provider toggle | `INTERVIEWKATA_AI_PROVIDER=openai` (default) or `anthropic` |
 
 ---
 

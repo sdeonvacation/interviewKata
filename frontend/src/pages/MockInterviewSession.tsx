@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useInterviewSession } from '@/hooks/useInterviewSession';
 import { ChatBubble } from '@/components/ChatBubble';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { Timer } from '@/components/Timer';
 import { useTimer } from '@/hooks/useTimer';
 import { TopicArea, Difficulty } from '@/types';
-import { Send, Play, Square, Award, MessageSquare } from 'lucide-react';
+import { Send, Play, Square, Award, MessageSquare, History } from 'lucide-react';
 
 const TOPIC_AREAS = Object.values(TopicArea);
 const DIFFICULTIES = Object.values(Difficulty);
@@ -23,6 +23,7 @@ const TOPIC_LABELS: Record<TopicArea, string> = {
 
 export function MockInterviewSession() {
   const { id: interviewId } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { state, interview, turns, error, startInterview, loadInterview, sendMessage, endInterview } =
     useInterviewSession();
   const [input, setInput] = useState('');
@@ -139,6 +140,14 @@ export function MockInterviewSession() {
           >
             <Play className="w-4 h-4" />
             {state === 'loading' ? 'Starting...' : 'Start Interview'}
+          </button>
+
+          <button
+            onClick={() => navigate('/interviews/history')}
+            className="w-full flex items-center justify-center gap-2 text-sm text-[#8b949e] hover:text-[#f0f6fc] transition-colors mt-1"
+          >
+            <History className="w-4 h-4" />
+            View past interviews
           </button>
         </div>
       </div>

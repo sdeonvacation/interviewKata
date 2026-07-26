@@ -1,10 +1,7 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import Dashboard from '@/pages/Dashboard';
-import TopicBrowser from '@/pages/TopicBrowser';
 import ReviewSession from '@/pages/ReviewSession';
-import GuidePage from '@/pages/GuidePage';
-import QuizSession from '@/pages/QuizSession';
 import ChallengeList from '@/pages/ChallengeList';
 import ChallengeWorkspace from '@/pages/ChallengeWorkspace';
 import DesignExerciseList from '@/pages/DesignExerciseList';
@@ -23,10 +20,9 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/topics" element={<TopicBrowser />} />
+          {/* Topics browser merged into Study & Learn */}
+          <Route path="/topics" element={<Navigate to="/study" replace />} />
           <Route path="/review" element={<ReviewSession />} />
-          <Route path="/guides/:id" element={<GuidePage />} />
-          <Route path="/quiz/:id" element={<QuizSession />} />
           <Route path="/challenges" element={<ChallengeList />} />
           <Route path="/challenges/:id" element={<ChallengeWorkspace />} />
           <Route path="/exercises" element={<DesignExerciseList />} />

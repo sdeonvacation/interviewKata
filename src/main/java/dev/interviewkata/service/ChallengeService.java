@@ -127,6 +127,89 @@ public class ChallengeService {
         return DtoMapper.toDto(saved);
     }
 
+    /**
+     * Summary of a reference-solution backfill run.
+     * remaining = challenges still lacking a solution after this run.
+     */
+    public record BackfillResult(int attempted, int succeeded, int failed, int skipped, long remaining) {
+    }
+
+    /**
+     * Backfills AI-generated, test-verified reference solutions for challenges that lack one.
+     * A solution is only saved if it passes ALL of the challenge's test cases in the sandbox.
+     * Idempotent: only targets challenges without a solution, so re-running resumes the remainder.
+     *
+     * @param limit                    max challenges to process this run
+     * @param maxAttemptsPerChallenge  AI generation+verification attempts per challenge (min 1)
+     */
+    @Transactional
+    public BackfillResult backfillReferenceSolutions(int limit, int maxAttemptsPerChallenge) {
+        int attempts = Math.max(maxAttemptsPerChallenge, 1);
+        List<Challenge> candidates = challengeRepository.findWithoutReferenceSolution();
+        List<Challenge> batch = candidates.stream().limit(Math.max(limit, 0)).toList();
+
+        int attempted = 0;
+        int succeeded = 0;
+        int failed = 0;
+        int skipped = 0;
+
+        for (Challenge challenge : batch) {
+            try {
+                List<Map<String, Object>> rawTestCases = challenge.getTestCases();
+                if (rawTestCases == null || rawTestCases.isEmpty()) {
+                    skipped++;
+                    log.info("Backfill SKIP (no test cases): {}", challenge.getTitle());
+                    continue;
+                }
+
+                attempted++;
+                List<TestCase> testCases = mapTestCases(rawTestCases);
+                boolean solved = false;
+
+                for (int attempt = 1; attempt <= attempts && !solved; attempt++) {
+                    String solution = aiService.generateReferenceSolution(
+                            challenge.getTitle(),
+                            challenge.getProblemStatement(),
+                            challenge.getStarterCode());
+
+                    if (solution == null || solution.isBlank()) {
+                        log.info("Backfill attempt {}/{} produced empty solution: {}",
+                                attempt, attempts, challenge.getTitle());
+                        continue;
+                    }
+
+                    TestResult result = jshellSandbox.executeWithTests(
+                            solution, challenge.getStarterCode(), testCases);
+
+                    if (result.allPassed()) {
+                        challenge.setReferenceSolution(solution);
+                        challengeRepository.save(challenge);
+                        solved = true;
+                        log.info("Backfill PASS ({}/{} tests) attempt {}/{}: {}",
+                                result.passed(), result.total(), attempt, attempts, challenge.getTitle());
+                    } else {
+                        log.info("Backfill FAIL ({}/{} tests) attempt {}/{}: {}",
+                                result.passed(), result.total(), attempt, attempts, challenge.getTitle());
+                    }
+                }
+
+                if (solved) {
+                    succeeded++;
+                } else {
+                    failed++;
+                }
+            } catch (Exception e) {
+                failed++;
+                log.warn("Backfill ERROR for challenge '{}': {}", challenge.getTitle(), e.getMessage());
+            }
+        }
+
+        long remaining = challengeRepository.findWithoutReferenceSolution().size();
+        log.info("Backfill run complete: attempted={}, succeeded={}, failed={}, skipped={}, remaining={}",
+                attempted, succeeded, failed, skipped, remaining);
+        return new BackfillResult(attempted, succeeded, failed, skipped, remaining);
+    }
+
     private List<TestCase> mapTestCases(List<Map<String, Object>> rawTestCases) {
         if (rawTestCases == null || rawTestCases.isEmpty()) {
             return List.of();

@@ -67,6 +67,37 @@ public class AiService {
     }
 
     /**
+     * Generate a complete Java reference solution for a coding challenge.
+     * Returns raw Java code with any markdown code fences stripped.
+     * On AI failure, returns an empty string (caller treats blank as "no solution").
+     */
+    public String generateReferenceSolution(String title, String problemStatement, String starterCode) {
+        String prompt = String.format(
+                PromptTemplates.REFERENCE_SOLUTION_PROMPT,
+                title,
+                problemStatement,
+                starterCode == null ? "" : starterCode);
+        String response = callAi(prompt, "");
+        return stripCodeFences(response);
+    }
+
+    /**
+     * Strips leading/trailing markdown code fences (```java ... ```) from AI output.
+     * Mirrors the fence-stripping used in CardService.parseAndCreateCards.
+     */
+    private String stripCodeFences(String response) {
+        if (response == null) {
+            return "";
+        }
+        String code = response.strip();
+        if (code.startsWith("```")) {
+            code = code.replaceFirst("```(?:java)?\\s*", "");
+            code = code.replaceFirst("\\s*```$", "");
+        }
+        return code.strip();
+    }
+
+    /**
      * Generate quiz questions for a topic.
      * Returns JSON array of question objects.
      */

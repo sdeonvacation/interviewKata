@@ -49,6 +49,18 @@ public final class PromptTemplates {
             "Evaluation Rubric: %s\n\n" +
             "Evaluate this answer and return JSON.";
 
+    public static final String REFERENCE_SOLUTION_PROMPT =
+            "You are a senior engineer. Write a COMPLETE, CORRECT Java solution to the following coding problem.\n\n" +
+            "Problem Title: %s\n\n" +
+            "Problem Statement:\n%s\n\n" +
+            "Starter Code (match this method signature exactly):\n%s\n\n" +
+            "REQUIREMENTS:\n" +
+            "- Output ONLY the Java code. No markdown fences, no prose, no explanation.\n" +
+            "- The code must compile and pass all tests.\n" +
+            "- Match the method signature implied by the starter code (same name, parameters, return type).\n" +
+            "- Provide a full working implementation, not a stub.\n\n" +
+            ANTI_HALLUCINATION;
+
     public static final String CODE_REVIEW_PROMPT =
             "You are a senior software engineer conducting a code review. " +
             "Review the following code solution for a programming challenge.\n\n" +

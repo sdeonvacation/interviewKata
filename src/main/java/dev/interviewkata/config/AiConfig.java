@@ -19,10 +19,10 @@ public class AiConfig {
     @Value("${interviewkata.ai.fallback.api-key:#{null}}")
     private String fallbackApiKey;
 
-    @Value("${interviewkata.ai.fallback.base-url:https://integrate.api.nvidia.com/v1}")
+    @Value("${interviewkata.ai.fallback.base-url:https://generativelanguage.googleapis.com/v1beta/openai}")
     private String fallbackBaseUrl;
 
-    @Value("${interviewkata.ai.fallback.model:nvidia/llama-3.1-nemotron-70b-instruct}")
+    @Value("${interviewkata.ai.fallback.model:gemini-2.0-flash}")
     private String fallbackModel;
 
     @Bean

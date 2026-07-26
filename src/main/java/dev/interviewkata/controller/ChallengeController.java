@@ -57,4 +57,11 @@ public class ChallengeController {
     public ResponseEntity<Map<String, String>> runCode(@Valid @RequestBody SubmitCodeRequest request) {
         return ResponseEntity.ok(Map.of("output", "// Code received (" + request.code().length() + " chars). Execution not yet implemented."));
     }
+
+    @PostMapping("/backfill-solutions")
+    public ResponseEntity<ChallengeService.BackfillResult> backfill(
+            @RequestParam(defaultValue = "20") int limit,
+            @RequestParam(defaultValue = "2") int attempts) {
+        return ResponseEntity.ok(challengeService.backfillReferenceSolutions(limit, attempts));
+    }
 }

@@ -6,6 +6,7 @@ import dev.interviewkata.model.enums.Difficulty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -27,4 +28,8 @@ public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
             LocalDateTime date, int maxCount, Pageable pageable);
 
     List<Challenge> findByTitle(String title);
+
+    /** Challenges lacking a reference solution (null or empty). */
+    @Query("SELECT c FROM Challenge c WHERE c.referenceSolution IS NULL OR c.referenceSolution = ''")
+    List<Challenge> findWithoutReferenceSolution();
 }

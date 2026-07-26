@@ -8,7 +8,7 @@ InterviewKata is a full-stack software-engineering interview prep platform:
 - **Backend:** Java 21 + Spring Boot 3.3 (`src/main/java/dev/interviewkata/`)
 - **Frontend:** React 18 + TypeScript + Vite + Tailwind (`frontend/src/`)
 - **DB:** PostgreSQL 16 via Docker (colima), Liquibase migrations
-- **AI:** Spring AI → Google Gemini (primary) + NVIDIA Llama 3.1 (fallback)
+- **AI:** Spring AI → NVIDIA-hosted gpt-oss-120b (primary) + Google Gemini (fallback)
 
 ## Golden Rules
 
@@ -26,19 +26,19 @@ make test         # full suite
 # Integration/E2E tests need Docker (Testcontainers):
 DOCKER_HOST=unix://$HOME/.colima/default/docker.sock \
 TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock \
-./gradlew test --console=plain
+./mvnw test
 ```
 
-- Backend jar: `./gradlew bootJar` → `build/libs/interviewkata-0.0.1-SNAPSHOT.jar`
+- Backend jar: `./mvnw -DskipTests package` → `target/interviewkata-0.0.1-SNAPSHOT.jar`
 - Frontend typecheck: `cd frontend && tsc --noEmit`
 - Run idempotent commands (tests, builds) **once**; tee output to a file and grep it rather than re-running.
 
 ## Environment Gotchas (IMPORTANT)
 
 - **DB runs on colima `default` profile.** Use `DOCKER_HOST=unix://$HOME/.colima/default/docker.sock` for docker commands. DB port is `5436` (host) → `5432` (container).
-- **Testcontainers + colima:** docker-java 3.3.6 negotiates Docker API v1.32 which modern colima rejects. `build.gradle.kts` sets `systemProperty("api.version","1.43")` on the test task and passes through `DOCKER_HOST`/`TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE` (test workers don't inherit Gradle sysprops).
-- **Lombok:** entities use `@Data`/`@Builder`. Editor/LSP will show false "method builder()/getX() undefined" errors — **ignore them; trust `./gradlew compileJava`.**
-- **`make dev` never orphans:** `stop` kills by port (`lsof -ti tcp:5050`) to catch the child JVM that `gradle bootRun` forks. Don't revert to PID-only kills.
+- **Testcontainers + colima:** docker-java 3.3.6 negotiates Docker API v1.32 which modern colima rejects. `pom.xml`'s `maven-surefire-plugin` sets `api.version=1.43` (overridable with `-Dapi.version=<ver>`), and surefire forks inherit `DOCKER_HOST`/`TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE` from the shell env.
+- **Lombok:** entities use `@Data`/`@Builder`. Editor/LSP will show false "method builder()/getX() undefined" errors — **ignore them; trust `./mvnw compile`.**
+- **`make dev` never orphans:** `stop` kills by port (`lsof -ti tcp:5050`) to catch the child JVM that `mvn spring-boot:run` forks. Don't revert to PID-only kills.
 
 ## Backend Conventions
 
