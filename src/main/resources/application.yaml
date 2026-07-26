@@ -17,7 +17,7 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.yaml
   ai:
     openai:
-      api-key: ${JOBHUNTER_AI_API_KEY:sk-placeholder}
+      api-key: ${INTERVIEWKATA_AI_API_KEY:sk-placeholder}
       base-url: https://generativelanguage.googleapis.com/v1beta/openai
       chat:
         options:
@@ -46,7 +46,7 @@ interviewkata:
     max-interviews-per-day: 20
     cache-explanations: true
     fallback:
-      api-key: ${JOBHUNTER_AI_FALLBACK_API_KEY:}
+      api-key: ${INTERVIEWKATA_AI_FALLBACK_API_KEY:}
       base-url: https://integrate.api.nvidia.com
       model: ${INTERVIEWKATA_AI_FALLBACK_MODEL:meta/llama-3.1-8b-instruct}
   seed:

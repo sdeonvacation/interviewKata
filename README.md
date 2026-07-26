@@ -45,8 +45,8 @@ Every AI surface renders **markdown**, uses **Java** for code examples, and is h
 The app runs without keys (AI features degrade gracefully), but for full functionality export:
 
 ```bash
-export JOBHUNTER_AI_API_KEY="<your-google-gemini-key>"
-export JOBHUNTER_AI_FALLBACK_API_KEY="<your-nvidia-api-key>"   # optional fallback
+export INTERVIEWKATA_AI_API_KEY="<your-google-gemini-key>"
+export INTERVIEWKATA_AI_FALLBACK_API_KEY="<your-nvidia-api-key>"   # optional fallback
 ```
 
 ### 2. Start everything with one command
