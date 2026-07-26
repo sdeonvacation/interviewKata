@@ -1,6 +1,6 @@
 .PHONY: dev dev-backend dev-frontend stop stop-backend stop-frontend db db-stop db-backup db-restore test build clean
 
-GRADLE := $(shell command -v ./gradlew 2>/dev/null || command -v gradle)
+MVN := $(shell command -v ./mvnw 2>/dev/null || command -v mvn)
 DOCKER_HOST_VAR := unix://$(HOME)/.colima/default/docker.sock
 
 # Start everything (DB + backend + frontend) in background.
@@ -17,8 +17,8 @@ dev: stop db dev-backend dev-frontend
 
 dev-backend:
 	@echo "Starting backend..."
-	@$(GRADLE) bootRun > /tmp/interviewkata-backend.log 2>&1 & echo $$! > /tmp/interviewkata-backend.pid
-	@for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do \
+	@$(MVN) -q -DskipTests spring-boot:run > /tmp/interviewkata-backend.log 2>&1 & echo $$! > /tmp/interviewkata-backend.pid
+	@for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do \
 		sleep 1; \
 		if curl -sf http://localhost:5050/actuator/health > /dev/null 2>&1; then \
 			echo "  Backend UP on :5050"; \
@@ -36,7 +36,7 @@ dev-frontend:
 stop: stop-backend stop-frontend
 	@echo "Done"
 
-# Kill by PORT (authoritative) to catch orphaned child JVMs that gradle bootRun forks,
+# Kill by PORT (authoritative) to catch orphaned child JVMs that the build tool forks,
 # then clean up any tracked PID and its process group.
 stop-backend:
 	@-lsof -ti tcp:5050 2>/dev/null | xargs kill -9 2>/dev/null || true
@@ -68,12 +68,12 @@ db-restore:
 	@./db/restore.sh
 
 test:
-	$(GRADLE) test
+	$(MVN) test
 
 build:
-	$(GRADLE) bootJar
+	$(MVN) -DskipTests package
 	cd frontend && npm run build
 
 clean:
-	$(GRADLE) clean
+	$(MVN) clean
 	rm -rf frontend/dist

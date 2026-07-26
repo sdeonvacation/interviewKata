@@ -1,8 +1,8 @@
-# Gradle
+# Build output
 .gradle/
 build/
+target/
 bin/
-!gradle/wrapper/gradle-wrapper.jar
 
 # IDE
 .idea/
