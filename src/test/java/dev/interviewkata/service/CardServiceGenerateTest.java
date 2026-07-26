@@ -54,6 +54,8 @@ class CardServiceGenerateTest {
                 .name("Collections")
                 .area(TopicArea.JAVA_CORE)
                 .build();
+        // Existing cards are gathered for context; default to none (lenient — not every test reaches it).
+        lenient().when(cardRepository.findByTopicId(any())).thenReturn(List.of());
     }
 
     @Test
@@ -66,13 +68,13 @@ class CardServiceGenerateTest {
                 """;
 
         when(topicRepository.findById(topicId)).thenReturn(Optional.of(testTopic));
-        when(aiService.generateCards("Collections", "JAVA_CORE", 5)).thenReturn(aiResponse);
+        when(aiService.generateCards(eq("Collections"), eq("JAVA_CORE"), eq(5), anyList())).thenReturn(aiResponse);
         when(cardRepository.saveAll(anyList())).thenAnswer(inv -> inv.getArgument(0));
 
         List<CardDto> result = cardService.generateCardsForTopic(topicId);
 
         assertEquals(2, result.size());
-        verify(aiService).generateCards("Collections", "JAVA_CORE", 5);
+        verify(aiService).generateCards(eq("Collections"), eq("JAVA_CORE"), eq(5), anyList());
         verify(cardRepository).saveAll(anyList());
     }
 
@@ -82,13 +84,13 @@ class CardServiceGenerateTest {
         when(topicRepository.findById(unknownId)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> cardService.generateCardsForTopic(unknownId));
-        verify(aiService, never()).generateCards(any(), any(), anyInt());
+        verify(aiService, never()).generateCards(any(), any(), anyInt(), anyList());
     }
 
     @Test
     void generateCardsForTopic_aiReturnsEmptyArray_throws() {
         when(topicRepository.findById(topicId)).thenReturn(Optional.of(testTopic));
-        when(aiService.generateCards(any(), any(), anyInt())).thenReturn("[]");
+        when(aiService.generateCards(any(), any(), anyInt(), anyList())).thenReturn("[]");
 
         assertThrows(IllegalStateException.class, () -> cardService.generateCardsForTopic(topicId));
     }
@@ -96,7 +98,7 @@ class CardServiceGenerateTest {
     @Test
     void generateCardsForTopic_aiReturnsInvalidJson_throws() {
         when(topicRepository.findById(topicId)).thenReturn(Optional.of(testTopic));
-        when(aiService.generateCards(any(), any(), anyInt())).thenReturn("not json at all");
+        when(aiService.generateCards(any(), any(), anyInt(), anyList())).thenReturn("not json at all");
 
         assertThrows(IllegalStateException.class, () -> cardService.generateCardsForTopic(topicId));
     }
@@ -109,7 +111,7 @@ class CardServiceGenerateTest {
                 ```""";
 
         when(topicRepository.findById(topicId)).thenReturn(Optional.of(testTopic));
-        when(aiService.generateCards(any(), any(), anyInt())).thenReturn(aiResponse);
+        when(aiService.generateCards(any(), any(), anyInt(), anyList())).thenReturn(aiResponse);
         when(cardRepository.saveAll(anyList())).thenAnswer(inv -> inv.getArgument(0));
 
         List<CardDto> result = cardService.generateCardsForTopic(topicId);
@@ -128,7 +130,7 @@ class CardServiceGenerateTest {
                 """;
 
         when(topicRepository.findById(topicId)).thenReturn(Optional.of(testTopic));
-        when(aiService.generateCards(any(), any(), anyInt())).thenReturn(aiResponse);
+        when(aiService.generateCards(any(), any(), anyInt(), anyList())).thenReturn(aiResponse);
         when(cardRepository.saveAll(anyList())).thenAnswer(inv -> inv.getArgument(0));
 
         List<CardDto> result = cardService.generateCardsForTopic(topicId);
@@ -144,7 +146,7 @@ class CardServiceGenerateTest {
                 """;
 
         when(topicRepository.findById(topicId)).thenReturn(Optional.of(testTopic));
-        when(aiService.generateCards(any(), any(), anyInt())).thenReturn(aiResponse);
+        when(aiService.generateCards(any(), any(), anyInt(), anyList())).thenReturn(aiResponse);
         when(cardRepository.saveAll(anyList())).thenAnswer(inv -> inv.getArgument(0));
 
         List<CardDto> result = cardService.generateCardsForTopic(topicId);
@@ -159,7 +161,7 @@ class CardServiceGenerateTest {
                 """;
 
         when(topicRepository.findById(topicId)).thenReturn(Optional.of(testTopic));
-        when(aiService.generateCards(any(), any(), anyInt())).thenReturn(aiResponse);
+        when(aiService.generateCards(any(), any(), anyInt(), anyList())).thenReturn(aiResponse);
         when(cardRepository.saveAll(anyList())).thenAnswer(inv -> inv.getArgument(0));
 
         @SuppressWarnings("unchecked")
@@ -187,7 +189,7 @@ class CardServiceGenerateTest {
                 """;
 
         when(topicRepository.findById(topicId)).thenReturn(Optional.of(testTopic));
-        when(aiService.generateCards(any(), any(), anyInt())).thenReturn(aiResponse);
+        when(aiService.generateCards(any(), any(), anyInt(), anyList())).thenReturn(aiResponse);
         when(cardRepository.saveAll(anyList())).thenAnswer(inv -> inv.getArgument(0));
 
         List<CardDto> result = cardService.generateCardsForTopic(topicId);
@@ -202,7 +204,7 @@ class CardServiceGenerateTest {
                 """;
 
         when(topicRepository.findById(topicId)).thenReturn(Optional.of(testTopic));
-        when(aiService.generateCards(any(), any(), anyInt())).thenReturn(aiResponse);
+        when(aiService.generateCards(any(), any(), anyInt(), anyList())).thenReturn(aiResponse);
         when(cardRepository.saveAll(anyList())).thenAnswer(inv -> inv.getArgument(0));
 
         List<CardDto> result = cardService.generateCardsForTopic(topicId);

@@ -129,6 +129,7 @@ export interface Submission {
   testResults: Record<string, unknown>[] | null;
   aiReview: string | null;
   executionTimeMs: number | null;
+  code: string | null;
 }
 
 export interface DesignExercise {

@@ -64,6 +64,11 @@ export function ReviewSession() {
     ? ((currentIndex + 1) / session.totalCards) * 100
     : 0;
 
+  // Distinct topics covered by the loaded session (for coverage clarity).
+  const coveredTopics = session
+    ? Array.from(new Set(session.cards.map((c) => c.topicName).filter(Boolean)))
+    : [];
+
   const handleShowAnswer = () => {
     setIsFlipped(true);
     showAnswer();
@@ -72,9 +77,33 @@ export function ReviewSession() {
   return (
     <div className="min-h-screen bg-[#06090f] px-4 py-10">
       <div className="max-w-2xl mx-auto space-y-8">
-        <h1 className="text-2xl font-bold text-[#f0f6fc] tracking-tight">
-          Review Session
-        </h1>
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-[#f0f6fc] tracking-tight">
+            Review Session
+          </h1>
+          <p className="text-sm text-[#8b949e]">
+            {topicId
+              ? 'Cards from this topic that are due, surfaced by spaced repetition.'
+              : 'Cards due across all your topics, surfaced by spaced repetition (SM-2).'}{' '}
+            These are your saved cards resurfacing when due — not generated on the spot.
+          </p>
+          {coveredTopics.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              <span className="text-xs text-[#484f58]">Covering:</span>
+              {coveredTopics.slice(0, 8).map((t) => (
+                <span
+                  key={t}
+                  className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-400/90 border border-amber-500/20"
+                >
+                  {t}
+                </span>
+              ))}
+              {coveredTopics.length > 8 && (
+                <span className="text-xs text-[#484f58]">+{coveredTopics.length - 8} more</span>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Error state */}
         {error && (
@@ -119,7 +148,12 @@ export function ReviewSession() {
             </div>
 
             {/* Flash card */}
-            <div className="flex justify-center">
+            <div className="flex flex-col items-center gap-3">
+              {currentCard.topicName && (
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#161b22] text-[#8b949e] border border-white/[0.06]">
+                  {currentCard.topicName}
+                </span>
+              )}
               <FlashCard
                 front={currentCard.front}
                 back={currentCard.back}

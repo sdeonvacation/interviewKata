@@ -98,7 +98,8 @@ public final class DtoMapper {
                 submission.getStatus(),
                 submission.getTestResults(),
                 submission.getAiReview(),
-                submission.getExecutionTimeMs()
+                submission.getExecutionTimeMs(),
+                submission.getCode()
         );
     }
 

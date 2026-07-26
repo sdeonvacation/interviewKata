@@ -33,12 +33,21 @@ export function ChallengeWorkspace() {
     get<ChallengeDetail>(`/challenges/${id}`)
       .then((c) => {
         setChallenge(c);
-        setCode(c.starterCode ?? '');
+        // Restore code with priority: local draft (unsubmitted edits) → latest submitted code → starter.
+        const draft = localStorage.getItem(`challenge-code-${id}`);
+        const lastSubmittedCode = c.submissions?.find((s) => s.code)?.code ?? null;
+        setCode(draft ?? lastSubmittedCode ?? c.starterCode ?? '');
         timer.start();
       })
       .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load challenge'))
       .finally(() => setLoading(false));
   }, [id]);
+
+  // Persist the working code locally so it survives refresh / navigation.
+  const handleCodeChange = (value: string) => {
+    setCode(value);
+    if (id) localStorage.setItem(`challenge-code-${id}`, value);
+  };
 
   const toggleHint = (index: number) => {
     setExpandedHints((prev) => {
@@ -208,7 +217,7 @@ export function ChallengeWorkspace() {
           <div className="flex-1 min-h-0 card !p-0 overflow-hidden">
             <CodeEditor
               value={code}
-              onChange={setCode}
+              onChange={handleCodeChange}
               language={challenge.challengeType === 'SQL' ? 'sql' : 'java'}
             />
           </div>

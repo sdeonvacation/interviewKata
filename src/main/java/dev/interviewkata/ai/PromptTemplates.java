@@ -80,16 +80,21 @@ public final class PromptTemplates {
             "Generate exactly %d flashcards for the following topic.\n\n" +
             "Topic: %s\n" +
             "Area: %s\n\n" +
+            "%s" +
+            "Prioritize the MOST FREQUENTLY ASKED, high-yield questions that actually appear in real " +
+            "software-engineering interviews for this topic (the kind repeatedly asked at top tech companies). " +
+            "Favor commonly-tested concepts over obscure trivia.\n\n" +
             "Each flashcard should test a key concept, definition, or practical knowledge point. " +
             "Return a JSON array where each element has:\n" +
             "{\"front\": \"<question or concept to recall>\", \"back\": \"<concise answer>\", " +
             "\"difficulty\": \"EASY|MEDIUM|HARD\", \"tags\": [\"<relevant-tag>\"]}\n\n" +
             "Guidelines:\n" +
             "- Mix difficulties: 2 EASY, 2 MEDIUM, 1 HARD\n" +
-            "- Front should be a clear question or prompt\n" +
-            "- Back should be a concise but complete answer\n" +
+            "- All flashcards in THIS set must be unique (no duplicate questions within the batch)\n" +
+            "- Front should be a clear question or prompt commonly posed by interviewers\n" +
+            "- Back should be a concise but complete answer, using Java for any code\n" +
             "- Tags should be 1-3 relevant keywords\n" +
-            "- Focus on interview-relevant knowledge\n\n" +
+            "- Only include factually correct content; do NOT invent APIs, signatures, or benchmarks\n\n" +
             "Return ONLY the JSON array, no other text.";
 
     public static final String INTERVIEW_PROMPT =

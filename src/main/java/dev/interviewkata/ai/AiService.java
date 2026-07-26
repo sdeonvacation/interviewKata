@@ -80,7 +80,25 @@ public class AiService {
      * Returns JSON array of card objects with front, back, difficulty, tags.
      */
     public String generateCards(String topicName, String area, int count) {
-        String prompt = String.format(PromptTemplates.CARD_GENERATION_PROMPT, count, topicName, area);
+        return generateCards(topicName, area, count, java.util.List.of());
+    }
+
+    /**
+     * Generate fresh cards, instructing the model to avoid repeating existing questions.
+     */
+    public String generateCards(String topicName, String area, int count, java.util.List<String> existingFronts) {
+        String avoidBlock = "";
+        if (existingFronts != null && !existingFronts.isEmpty()) {
+            String list = existingFronts.stream()
+                    .limit(60)
+                    .map(f -> "- " + f)
+                    .collect(java.util.stream.Collectors.joining("\n"));
+            avoidBlock = "For reference, these questions already exist for this topic:\n" + list + "\n\n"
+                    + "Prefer introducing fresh questions and new angles, BUT it is fine to revisit the "
+                    + "most critical, frequently-asked interview hotspots again (repetition of high-yield "
+                    + "questions aids retention). Avoid verbatim duplicates of trivial cards.\n\n";
+        }
+        String prompt = String.format(PromptTemplates.CARD_GENERATION_PROMPT, count, topicName, area, avoidBlock);
         return callAi(prompt, "[]");
     }
 

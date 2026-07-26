@@ -11,6 +11,7 @@ public record SubmissionResultDto(
         SubmissionStatus status,
         List<Map<String, Object>> testResults,
         String aiReview,
-        Integer executionTimeMs
+        Integer executionTimeMs,
+        String code
 ) {
 }

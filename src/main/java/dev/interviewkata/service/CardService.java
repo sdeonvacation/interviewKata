@@ -71,14 +71,33 @@ public class CardService {
         Topic topic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new EntityNotFoundException("Topic not found: " + topicId));
 
+        // Pass existing fronts as context so the AI can add fresh angles while still
+        // being free to resurface the most frequently-asked interview hotspots.
+        List<String> existingFronts = cardRepository.findByTopicId(topicId).stream()
+                .map(Card::getFront)
+                .toList();
+
         String aiResponse = aiService.generateCards(
                 topic.getName(),
                 topic.getArea().name(),
-                DEFAULT_CARD_COUNT
+                DEFAULT_CARD_COUNT,
+                existingFronts
         );
 
-        List<Card> cards = parseAndCreateCards(aiResponse, topic);
-        List<Card> saved = cardRepository.saveAll(cards);
+        List<Card> parsed = parseAndCreateCards(aiResponse, topic);
+
+        // De-duplicate WITHIN this batch only (each of the N generated cards must be unique).
+        // Similarity to cards from previous generations is allowed on purpose (hotspot revision).
+        List<Card> unique = new ArrayList<>();
+        java.util.Set<String> seen = new java.util.HashSet<>();
+        for (Card card : parsed) {
+            String key = card.getFront() == null ? "" : card.getFront().trim().toLowerCase().replaceAll("\\s+", " ");
+            if (seen.add(key)) {
+                unique.add(card);
+            }
+        }
+
+        List<Card> saved = cardRepository.saveAll(unique);
         return saved.stream().map(DtoMapper::toDto).toList();
     }
 

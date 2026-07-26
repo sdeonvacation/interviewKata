@@ -36,7 +36,7 @@ class ChallengeControllerTest {
         UUID id = UUID.randomUUID();
         SubmitCodeRequest request = new SubmitCodeRequest("System.out.println(\"hello\");");
         SubmissionResultDto dto = new SubmissionResultDto(
-                UUID.randomUUID(), SubmissionStatus.PASSED, List.of(), "Good job", 100);
+                UUID.randomUUID(), SubmissionStatus.PASSED, List.of(), "Good job", 100, "System.out.println(\"hello\");");
         when(challengeService.submitSolution(id, "System.out.println(\"hello\");", true)).thenReturn(dto);
 
         ResponseEntity<SubmissionResultDto> result = controller.submitSolution(id, request);

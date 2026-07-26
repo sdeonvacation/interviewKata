@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { get } from '@/api/client';
-import { Topic } from '@/types';
+import { get, post } from '@/api/client';
+import { Topic, Card } from '@/types';
 import {
   GraduationCap,
   ChevronRight,
@@ -9,6 +9,8 @@ import {
   History,
   Loader2,
   BookOpen,
+  Layers,
+  Sparkles,
 } from 'lucide-react';
 
 const AREA_LABELS: Record<string, string> = {
@@ -30,9 +32,12 @@ function TopicRow({
   depth: number;
   onStudy: (id: string) => void;
 }) {
+  const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
   const [children, setChildren] = useState<Topic[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [cardCount, setCardCount] = useState(topic.cardCount);
+  const [generating, setGenerating] = useState(false);
 
   const hasChildren = topic.childCount > 0;
 
@@ -50,6 +55,19 @@ function TopicRow({
       }
     }
     setExpanded((v) => !v);
+  };
+
+  const handleGenerate = async () => {
+    if (generating) return;
+    setGenerating(true);
+    try {
+      const cards = await post<Card[]>(`/topics/${topic.id}/generate-cards`, {});
+      setCardCount((c) => c + cards.length);
+    } catch {
+      // silent; leave count unchanged
+    } finally {
+      setGenerating(false);
+    }
   };
 
   return (
@@ -74,18 +92,41 @@ function TopicRow({
             <span className="w-4 shrink-0" />
           )}
           <span className="text-[#f0f6fc] text-sm">{topic.name}</span>
-          {topic.cardCount > 0 && (
-            <span className="text-[#484f58] text-xs">{topic.cardCount} cards</span>
+          <span className="text-[#484f58] text-xs">{cardCount} cards</span>
+        </button>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            onClick={handleGenerate}
+            disabled={generating}
+            title="Generate fresh cards with AI (most frequently asked questions)"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-[#161b22] text-[#8b949e] hover:text-amber-400 hover:bg-amber-500/10 border border-white/[0.06] transition-colors disabled:opacity-50"
+          >
+            {generating ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Sparkles className="w-3.5 h-3.5" />
+            )}
+            Generate
+          </button>
+          {cardCount > 0 && (
+            <button
+              onClick={() => navigate(`/review?topicId=${topic.id}&includeChildren=true`)}
+              title="Review this topic's flashcards"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-[#161b22] text-[#8b949e] hover:text-amber-400 hover:bg-amber-500/10 border border-white/[0.06] transition-colors"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              Cards
+            </button>
           )}
-        </button>
-        <button
-          onClick={() => onStudy(topic.id)}
-          className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors shrink-0"
-          title="Study this topic with the AI tutor"
-        >
-          <GraduationCap className="w-3.5 h-3.5" />
-          Study
-        </button>
+          <button
+            onClick={() => onStudy(topic.id)}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+            title="Study this topic with the AI tutor"
+          >
+            <GraduationCap className="w-3.5 h-3.5" />
+            Study
+          </button>
+        </div>
       </div>
       {expanded && children && children.length > 0 && (
         <div>
