@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict U0Rx7dBcQRcWrcDrOmcTtQn1BB9kRLI5sf3xVGLVeJiAhnidL0HmO311wrgPwLn
+\restrict zsCh4UojvnlnbgZPca9gEAdfRv2Fh8brWXgvejYciLvhLbeRMNrYwDOadfTAhCO
 
 -- Dumped from database version 16.14
 -- Dumped by pg_dump version 16.14
@@ -1716,5 +1716,5 @@ ALTER TABLE ONLY public.user_progress
 -- PostgreSQL database dump complete
 --
 
-\unrestrict U0Rx7dBcQRcWrcDrOmcTtQn1BB9kRLI5sf3xVGLVeJiAhnidL0HmO311wrgPwLn
+\unrestrict zsCh4UojvnlnbgZPca9gEAdfRv2Fh8brWXgvejYciLvhLbeRMNrYwDOadfTAhCO
 
