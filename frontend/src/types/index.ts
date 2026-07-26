@@ -159,6 +159,17 @@ export interface InterviewTurn {
   isComplete: boolean;
 }
 
+export interface InterviewSummary {
+  id: string;
+  topicArea: string;
+  difficulty: string;
+  state: string;
+  startedAt: string;
+  completedAt: string | null;
+  turnCount: number;
+  overallScore: number | null;
+}
+
 export interface TodayActivity {
   cardsReviewed: number;
   challengesSolved: number;
@@ -200,6 +211,34 @@ export interface DashboardData {
   todayActivity: TodayActivity;
   weakAreas: string[];
   recentSessions: unknown[];
+}
+
+export interface StudyMessageDto {
+  role: string;
+  content: string;
+  sequence: number;
+}
+
+export interface StudySessionDto {
+  id: string;
+  topicId: string;
+  topicName: string;
+  topicArea: string;
+  startedAt: string;
+  lastActivityAt: string;
+  messageCount: number;
+  messages: StudyMessageDto[] | null;
+}
+
+export interface StudySessionSummary {
+  id: string;
+  topicId: string;
+  topicName: string;
+  topicArea: string;
+  startedAt: string;
+  lastActivityAt: string;
+  messageCount: number;
+  preview: string;
 }
 
 export interface DailyRecommendation {

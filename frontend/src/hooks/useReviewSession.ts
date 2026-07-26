@@ -22,7 +22,7 @@ interface GradeResponse {
   cardsRemaining: number;
 }
 
-function useReviewSession(topicId?: string): UseReviewSessionReturn {
+function useReviewSession(topicId?: string, includeChildren?: boolean): UseReviewSessionReturn {
   const [state, setState] = useState<ReviewState>('idle');
   const [session, setSession] = useState<ReviewSessionData | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -38,6 +38,7 @@ function useReviewSession(topicId?: string): UseReviewSessionReturn {
     try {
       const body: Record<string, unknown> = { limit: 20 };
       if (topicId) body.topicId = topicId;
+      if (includeChildren) body.includeChildren = true;
       const data = await post<ReviewSessionData>('/reviews/start', body);
       setSession(data);
       setCurrentIndex(0);
@@ -46,7 +47,7 @@ function useReviewSession(topicId?: string): UseReviewSessionReturn {
       setError(e instanceof Error ? e.message : 'Failed to start session');
       setState('idle');
     }
-  }, [topicId]);
+  }, [topicId, includeChildren]);
 
   const showAnswer = useCallback(() => {
     if (state === 'reviewing') {

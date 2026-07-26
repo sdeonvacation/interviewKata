@@ -20,6 +20,7 @@ import dev.interviewkata.scheduling.SM2Scheduler.SM2Result;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,13 +60,19 @@ public class ReviewSessionService {
 
     @Transactional
     public ReviewSessionDto startSession(UUID topicId, int limit) {
+        return startSession(topicId, limit, false);
+    }
+
+    @Transactional
+    public ReviewSessionDto startSession(UUID topicId, int limit, boolean includeChildren) {
         int sessionSize = limit > 0 ? limit : 20;
         List<Card> dueCards;
 
         if (topicId != null) {
-            dueCards = cardRepository.findDueCardsByTopicId(
-                    topicId, LocalDateTime.now(),
-                    PageRequest.of(0, sessionSize)).getContent();
+            Page<Card> page = includeChildren
+                    ? cardRepository.findDueCardsByTopicOrParent(topicId, LocalDateTime.now(), PageRequest.of(0, sessionSize))
+                    : cardRepository.findDueCardsByTopicId(topicId, LocalDateTime.now(), PageRequest.of(0, sessionSize));
+            dueCards = page.getContent();
         } else {
             dueCards = cardRepository.findDueCards(
                     LocalDateTime.now(),

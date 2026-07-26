@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { TopicTree } from '../TopicTree';
 import { Topic, TopicArea } from '@/types';
 import * as client from '@/api/client';
@@ -58,17 +59,17 @@ describe('TopicTree - Generate Cards', () => {
   });
 
   it('does not show generate button for topics with cards', () => {
-    render(<TopicTree topics={mockTopicsWithCards} />);
+    render(<MemoryRouter><TopicTree topics={mockTopicsWithCards} /></MemoryRouter>);
     expect(screen.queryByText('Generate')).not.toBeInTheDocument();
   });
 
   it('shows generate button for topics with 0 cards', () => {
-    render(<TopicTree topics={mockTopicsWithZeroCards} />);
+    render(<MemoryRouter><TopicTree topics={mockTopicsWithZeroCards} /></MemoryRouter>);
     expect(screen.getByText('Generate')).toBeInTheDocument();
   });
 
   it('only shows generate button for zero-card topics', () => {
-    render(<TopicTree topics={mockTopicsWithZeroCards} />);
+    render(<MemoryRouter><TopicTree topics={mockTopicsWithZeroCards} /></MemoryRouter>);
     const generateButtons = screen.getAllByText('Generate');
     expect(generateButtons).toHaveLength(1); // Only Generics has 0 cards
   });
@@ -79,7 +80,7 @@ describe('TopicTree - Generate Cards', () => {
     ];
     vi.mocked(client.post).mockResolvedValue(mockCards);
 
-    render(<TopicTree topics={mockTopicsWithZeroCards} />);
+    render(<MemoryRouter><TopicTree topics={mockTopicsWithZeroCards} /></MemoryRouter>);
     fireEvent.click(screen.getByText('Generate'));
 
     await waitFor(() => {
@@ -90,7 +91,7 @@ describe('TopicTree - Generate Cards', () => {
   it('shows loading state while generating', async () => {
     vi.mocked(client.post).mockReturnValue(new Promise(() => {})); // Never resolves
 
-    render(<TopicTree topics={mockTopicsWithZeroCards} />);
+    render(<MemoryRouter><TopicTree topics={mockTopicsWithZeroCards} /></MemoryRouter>);
     fireEvent.click(screen.getByText('Generate'));
 
     await waitFor(() => {
@@ -106,7 +107,7 @@ describe('TopicTree - Generate Cards', () => {
     vi.mocked(client.post).mockResolvedValue(mockCards);
     const onCardsGenerated = vi.fn();
 
-    render(<TopicTree topics={mockTopicsWithZeroCards} onCardsGenerated={onCardsGenerated} />);
+    render(<MemoryRouter><TopicTree topics={mockTopicsWithZeroCards} onCardsGenerated={onCardsGenerated} /></MemoryRouter>);
     fireEvent.click(screen.getByText('Generate'));
 
     await waitFor(() => {
@@ -117,7 +118,7 @@ describe('TopicTree - Generate Cards', () => {
   it('shows error message on failure', async () => {
     vi.mocked(client.post).mockRejectedValue(new Error('AI service unavailable'));
 
-    render(<TopicTree topics={mockTopicsWithZeroCards} />);
+    render(<MemoryRouter><TopicTree topics={mockTopicsWithZeroCards} /></MemoryRouter>);
     fireEvent.click(screen.getByText('Generate'));
 
     await waitFor(() => {
@@ -129,7 +130,7 @@ describe('TopicTree - Generate Cards', () => {
     vi.mocked(client.post).mockResolvedValue([]);
     const onSelect = vi.fn();
 
-    render(<TopicTree topics={mockTopicsWithZeroCards} onSelect={onSelect} />);
+    render(<MemoryRouter><TopicTree topics={mockTopicsWithZeroCards} onSelect={onSelect} /></MemoryRouter>);
     fireEvent.click(screen.getByText('Generate'));
 
     // onSelect should NOT be called - stopPropagation prevents it
@@ -137,7 +138,7 @@ describe('TopicTree - Generate Cards', () => {
   });
 
   it('renders topic names and card counts', () => {
-    render(<TopicTree topics={mockTopicsWithCards} />);
+    render(<MemoryRouter><TopicTree topics={mockTopicsWithCards} /></MemoryRouter>);
     expect(screen.getByText('Collections')).toBeInTheDocument();
     expect(screen.getByText('Concurrency')).toBeInTheDocument();
     expect(screen.getByText('10 cards')).toBeInTheDocument();
@@ -146,13 +147,13 @@ describe('TopicTree - Generate Cards', () => {
 
   it('calls onSelect with clicked topic', () => {
     const onSelect = vi.fn();
-    render(<TopicTree topics={mockTopicsWithCards} onSelect={onSelect} />);
+    render(<MemoryRouter><TopicTree topics={mockTopicsWithCards} onSelect={onSelect} /></MemoryRouter>);
     fireEvent.click(screen.getByText('Concurrency'));
     expect(onSelect).toHaveBeenCalledWith(mockTopicsWithCards[1]);
   });
 
   it('renders empty state message when no topics', () => {
-    render(<TopicTree topics={[]} />);
+    render(<MemoryRouter><TopicTree topics={[]} /></MemoryRouter>);
     expect(screen.getByText('No subtopics found.')).toBeInTheDocument();
   });
 });

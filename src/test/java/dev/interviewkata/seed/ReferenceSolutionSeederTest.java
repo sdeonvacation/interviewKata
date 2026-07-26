@@ -52,7 +52,7 @@ class ReferenceSolutionSeederTest {
 
     @Test
     void seedSolutions_matchesByTitle_updatesSolution() {
-        when(challengeRepository.findByTitle("Two Sum")).thenReturn(Optional.of(challenge));
+        when(challengeRepository.findByTitle("Two Sum")).thenReturn(java.util.List.of(challenge));
         when(challengeRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
         // Trigger the seed — uses classpath resources
@@ -69,7 +69,7 @@ class ReferenceSolutionSeederTest {
     @Test
     void seedSolutions_challengeAlreadyHasSolution_doesNotOverwrite() {
         challenge.setReferenceSolution("Existing solution");
-        when(challengeRepository.findByTitle("Two Sum")).thenReturn(Optional.of(challenge));
+        when(challengeRepository.findByTitle("Two Sum")).thenReturn(java.util.List.of(challenge));
 
         seeder.seedSolutions();
 
@@ -78,7 +78,7 @@ class ReferenceSolutionSeederTest {
 
     @Test
     void seedSolutions_titleNotFound_skipsSilently() {
-        when(challengeRepository.findByTitle(any())).thenReturn(Optional.empty());
+        when(challengeRepository.findByTitle(any())).thenReturn(java.util.List.of());
 
         assertDoesNotThrow(() -> seeder.seedSolutions());
         verify(challengeRepository, never()).save(any());

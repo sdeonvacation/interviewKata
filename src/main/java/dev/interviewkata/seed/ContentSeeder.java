@@ -176,10 +176,8 @@ public class ContentSeeder {
      * Check if a challenge with the same title and topic already exists.
      */
     private boolean challengeExists(Challenge challenge) {
-        UUID topicId = challenge.getTopic().getId();
-        List<Challenge> existing = challengeRepository.findByTopicId(topicId);
-        return existing.stream()
-                .anyMatch(c -> c.getTitle().equals(challenge.getTitle()));
+        // Titles must be globally unique (a challenge can be reached from one topic only)
+        return !challengeRepository.findByTitle(challenge.getTitle()).isEmpty();
     }
 
     /**

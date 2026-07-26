@@ -82,7 +82,7 @@ class ChallengeServiceTest {
         when(challengeRepository.findAll(any(PageRequest.class))).thenReturn(page);
         when(submissionRepository.findByChallengeIdOrderBySubmittedAtDesc(any())).thenReturn(List.of());
 
-        Page<ChallengeDto> result = challengeService.listChallenges(null, null, 0);
+        Page<ChallengeDto> result = challengeService.listChallenges(null, null, 0, 20);
 
         assertEquals(1, result.getTotalElements());
         verify(challengeRepository).findAll(any(PageRequest.class));
@@ -96,7 +96,7 @@ class ChallengeServiceTest {
                 .thenReturn(page);
         when(submissionRepository.findByChallengeIdOrderBySubmittedAtDesc(any())).thenReturn(List.of());
 
-        Page<ChallengeDto> result = challengeService.listChallenges(ChallengeType.DSA, null, 0);
+        Page<ChallengeDto> result = challengeService.listChallenges(ChallengeType.DSA, null, 0, 20);
 
         assertEquals(1, result.getTotalElements());
         verify(challengeRepository).findByChallengeType(eq(ChallengeType.DSA), any(PageRequest.class));
@@ -109,7 +109,7 @@ class ChallengeServiceTest {
                 .thenReturn(page);
         when(submissionRepository.findByChallengeIdOrderBySubmittedAtDesc(any())).thenReturn(List.of());
 
-        Page<ChallengeDto> result = challengeService.listChallenges(null, Difficulty.EASY, 0);
+        Page<ChallengeDto> result = challengeService.listChallenges(null, Difficulty.EASY, 0, 20);
 
         assertEquals(1, result.getTotalElements());
         verify(challengeRepository).findByDifficulty(eq(Difficulty.EASY), any(PageRequest.class));
@@ -123,7 +123,7 @@ class ChallengeServiceTest {
                 .thenReturn(page);
         when(submissionRepository.findByChallengeIdOrderBySubmittedAtDesc(any())).thenReturn(List.of());
 
-        Page<ChallengeDto> result = challengeService.listChallenges(ChallengeType.DSA, Difficulty.EASY, 0);
+        Page<ChallengeDto> result = challengeService.listChallenges(ChallengeType.DSA, Difficulty.EASY, 0, 20);
 
         assertEquals(1, result.getTotalElements());
         verify(challengeRepository).findByChallengeTypeAndDifficulty(
@@ -135,7 +135,7 @@ class ChallengeServiceTest {
         Page<Challenge> page = new PageImpl<>(List.of());
         when(challengeRepository.findAll(any(PageRequest.class))).thenReturn(page);
 
-        Page<ChallengeDto> result = challengeService.listChallenges(null, null, 0);
+        Page<ChallengeDto> result = challengeService.listChallenges(null, null, 0, 20);
 
         assertEquals(0, result.getTotalElements());
         assertTrue(result.getContent().isEmpty());
@@ -155,7 +155,7 @@ class ChallengeServiceTest {
         when(jshellSandbox.executeWithTests(anyString(), anyString(), anyList())).thenReturn(testResult);
         when(submissionRepository.save(any(Submission.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        SubmissionResultDto dto = challengeService.submitSolution(challengeId, "user code");
+        SubmissionResultDto dto = challengeService.submitSolution(challengeId, "user code", false);
 
         assertEquals(SubmissionStatus.PASSED, dto.status());
         verify(jshellSandbox).executeWithTests(eq("user code"), anyString(), anyList());
@@ -175,7 +175,7 @@ class ChallengeServiceTest {
         when(jshellSandbox.executeWithTests(anyString(), anyString(), anyList())).thenReturn(testResult);
         when(submissionRepository.save(any(Submission.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        SubmissionResultDto dto = challengeService.submitSolution(challengeId, "bad code");
+        SubmissionResultDto dto = challengeService.submitSolution(challengeId, "bad code", false);
 
         assertEquals(SubmissionStatus.FAILED, dto.status());
     }
@@ -193,7 +193,7 @@ class ChallengeServiceTest {
         when(jshellSandbox.executeWithTests(anyString(), anyString(), anyList())).thenReturn(testResult);
         when(submissionRepository.save(any(Submission.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        SubmissionResultDto dto = challengeService.submitSolution(challengeId, "broken code");
+        SubmissionResultDto dto = challengeService.submitSolution(challengeId, "broken code", false);
 
         assertEquals(SubmissionStatus.ERROR, dto.status());
     }
@@ -211,7 +211,7 @@ class ChallengeServiceTest {
         when(jshellSandbox.executeWithTests(anyString(), anyString(), anyList())).thenReturn(testResult);
         when(submissionRepository.save(any(Submission.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        SubmissionResultDto dto = challengeService.submitSolution(challengeId, "while(true){}");
+        SubmissionResultDto dto = challengeService.submitSolution(challengeId, "while(true){}", false);
 
         assertEquals(SubmissionStatus.TIMEOUT, dto.status());
     }
@@ -230,7 +230,7 @@ class ChallengeServiceTest {
         when(jshellSandbox.executeWithTests(anyString(), anyString(), anyList())).thenReturn(testResult);
         when(submissionRepository.save(any(Submission.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        SubmissionResultDto dto = challengeService.submitSolution(challengeId, "code");
+        SubmissionResultDto dto = challengeService.submitSolution(challengeId, "code", false);
 
         assertEquals(123, dto.executionTimeMs());
     }
@@ -251,7 +251,7 @@ class ChallengeServiceTest {
         when(submissionRepository.save(any(Submission.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // Should not throw despite AI failure
-        SubmissionResultDto dto = challengeService.submitSolution(challengeId, "code");
+        SubmissionResultDto dto = challengeService.submitSolution(challengeId, "code", true);
 
         assertEquals(SubmissionStatus.PASSED, dto.status());
     }
@@ -272,7 +272,7 @@ class ChallengeServiceTest {
         ArgumentCaptor<Submission> captor = ArgumentCaptor.forClass(Submission.class);
         when(submissionRepository.save(captor.capture())).thenAnswer(inv -> inv.getArgument(0));
 
-        challengeService.submitSolution(challengeId, "code");
+        challengeService.submitSolution(challengeId, "code", false);
 
         Submission saved = captor.getValue();
         assertNotNull(saved.getTestResults());

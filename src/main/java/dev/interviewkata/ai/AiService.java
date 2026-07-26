@@ -36,6 +36,15 @@ public class AiService {
     }
 
     /**
+     * Answer a free-form question given a context (card content, challenge description, etc.)
+     */
+    public String answerQuestion(String question, String context) {
+        String userMessage = "Context:\n" + context + "\n\nQuestion: " + question;
+        return callAiWithSystem(PromptTemplates.ANSWER_QUESTION_SYSTEM_PROMPT, userMessage,
+                FALLBACK_PREFIX + "Unable to answer right now.");
+    }
+
+    /**
      * Evaluate a candidate's answer against a rubric.
      * Returns JSON with score, feedback, strengths, weaknesses.
      */
@@ -77,13 +86,26 @@ public class AiService {
 
     /**
      * Generate the next interview question based on transcript and phase.
+     * Rules go in the system role; the transcript goes in the user role so the model
+     * cannot confuse candidate input with interviewer instructions.
      */
     public String conductInterview(String transcript, String topic, String phase) {
+        String systemPrompt = String.format(PromptTemplates.INTERVIEW_PROMPT, topic, phase);
+        String userMessage = buildTranscriptMessage(transcript);
+        return callAiWithSystem(systemPrompt, userMessage, generateFallbackQuestion(topic, phase));
+    }
+
+    /**
+     * Conduct a study chat session — conversational AI tutoring on a topic.
+     * Full transcript is sent each turn to maintain context.
+     */
+    public String studyChat(String transcript, String topicName, String topicArea) {
+        String systemPrompt = String.format(PromptTemplates.STUDY_SYSTEM_PROMPT, topicName, topicArea);
         String effectiveTranscript = (transcript == null || transcript.isBlank())
                 ? "(No prior conversation)"
                 : transcript;
-        String prompt = String.format(PromptTemplates.INTERVIEW_PROMPT, topic, phase, effectiveTranscript);
-        return callAi(prompt, generateFallbackQuestion(topic, phase));
+        return callAiWithSystem(systemPrompt, effectiveTranscript,
+                "I'm having trouble connecting right now. Please try again.");
     }
 
     /**
@@ -91,12 +113,16 @@ public class AiService {
      * Uses a specialized prompt that evaluates answers for Situation, Task, Action, Result completeness.
      */
     public String conductBehavioralInterview(String transcript, String category, String phase) {
-        String effectiveTranscript = (transcript == null || transcript.isBlank())
-                ? "(No prior conversation)"
+        String systemPrompt = String.format(PromptTemplates.BEHAVIORAL_INTERVIEW_PROMPT, category, phase);
+        String userMessage = buildTranscriptMessage(transcript);
+        return callAiWithSystem(systemPrompt, userMessage, generateBehavioralFallbackQuestion(category, phase));
+    }
+
+    private String buildTranscriptMessage(String transcript) {
+        String effective = (transcript == null || transcript.isBlank())
+                ? "(No prior conversation — this is the first question.)"
                 : transcript;
-        String prompt = String.format(PromptTemplates.BEHAVIORAL_INTERVIEW_PROMPT,
-                category, phase, effectiveTranscript);
-        return callAi(prompt, generateBehavioralFallbackQuestion(category, phase));
+        return "Interview transcript so far:\n" + effective + "\n\nGenerate your response.";
     }
 
     private String callAi(String prompt, String fallback) {

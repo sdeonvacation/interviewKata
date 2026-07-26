@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { TopicTree } from '../TopicTree';
 import { Topic, TopicArea } from '@/types';
 
@@ -26,33 +27,51 @@ const mockTopics: Topic[] = [
   },
 ];
 
+function renderTree(props: Partial<Parameters<typeof TopicTree>[0]> = {}) {
+  return render(
+    <MemoryRouter>
+      <TopicTree topics={mockTopics} {...props} />
+    </MemoryRouter>
+  );
+}
+
 describe('TopicTree', () => {
   it('renders topic names', () => {
-    render(<TopicTree topics={mockTopics} />);
+    renderTree();
     expect(screen.getByText('Collections')).toBeInTheDocument();
     expect(screen.getByText('Concurrency')).toBeInTheDocument();
   });
 
   it('shows card counts', () => {
-    render(<TopicTree topics={mockTopics} />);
+    renderTree();
     expect(screen.getByText('10 cards')).toBeInTheDocument();
     expect(screen.getByText('8 cards')).toBeInTheDocument();
   });
 
   it('calls onSelect with clicked topic', () => {
     const onSelect = vi.fn();
-    render(<TopicTree topics={mockTopics} onSelect={onSelect} />);
+    renderTree({ onSelect });
     fireEvent.click(screen.getByText('Concurrency'));
     expect(onSelect).toHaveBeenCalledWith(mockTopics[1]);
   });
 
   it('renders empty state message when no topics', () => {
-    render(<TopicTree topics={[]} />);
+    render(
+      <MemoryRouter>
+        <TopicTree topics={[]} />
+      </MemoryRouter>
+    );
     expect(screen.getByText('No subtopics found.')).toBeInTheDocument();
   });
 
   it('does not crash when onSelect is not provided', () => {
-    render(<TopicTree topics={mockTopics} />);
+    renderTree();
     expect(() => fireEvent.click(screen.getByText('Collections'))).not.toThrow();
+  });
+
+  it('shows Study button for each topic', () => {
+    renderTree();
+    const studyButtons = screen.getAllByTitle('Study this topic with AI tutor');
+    expect(studyButtons).toHaveLength(2);
   });
 });

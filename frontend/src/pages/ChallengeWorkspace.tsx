@@ -5,6 +5,7 @@ import { get, post } from '@/api/client';
 import { CodeEditor } from '@/components/CodeEditor';
 import { TestResultPanel, TestResult } from '@/components/TestResultPanel';
 import { AiFeedbackPanel } from '@/components/AiFeedbackPanel';
+import { AskAiPanel } from '@/components/AskAiPanel';
 import { DifficultyBadge } from '@/components/DifficultyBadge';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { Timer } from '@/components/Timer';
@@ -186,8 +187,16 @@ export function ChallengeWorkspace() {
                       <div className="px-3 pb-3 pt-0">
                         <p className="text-sm text-[#8b949e] pl-6">{hint}</p>
                       </div>
-                    )}
-                  </div>
+          )}
+
+          {/* Ask AI */}
+          <div className="mt-6 border-t border-white/[0.06] pt-4">
+            <AskAiPanel
+              context={`Coding Challenge: ${challenge.title}\n\nProblem:\n${challenge.problemStatement}`}
+              placeholder="Ask about this problem..."
+            />
+          </div>
+        </div>
                 ))}
               </div>
             </div>

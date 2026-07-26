@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -16,4 +17,6 @@ public interface MockInterviewRepository extends JpaRepository<MockInterview, UU
     long countByStartedAtAfter(LocalDateTime since);
 
     Page<MockInterview> findByStateNot(InterviewState state, Pageable pageable);
+
+    List<MockInterview> findAllByOrderByStartedAtDesc();
 }

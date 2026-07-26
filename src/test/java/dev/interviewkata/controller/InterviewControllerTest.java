@@ -68,4 +68,29 @@ class InterviewControllerTest {
         assertEquals(200, result.getStatusCode().value());
         verify(mockInterviewEngine).submitAnswer(id, "My answer about polymorphism");
     }
+
+    @Test
+    void listInterviews_delegatesToService() {
+        var summary = new dev.interviewkata.dto.InterviewSummaryDto(
+                UUID.randomUUID(), "DSA", "MEDIUM", "COMPLETE",
+                java.time.LocalDateTime.now(), java.time.LocalDateTime.now(), 6, 8.0);
+        when(mockInterviewEngine.listInterviews()).thenReturn(java.util.List.of(summary));
+
+        var result = controller.listInterviews();
+
+        assertEquals(200, result.getStatusCode().value());
+        assertNotNull(result.getBody());
+        assertEquals(1, result.getBody().size());
+        verify(mockInterviewEngine).listInterviews();
+    }
+
+    @Test
+    void deleteInterview_delegatesToService() {
+        UUID id = UUID.randomUUID();
+
+        ResponseEntity<Void> result = controller.deleteInterview(id);
+
+        assertEquals(204, result.getStatusCode().value());
+        verify(mockInterviewEngine).deleteInterview(id);
+    }
 }

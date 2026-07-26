@@ -9,6 +9,8 @@ import {
   TrendingUp,
   Flame,
   Users,
+  GraduationCap,
+  History,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -25,10 +27,12 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/topics', label: 'Topics', icon: BookOpen },
+  { path: '/study', label: 'Study & Learn', icon: GraduationCap },
   { path: '/review', label: 'Review', icon: RefreshCw },
   { path: '/challenges', label: 'Coding', icon: Zap },
   { path: '/exercises', label: 'Design', icon: Target },
   { path: '/interviews/new', label: 'Interviews', icon: Mic },
+  { path: '/interviews/history', label: 'Interview History', icon: History },
   { path: '/behavioral', label: 'Behavioral', icon: Users },
   { path: '/progress', label: 'Progress', icon: TrendingUp },
 ];

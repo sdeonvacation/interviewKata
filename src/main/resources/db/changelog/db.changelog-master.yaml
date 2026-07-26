@@ -29,3 +29,5 @@ databaseChangeLog:
       file: db/changelog/014-add-card-version.yaml
   - include:
       file: db/changelog/015-add-interview-feedback.yaml
+  - include:
+      file: db/changelog/016-create-study-sessions.yaml

@@ -160,4 +160,28 @@ public final class DtoMapper {
                 session.getScore()
         );
     }
+
+    public static StudyMessageDto toDto(StudyConversationMessage message) {
+        return new StudyMessageDto(
+                message.getRole(),
+                message.getContent(),
+                message.getSequence()
+        );
+    }
+
+    public static StudySessionDto toDto(StudyConversation conversation, List<StudyConversationMessage> messages) {
+        List<StudyMessageDto> messageDtos = messages.stream()
+                .map(DtoMapper::toDto)
+                .toList();
+        return new StudySessionDto(
+                conversation.getId(),
+                conversation.getTopicId(),
+                conversation.getTopicName(),
+                conversation.getTopicArea(),
+                conversation.getStartedAt(),
+                conversation.getLastActivityAt(),
+                messageDtos.size(),
+                messageDtos
+        );
+    }
 }

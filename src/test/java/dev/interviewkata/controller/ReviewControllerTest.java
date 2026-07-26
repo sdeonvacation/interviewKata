@@ -32,39 +32,39 @@ class ReviewControllerTest {
     @Test
     void startSession_withTopicAndLimit_passesValues() {
         UUID topicId = UUID.randomUUID();
-        StartReviewRequest request = new StartReviewRequest(topicId, 10);
+        StartReviewRequest request = new StartReviewRequest(topicId, 10, null);
         ReviewSessionDto dto = new ReviewSessionDto(UUID.randomUUID(), List.of(), 0);
-        when(reviewSessionService.startSession(topicId, 10)).thenReturn(dto);
+        when(reviewSessionService.startSession(topicId, 10, false)).thenReturn(dto);
 
         ResponseEntity<ReviewSessionDto> result = controller.startSession(request);
 
         assertEquals(200, result.getStatusCode().value());
         assertEquals(dto, result.getBody());
-        verify(reviewSessionService).startSession(topicId, 10);
+        verify(reviewSessionService).startSession(topicId, 10, false);
     }
 
     @Test
     void startSession_nullLimit_defaults20() {
-        StartReviewRequest request = new StartReviewRequest(null, null);
+        StartReviewRequest request = new StartReviewRequest(null, null, null);
         ReviewSessionDto dto = new ReviewSessionDto(UUID.randomUUID(), List.of(), 0);
-        when(reviewSessionService.startSession(null, 20)).thenReturn(dto);
+        when(reviewSessionService.startSession(null, 20, false)).thenReturn(dto);
 
         ResponseEntity<ReviewSessionDto> result = controller.startSession(request);
 
         assertEquals(200, result.getStatusCode().value());
-        verify(reviewSessionService).startSession(null, 20);
+        verify(reviewSessionService).startSession(null, 20, false);
     }
 
     @Test
     void startSession_nullTopicId_passesNull() {
         UUID topicId = null;
-        StartReviewRequest request = new StartReviewRequest(topicId, 5);
+        StartReviewRequest request = new StartReviewRequest(topicId, 5, null);
         ReviewSessionDto dto = new ReviewSessionDto(UUID.randomUUID(), List.of(), 0);
-        when(reviewSessionService.startSession(null, 5)).thenReturn(dto);
+        when(reviewSessionService.startSession(null, 5, false)).thenReturn(dto);
 
         ResponseEntity<ReviewSessionDto> result = controller.startSession(request);
 
         assertEquals(200, result.getStatusCode().value());
-        verify(reviewSessionService).startSession(null, 5);
+        verify(reviewSessionService).startSession(null, 5, false);
     }
 }

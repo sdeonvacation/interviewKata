@@ -46,6 +46,7 @@ const CATEGORY_DESCRIPTIONS: Record<string, string> = {
 export default function BehavioralPage() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<BehavioralCategory[]>([]);
+  const [behavioralRootId, setBehavioralRootId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [startingInterview, setStartingInterview] = useState(false);
 
@@ -63,6 +64,7 @@ export default function BehavioralPage() {
         return;
       }
       const children = await get<Topic[]>(`/topics/${behavioralRoot.id}/children`);
+      setBehavioralRootId(behavioralRoot.id);
       const cats: BehavioralCategory[] = children
         .map((t) => ({
           name: t.name,
@@ -104,6 +106,15 @@ export default function BehavioralPage() {
   function handleReviewCards(topicId: string | null) {
     if (topicId) {
       navigate(`/review?topicId=${topicId}`);
+    } else {
+      navigate('/review');
+    }
+  }
+
+  function handleReviewAll() {
+    // Behavioral cards live under child topics — include children to review them all.
+    if (behavioralRootId) {
+      navigate(`/review?topicId=${behavioralRootId}&includeChildren=true`);
     } else {
       navigate('/review');
     }
@@ -174,7 +185,7 @@ export default function BehavioralPage() {
             German tech interview cultural notes.
           </p>
           <button
-            onClick={() => handleReviewCards(null)}
+            onClick={handleReviewAll}
             className="w-full px-4 py-2 rounded-lg bg-emerald-500/10 text-emerald-400 text-sm font-medium
               hover:bg-emerald-500/20 transition-colors border border-emerald-500/20"
           >

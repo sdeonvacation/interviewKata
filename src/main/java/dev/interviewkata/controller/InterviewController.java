@@ -1,6 +1,7 @@
 package dev.interviewkata.controller;
 
 import dev.interviewkata.dto.DtoMapper;
+import dev.interviewkata.dto.InterviewSummaryDto;
 import dev.interviewkata.dto.InterviewTurnDto;
 import dev.interviewkata.dto.StartInterviewRequest;
 import dev.interviewkata.dto.SubmitAnswerRequest;
@@ -50,5 +51,16 @@ public class InterviewController {
     @GetMapping("/{id}/turns")
     public ResponseEntity<List<InterviewTurnDto>> getTurns(@PathVariable UUID id) {
         return ResponseEntity.ok(mockInterviewEngine.getTurns(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<InterviewSummaryDto>> listInterviews() {
+        return ResponseEntity.ok(mockInterviewEngine.listInterviews());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteInterview(@PathVariable UUID id) {
+        mockInterviewEngine.deleteInterview(id);
+        return ResponseEntity.noContent().build();
     }
 }

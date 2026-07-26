@@ -33,6 +33,9 @@ public interface CardRepository extends JpaRepository<Card, UUID> {
     @Query("SELECT c FROM Card c WHERE c.topic.id = :topicId AND c.status != 'GRADUATED' AND (c.nextReview IS NULL OR c.nextReview <= :now) ORDER BY c.nextReview ASC NULLS FIRST")
     Page<Card> findDueCardsByTopicId(@Param("topicId") UUID topicId, @Param("now") LocalDateTime now, Pageable pageable);
 
+    @Query("SELECT c FROM Card c WHERE (c.topic.id = :topicId OR c.topic.parent.id = :topicId) AND c.status != 'GRADUATED' AND (c.nextReview IS NULL OR c.nextReview <= :now) ORDER BY c.nextReview ASC NULLS FIRST")
+    Page<Card> findDueCardsByTopicOrParent(@Param("topicId") UUID topicId, @Param("now") LocalDateTime now, Pageable pageable);
+
     @Query("SELECT COUNT(c) FROM Card c WHERE c.topic.id = :topicId OR c.topic.parent.id = :topicId")
     long countByTopicOrParent(@Param("topicId") UUID topicId);
 }

@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Seeds reference solutions into existing challenges by matching on title.
@@ -60,16 +59,17 @@ public class ReferenceSolutionSeeder {
             SolutionSeedFile seedFile = yamlMapper.readValue(is, SolutionSeedFile.class);
             int count = 0;
             for (SolutionEntry entry : seedFile.solutions) {
-                Optional<Challenge> challenge = challengeRepository.findByTitle(entry.title);
-                if (challenge.isPresent()) {
-                    Challenge c = challenge.get();
+                List<Challenge> matches = challengeRepository.findByTitle(entry.title);
+                if (matches.isEmpty()) {
+                    log.debug("No challenge found with title '{}' for solution seeding", entry.title);
+                    continue;
+                }
+                for (Challenge c : matches) {
                     if (c.getReferenceSolution() == null || c.getReferenceSolution().isBlank()) {
                         c.setReferenceSolution(entry.referenceSolution);
                         challengeRepository.save(c);
                         count++;
                     }
-                } else {
-                    log.debug("No challenge found with title '{}' for solution seeding", entry.title);
                 }
             }
             return count;

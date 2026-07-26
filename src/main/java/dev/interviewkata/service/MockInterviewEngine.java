@@ -1,6 +1,7 @@
 package dev.interviewkata.service;
 
 import dev.interviewkata.ai.AiService;
+import dev.interviewkata.dto.InterviewSummaryDto;
 import dev.interviewkata.dto.InterviewTurnDto;
 import dev.interviewkata.model.InterviewTurn;
 import dev.interviewkata.model.MockInterview;
@@ -13,11 +14,9 @@ import dev.interviewkata.repository.MockInterviewRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -32,27 +31,17 @@ public class MockInterviewEngine {
     private final MockInterviewRepository mockInterviewRepository;
     private final InterviewTurnRepository interviewTurnRepository;
     private final AiService aiService;
-    private final int maxInterviewsPerDay;
 
     public MockInterviewEngine(MockInterviewRepository mockInterviewRepository,
                                InterviewTurnRepository interviewTurnRepository,
-                               AiService aiService,
-                               @Value("${interviewkata.ai.max-interviews-per-day:3}") int maxInterviewsPerDay) {
+                               AiService aiService) {
         this.mockInterviewRepository = mockInterviewRepository;
         this.interviewTurnRepository = interviewTurnRepository;
         this.aiService = aiService;
-        this.maxInterviewsPerDay = maxInterviewsPerDay;
     }
 
     @Transactional
     public MockInterview startInterview(TopicArea topicArea, Difficulty difficulty) {
-        LocalDateTime todayStart = LocalDate.now().atStartOfDay();
-        long todayCount = mockInterviewRepository.countByStartedAtAfter(todayStart);
-
-        if (todayCount >= maxInterviewsPerDay) {
-            throw new RateLimitExceededException(
-                    "Daily interview limit reached (" + maxInterviewsPerDay + "/day)");
-        }
 
         MockInterview interview = MockInterview.builder()
                 .topicArea(topicArea)
@@ -75,7 +64,7 @@ public class MockInterviewEngine {
         return saved;
     }
 
-    private static final int MAX_TURNS = 8;
+    private static final String COMPLETE_SIGNAL = "[INTERVIEW_COMPLETE]";
 
     @Transactional
     public InterviewTurn submitAnswer(UUID interviewId, String answer) {
@@ -94,37 +83,32 @@ public class MockInterviewEngine {
         lastTurn.setAnsweredAt(LocalDateTime.now());
         interviewTurnRepository.save(lastTurn);
 
-        // Determine next phase based on topic type
         int nextTurnNumber = turns.size() + 1;
-        boolean isFinalTurn = nextTurnNumber > MAX_TURNS;
-
-        InterviewPhase nextPhase;
-        if (isFinalTurn) {
-            nextPhase = InterviewPhase.WRAP_UP;
-        } else {
-            nextPhase = interview.getTopicArea() == TopicArea.BEHAVIORAL
-                    ? determineBehavioralPhase(nextTurnNumber)
-                    : determinePhase(nextTurnNumber);
-        }
+        InterviewPhase nextPhase = interview.getTopicArea() == TopicArea.BEHAVIORAL
+                ? determineBehavioralPhase(nextTurnNumber)
+                : determinePhase(nextTurnNumber);
 
         // Build transcript from all turns for context
         String transcript = buildTranscript(turns);
-        String nextQuestion = generateQuestion(transcript, interview.getTopicArea(), nextPhase);
+        String aiResponse = generateQuestion(transcript, interview.getTopicArea(), nextPhase);
+
+        // Check if AI decided to end the interview
+        boolean aiEnded = aiResponse.contains(COMPLETE_SIGNAL);
+        String cleanResponse = aiResponse.replace(COMPLETE_SIGNAL, "").trim();
 
         InterviewTurn nextTurn = InterviewTurn.builder()
                 .interview(interview)
                 .turnNumber(nextTurnNumber)
-                .aiQuestion(nextQuestion)
-                .phase(nextPhase)
+                .aiQuestion(cleanResponse)
+                .phase(aiEnded ? InterviewPhase.WRAP_UP : nextPhase)
                 .build();
 
         InterviewTurn savedTurn = interviewTurnRepository.save(nextTurn);
 
-        // Auto-complete on WRAP_UP
-        if (isFinalTurn) {
+        if (aiEnded) {
             interview.setState(InterviewState.COMPLETE);
             interview.setCompletedAt(LocalDateTime.now());
-            interview.setFeedback(nextQuestion);
+            interview.setFeedback(cleanResponse);
         } else {
             interview.setState(InterviewState.ASKING);
         }
@@ -155,6 +139,31 @@ public class MockInterviewEngine {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<InterviewSummaryDto> listInterviews() {
+        return mockInterviewRepository.findAllByOrderByStartedAtDesc().stream()
+                .map(i -> new InterviewSummaryDto(
+                        i.getId(),
+                        i.getTopicArea().name(),
+                        i.getDifficulty().name(),
+                        i.getState().name(),
+                        i.getStartedAt(),
+                        i.getCompletedAt(),
+                        (int) interviewTurnRepository.countByInterviewId(i.getId()),
+                        i.getOverallScore()
+                ))
+                .toList();
+    }
+
+    @Transactional
+    public void deleteInterview(UUID interviewId) {
+        if (!mockInterviewRepository.existsById(interviewId)) {
+            throw new EntityNotFoundException("Interview not found: " + interviewId);
+        }
+        interviewTurnRepository.deleteByInterviewId(interviewId);
+        mockInterviewRepository.deleteById(interviewId);
+    }
+
     private InterviewPhase determinePhase(int turnNumber) {
         if (turnNumber <= 2) return InterviewPhase.INTRO;
         if (turnNumber <= 5) return InterviewPhase.TECHNICAL;
@@ -183,10 +192,21 @@ public class MockInterviewEngine {
                     StringBuilder sb = new StringBuilder();
                     sb.append("Interviewer: ").append(turn.getAiQuestion());
                     if (turn.getUserAnswer() != null) {
-                        sb.append("\nCandidate: ").append(turn.getUserAnswer());
+                        sb.append("\nCandidate: ").append(sanitizeAnswer(turn.getUserAnswer()));
                     }
                     return sb.toString();
                 })
                 .collect(Collectors.joining("\n\n"));
+    }
+
+    /**
+     * Strip role labels and control markers a candidate might inject to forge interviewer
+     * turns or trigger early completion.
+     */
+    private String sanitizeAnswer(String answer) {
+        return answer
+                .replaceAll("(?im)^\\s*(Interviewer|Candidate)\\s*:", "")
+                .replace(COMPLETE_SIGNAL, "")
+                .trim();
     }
 }

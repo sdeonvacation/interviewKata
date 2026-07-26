@@ -1,0 +1,85 @@
+databaseChangeLog:
+  - changeSet:
+      id: 016-create-study-conversation-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: study_conversation
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: topic_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: topic_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: topic_area
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: started_at
+                  type: timestamp without time zone
+                  defaultValueComputed: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_activity_at
+                  type: timestamp without time zone
+                  defaultValueComputed: now()
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 016-create-study-conversation-message-table
+      author: interviewkata
+      changes:
+        - createTable:
+            tableName: study_conversation_message
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: conversation_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_study_message_session
+                    references: study_conversation(id)
+              - column:
+                  name: role
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sequence
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp without time zone
+                  defaultValueComputed: now()
+                  constraints:
+                    nullable: false

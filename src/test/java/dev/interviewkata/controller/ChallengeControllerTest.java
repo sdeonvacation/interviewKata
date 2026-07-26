@@ -37,13 +37,13 @@ class ChallengeControllerTest {
         SubmitCodeRequest request = new SubmitCodeRequest("System.out.println(\"hello\");");
         SubmissionResultDto dto = new SubmissionResultDto(
                 UUID.randomUUID(), SubmissionStatus.PASSED, List.of(), "Good job", 100);
-        when(challengeService.submitSolution(id, "System.out.println(\"hello\");")).thenReturn(dto);
+        when(challengeService.submitSolution(id, "System.out.println(\"hello\");", true)).thenReturn(dto);
 
         ResponseEntity<SubmissionResultDto> result = controller.submitSolution(id, request);
 
         assertEquals(200, result.getStatusCode().value());
         assertEquals(dto, result.getBody());
-        verify(challengeService).submitSolution(id, "System.out.println(\"hello\");");
+        verify(challengeService).submitSolution(id, "System.out.println(\"hello\");", true);
     }
 
     @Test

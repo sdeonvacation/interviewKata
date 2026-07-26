@@ -34,6 +34,7 @@ class BehavioralAiServiceTest {
     @Test
     void conductBehavioralInterview_success_returnsResponse() {
         when(chatClient.prompt()).thenReturn(requestSpec);
+        when(requestSpec.system(anyString())).thenReturn(requestSpec);
         when(requestSpec.user(anyString())).thenReturn(requestSpec);
         when(requestSpec.call()).thenReturn(callResponseSpec);
         when(callResponseSpec.content()).thenReturn("Tell me about a time you led a team through a crisis.");
@@ -46,26 +47,31 @@ class BehavioralAiServiceTest {
     @Test
     void conductBehavioralInterview_usesCorrectPromptTemplate() {
         when(chatClient.prompt()).thenReturn(requestSpec);
+        when(requestSpec.system(anyString())).thenReturn(requestSpec);
         when(requestSpec.user(anyString())).thenReturn(requestSpec);
         when(requestSpec.call()).thenReturn(callResponseSpec);
         when(callResponseSpec.content()).thenReturn("response");
 
         aiService.conductBehavioralInterview("some transcript", "Teamwork", "PROBE");
 
-        ArgumentCaptor<String> promptCaptor = ArgumentCaptor.forClass(String.class);
-        verify(requestSpec).user(promptCaptor.capture());
+        // Rules go in the system message; transcript goes in the user message
+        ArgumentCaptor<String> systemCaptor = ArgumentCaptor.forClass(String.class);
+        verify(requestSpec).system(systemCaptor.capture());
+        String system = systemCaptor.getValue();
+        assertTrue(system.contains("behavioral interview"));
+        assertTrue(system.contains("Teamwork"));
+        assertTrue(system.contains("PROBE"));
+        assertTrue(system.contains("STAR"));
 
-        String prompt = promptCaptor.getValue();
-        assertTrue(prompt.contains("behavioral interview"));
-        assertTrue(prompt.contains("Teamwork"));
-        assertTrue(prompt.contains("PROBE"));
-        assertTrue(prompt.contains("some transcript"));
-        assertTrue(prompt.contains("STAR"));
+        ArgumentCaptor<String> userCaptor = ArgumentCaptor.forClass(String.class);
+        verify(requestSpec).user(userCaptor.capture());
+        assertTrue(userCaptor.getValue().contains("some transcript"));
     }
 
     @Test
     void conductBehavioralInterview_emptyTranscript_usesPlaceholder() {
         when(chatClient.prompt()).thenReturn(requestSpec);
+        when(requestSpec.system(anyString())).thenReturn(requestSpec);
         when(requestSpec.user(anyString())).thenReturn(requestSpec);
         when(requestSpec.call()).thenReturn(callResponseSpec);
         when(callResponseSpec.content()).thenReturn("Welcome!");
@@ -74,12 +80,13 @@ class BehavioralAiServiceTest {
 
         ArgumentCaptor<String> promptCaptor = ArgumentCaptor.forClass(String.class);
         verify(requestSpec).user(promptCaptor.capture());
-        assertTrue(promptCaptor.getValue().contains("(No prior conversation)"));
+        assertTrue(promptCaptor.getValue().contains("No prior conversation"));
     }
 
     @Test
     void conductBehavioralInterview_nullTranscript_usesPlaceholder() {
         when(chatClient.prompt()).thenReturn(requestSpec);
+        when(requestSpec.system(anyString())).thenReturn(requestSpec);
         when(requestSpec.user(anyString())).thenReturn(requestSpec);
         when(requestSpec.call()).thenReturn(callResponseSpec);
         when(callResponseSpec.content()).thenReturn("Welcome!");
@@ -88,7 +95,7 @@ class BehavioralAiServiceTest {
 
         ArgumentCaptor<String> promptCaptor = ArgumentCaptor.forClass(String.class);
         verify(requestSpec).user(promptCaptor.capture());
-        assertTrue(promptCaptor.getValue().contains("(No prior conversation)"));
+        assertTrue(promptCaptor.getValue().contains("No prior conversation"));
     }
 
     @Test

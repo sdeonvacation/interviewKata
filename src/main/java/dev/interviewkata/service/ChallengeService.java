@@ -50,8 +50,9 @@ public class ChallengeService {
         this.jshellSandbox = jshellSandbox;
     }
 
-    public Page<ChallengeDto> listChallenges(ChallengeType type, Difficulty difficulty, int page) {
-        PageRequest pageRequest = PageRequest.of(page, 20);
+    public Page<ChallengeDto> listChallenges(ChallengeType type, Difficulty difficulty, int page, int size) {
+        int cappedSize = Math.min(Math.max(size, 1), 300);
+        PageRequest pageRequest = PageRequest.of(page, cappedSize);
         Page<Challenge> challenges;
         if (type != null && difficulty != null) {
             challenges = challengeRepository.findByChallengeTypeAndDifficulty(type, difficulty, pageRequest);

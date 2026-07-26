@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public record StartReviewRequest(
         UUID topicId,
-        Integer limit
+        Integer limit,
+        Boolean includeChildren
 ) {
 }

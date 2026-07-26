@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Topic, Card } from '@/types';
 import { post } from '@/api/client';
-import { ChevronRight, Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import { ChevronRight, Sparkles, Loader2, AlertCircle, GraduationCap } from 'lucide-react';
 
 interface TopicTreeProps {
   topics: Topic[];
@@ -18,6 +19,7 @@ function TopicNode({
   onSelect?: (topic: Topic) => void;
   onCardsGenerated?: (topicId: string, count: number) => void;
 }) {
+  const navigate = useNavigate();
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,6 +53,14 @@ function TopicNode({
           <span className="text-[#8b949e] text-sm">
             {topic.cardCount} cards
           </span>
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`/study/${topic.id}`); }}
+            className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+            title="Study this topic with AI tutor"
+          >
+            <GraduationCap className="w-3 h-3" />
+            Study
+          </button>
           {topic.cardCount === 0 && (
             <button
               onClick={handleGenerate}

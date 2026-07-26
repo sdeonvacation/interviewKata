@@ -51,4 +51,14 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    // docker-java's default negotiated API version (1.32) is rejected by modern Docker engines
+    // (colima 29.x requires >= 1.40). Pin a compatible version for Testcontainers-backed tests.
+    // Test workers do NOT inherit the Gradle process' system properties, so it must be set here.
+    // Override on the command line with -Dapi.version=... if needed.
+    systemProperty("api.version", System.getProperty("api.version", "1.43"))
+    // DOCKER_HOST and TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE are inherited from the environment
+    // automatically; pass them through explicitly so a non-inheriting runner still works.
+    System.getenv("DOCKER_HOST")?.let { environment("DOCKER_HOST", it) }
+    System.getenv("TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE")
+        ?.let { environment("TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE", it) }
 }

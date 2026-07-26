@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { get, post } from '@/api/client';
 import { Difficulty } from '@/types';
 import { AiFeedbackPanel } from '@/components/AiFeedbackPanel';
+import { AskAiPanel } from '@/components/AskAiPanel';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { DifficultyBadge } from '@/components/DifficultyBadge';
 import { Send } from 'lucide-react';
@@ -101,6 +102,12 @@ export function DesignWorkspace() {
               ))}
             </ul>
           </div>
+
+          {/* Ask AI */}
+          <AskAiPanel
+            context={`System Design Exercise: ${exercise.title}\n\nPrompt:\n${exercise.prompt}\n\nEvaluation Criteria: ${exercise.evaluationCriteria.join(', ')}`}
+            placeholder="Ask about this design problem..."
+          />
         </div>
 
         {/* Right panel - answer textarea */}

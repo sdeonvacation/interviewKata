@@ -29,8 +29,9 @@ public class ChallengeController {
     public ResponseEntity<Page<ChallengeDto>> listChallenges(
             @RequestParam(required = false) ChallengeType type,
             @RequestParam(required = false) Difficulty difficulty,
-            @RequestParam(defaultValue = "0") int page) {
-        return ResponseEntity.ok(challengeService.listChallenges(type, difficulty, page));
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(challengeService.listChallenges(type, difficulty, page, size));
     }
 
     @GetMapping("/{id}")

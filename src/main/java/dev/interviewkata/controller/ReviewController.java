@@ -25,7 +25,8 @@ public class ReviewController {
     @PostMapping("/start")
     public ResponseEntity<ReviewSessionDto> startSession(@Valid @RequestBody StartReviewRequest request) {
         int limit = request.limit() != null ? request.limit() : 20;
-        return ResponseEntity.ok(reviewSessionService.startSession(request.topicId(), limit));
+        boolean includeChildren = Boolean.TRUE.equals(request.includeChildren());
+        return ResponseEntity.ok(reviewSessionService.startSession(request.topicId(), limit, includeChildren));
     }
 
     @PostMapping("/{sessionId}/grade")

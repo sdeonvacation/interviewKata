@@ -3,13 +3,15 @@ import { useSearchParams } from 'react-router-dom';
 import { RotateCcw, Trophy } from 'lucide-react';
 import { FlashCard } from '@/components/FlashCard';
 import { GradeButtons } from '@/components/GradeButtons';
+import { AskAiPanel } from '@/components/AskAiPanel';
 import { useReviewSession } from '@/hooks/useReviewSession';
 
 export function ReviewSession() {
   const [searchParams] = useSearchParams();
   const topicId = searchParams.get('topicId') || undefined;
+  const includeChildren = searchParams.get('includeChildren') === 'true';
   const { state, session, currentCard, currentIndex, completedCards, error, startSession, showAnswer, gradeCard } =
-    useReviewSession(topicId);
+    useReviewSession(topicId, includeChildren);
 
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -150,6 +152,14 @@ export function ReviewSession() {
                 <GradeButtons onGrade={gradeCard} disabled={false} />
               </div>
             )}
+
+            {/* Ask AI */}
+            <div className="flex justify-center">
+              <AskAiPanel
+                context={`Flashcard Question: ${currentCard.front}\nAnswer: ${currentCard.back}`}
+                placeholder="Ask about this concept..."
+              />
+            </div>
           </div>
         )}
 

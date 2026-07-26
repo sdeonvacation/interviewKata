@@ -137,6 +137,7 @@ class AiServiceTest {
     @Test
     void conductInterview_success_returnsQuestion() {
         when(chatClient.prompt()).thenReturn(requestSpec);
+        when(requestSpec.system(anyString())).thenReturn(requestSpec);
         when(requestSpec.user(anyString())).thenReturn(requestSpec);
         when(requestSpec.call()).thenReturn(callResponseSpec);
         when(callResponseSpec.content()).thenReturn("Can you explain the difference between ArrayList and LinkedList?");
@@ -160,6 +161,7 @@ class AiServiceTest {
     @Test
     void conductInterview_nullTranscript_handledGracefully() {
         when(chatClient.prompt()).thenReturn(requestSpec);
+        when(requestSpec.system(anyString())).thenReturn(requestSpec);
         when(requestSpec.user(anyString())).thenReturn(requestSpec);
         when(requestSpec.call()).thenReturn(callResponseSpec);
         when(callResponseSpec.content()).thenReturn("Tell me about Spring Boot.");

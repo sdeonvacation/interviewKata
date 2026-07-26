@@ -43,12 +43,11 @@ class MockInterviewEngineTest {
 
     @BeforeEach
     void setUp() {
-        engine = new MockInterviewEngine(mockInterviewRepository, interviewTurnRepository, aiService, 3);
+        engine = new MockInterviewEngine(mockInterviewRepository, interviewTurnRepository, aiService);
     }
 
     @Test
     void startInterview_callsAiForFirstQuestion() {
-        when(mockInterviewRepository.countByStartedAtAfter(any())).thenReturn(0L);
         when(aiService.conductInterview(eq(""), eq("JAVA_CORE"), eq("INTRO")))
                 .thenReturn("What is your experience with Java generics?");
 
@@ -71,7 +70,6 @@ class MockInterviewEngineTest {
 
     @Test
     void startInterview_aiFails_usesFallbackQuestion() {
-        when(mockInterviewRepository.countByStartedAtAfter(any())).thenReturn(0L);
         when(aiService.conductInterview(any(), any(), any()))
                 .thenReturn("Tell me about your experience with JAVA_CORE. What concepts are you most comfortable with?");
 
@@ -90,16 +88,6 @@ class MockInterviewEngineTest {
         verify(interviewTurnRepository).save(turnCaptor.capture());
         assertNotNull(turnCaptor.getValue().getAiQuestion());
         assertFalse(turnCaptor.getValue().getAiQuestion().isBlank());
-    }
-
-    @Test
-    void startInterview_rateLimitExceeded_throws() {
-        when(mockInterviewRepository.countByStartedAtAfter(any())).thenReturn(3L);
-
-        assertThrows(RateLimitExceededException.class,
-                () -> engine.startInterview(TopicArea.JAVA_CORE, Difficulty.MEDIUM));
-
-        verify(aiService, never()).conductInterview(any(), any(), any());
     }
 
     @Test
@@ -168,5 +156,52 @@ class MockInterviewEngineTest {
 
         assertEquals(InterviewState.COMPLETE, result.getState());
         assertNotNull(result.getCompletedAt());
+    }
+
+    @Test
+    void deleteInterview_deletesTurnsThenInterview() {
+        UUID interviewId = UUID.randomUUID();
+        when(mockInterviewRepository.existsById(interviewId)).thenReturn(true);
+
+        engine.deleteInterview(interviewId);
+
+        verify(interviewTurnRepository).deleteByInterviewId(interviewId);
+        verify(mockInterviewRepository).deleteById(interviewId);
+    }
+
+    @Test
+    void deleteInterview_missing_throws() {
+        UUID interviewId = UUID.randomUUID();
+        when(mockInterviewRepository.existsById(interviewId)).thenReturn(false);
+
+        assertThrows(jakarta.persistence.EntityNotFoundException.class,
+                () -> engine.deleteInterview(interviewId));
+        verify(interviewTurnRepository, never()).deleteByInterviewId(any());
+        verify(mockInterviewRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void listInterviews_mapsSummaries() {
+        UUID id = UUID.randomUUID();
+        MockInterview interview = MockInterview.builder()
+                .id(id)
+                .topicArea(TopicArea.DSA)
+                .difficulty(Difficulty.MEDIUM)
+                .state(InterviewState.COMPLETE)
+                .startedAt(LocalDateTime.now())
+                .completedAt(LocalDateTime.now())
+                .overallScore(8.0)
+                .build();
+        when(mockInterviewRepository.findAllByOrderByStartedAtDesc()).thenReturn(List.of(interview));
+        when(interviewTurnRepository.countByInterviewId(id)).thenReturn(6L);
+
+        var result = engine.listInterviews();
+
+        assertEquals(1, result.size());
+        assertEquals("DSA", result.get(0).topicArea());
+        assertEquals("MEDIUM", result.get(0).difficulty());
+        assertEquals("COMPLETE", result.get(0).state());
+        assertEquals(6, result.get(0).turnCount());
+        assertEquals(8.0, result.get(0).overallScore());
     }
 }

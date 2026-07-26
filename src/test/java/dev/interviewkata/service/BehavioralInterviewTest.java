@@ -42,7 +42,7 @@ class BehavioralInterviewTest {
 
     @BeforeEach
     void setUp() {
-        engine = new MockInterviewEngine(mockInterviewRepository, interviewTurnRepository, aiService, 3);
+        engine = new MockInterviewEngine(mockInterviewRepository, interviewTurnRepository, aiService);
     }
 
     @Test

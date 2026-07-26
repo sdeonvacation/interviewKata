@@ -11,4 +11,8 @@ import java.util.UUID;
 public interface InterviewTurnRepository extends JpaRepository<InterviewTurn, UUID> {
 
     List<InterviewTurn> findByInterviewIdOrderByTurnNumber(UUID interviewId);
+
+    long countByInterviewId(UUID interviewId);
+
+    void deleteByInterviewId(UUID interviewId);
 }

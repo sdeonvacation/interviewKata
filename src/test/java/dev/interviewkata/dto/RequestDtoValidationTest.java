@@ -20,7 +20,7 @@ class RequestDtoValidationTest {
 
     @Test
     void startReviewRequest_nullableFields() {
-        StartReviewRequest req = new StartReviewRequest(null, null);
+        StartReviewRequest req = new StartReviewRequest(null, null, null);
 
         assertNull(req.topicId());
         assertNull(req.limit());
@@ -29,7 +29,7 @@ class RequestDtoValidationTest {
     @Test
     void startReviewRequest_withValues() {
         UUID topicId = UUID.randomUUID();
-        StartReviewRequest req = new StartReviewRequest(topicId, 15);
+        StartReviewRequest req = new StartReviewRequest(topicId, 15, null);
 
         assertEquals(topicId, req.topicId());
         assertEquals(15, req.limit());

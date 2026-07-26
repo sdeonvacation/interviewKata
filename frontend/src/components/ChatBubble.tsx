@@ -1,4 +1,5 @@
 import { Bot, User } from 'lucide-react';
+import { MarkdownRenderer } from './MarkdownRenderer';
 
 interface ChatBubbleProps {
   role: 'AI' | 'USER';
@@ -25,7 +26,7 @@ export function ChatBubble({ role, content, timestamp }: ChatBubbleProps) {
               : 'bg-amber-500/10 rounded-2xl rounded-br-sm'
           }`}
         >
-          {content}
+          {isAI ? <MarkdownRenderer content={content} /> : content}
         </div>
         {timestamp && (
           <span className={`text-xs text-[#484f58] ${isAI ? 'text-left' : 'text-right'}`}>

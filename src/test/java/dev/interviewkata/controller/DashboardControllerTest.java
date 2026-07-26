@@ -56,7 +56,7 @@ class DashboardControllerTest {
         ChallengeDto challenge = new ChallengeDto(UUID.randomUUID(), UUID.randomUUID(),
                 "Two Sum", Difficulty.EASY, ChallengeType.DSA, false);
         DesignExerciseDto exercise = new DesignExerciseDto(UUID.randomUUID(), UUID.randomUUID(),
-                "Design Cache", Difficulty.MEDIUM, 45);
+                "Design Cache", Difficulty.MEDIUM, 45, "Design a cache system", List.of("Scalability"));
 
         DailyRecommendationDto dto = new DailyRecommendationDto(
                 List.of(card), List.of(challenge), exercise, "Day 5 streak!",
