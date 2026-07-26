@@ -8,7 +8,7 @@ InterviewKata is a full-stack software-engineering interview prep platform:
 - **Backend:** Java 21 + Spring Boot 3.3 (`src/main/java/dev/interviewkata/`)
 - **Frontend:** React 18 + TypeScript + Vite + Tailwind (`frontend/src/`)
 - **DB:** PostgreSQL 16 via Docker (colima), Liquibase migrations
-- **AI:** Spring AI → NVIDIA-hosted gpt-oss-120b (primary) + Google Gemini (fallback)
+- **AI:** Spring AI → pluggable OpenAI-compatible providers (primary + fallback), configured via `INTERVIEWKATA_AI_*` env vars; defaults to NVIDIA gpt-oss-120b + Gemini.
 
 ## Golden Rules
 

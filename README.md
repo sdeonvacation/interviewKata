@@ -27,7 +27,7 @@ Every AI surface renders **markdown**, uses **Java** for code examples, and is h
 - **Backend:** Java 21, Spring Boot 3.3, Spring AI, Spring Data JPA, Liquibase
 - **Database:** PostgreSQL 16 (Docker)
 - **Frontend:** React 18 + TypeScript, Vite, Tailwind CSS, lucide-react, react-markdown
-- **AI:** NVIDIA-hosted openai/gpt-oss-120b (primary) with Google Gemini fallback
+- **AI:** Any OpenAI-compatible LLM provider (pluggable primary + fallback via Spring AI). Defaults ship with NVIDIA-hosted and Google Gemini endpoints, but any OpenAI-compatible API works.
 - **Testing:** JUnit 5, Mockito, Testcontainers (real Postgres integration/E2E)
 
 ---
@@ -42,22 +42,22 @@ Every AI surface renders **markdown**, uses **Java** for code examples, and is h
 
 ### 1. Configure AI (env-driven)
 
-All AI provider settings — endpoint, model, and key for both the primary and fallback — are read from the environment (`application.yaml` only holds sane defaults). The app runs without keys (AI features degrade gracefully), but for full functionality export:
+The AI backend is provider-agnostic: point these env vars at **any OpenAI-compatible provider** for both the primary and fallback client. `INTERVIEWKATA_AI_PROVIDER` selects the primary client type (`openai` for any OpenAI-compatible endpoint, or `anthropic`), and each `*_BASE_URL` / `*_MODEL` / `*_API_KEY` triple can target whatever provider you like. All settings are read from the environment (`application.yaml` only holds sane defaults). The app runs without keys (AI features degrade gracefully), but for full functionality export:
 
 ```bash
-# Primary provider (default: NVIDIA-hosted openai/gpt-oss-120b)
+# Primary provider — any OpenAI-compatible endpoint (example default: NVIDIA-hosted openai/gpt-oss-120b)
 export INTERVIEWKATA_AI_PROVIDER="openai"        # primary client type: openai | anthropic
-export INTERVIEWKATA_AI_API_KEY="<your-nvidia-api-key>"
+export INTERVIEWKATA_AI_API_KEY="<your-api-key>"
 export INTERVIEWKATA_AI_BASE_URL="https://integrate.api.nvidia.com"
 export INTERVIEWKATA_AI_MODEL="openai/gpt-oss-120b"
 
-# Fallback provider (default: Google Gemini)
-export INTERVIEWKATA_AI_FALLBACK_API_KEY="<your-google-gemini-key>"
+# Fallback provider — any OpenAI-compatible endpoint (example default: Google Gemini)
+export INTERVIEWKATA_AI_FALLBACK_API_KEY="<your-fallback-api-key>"
 export INTERVIEWKATA_AI_FALLBACK_BASE_URL="https://generativelanguage.googleapis.com/v1beta/openai"
 export INTERVIEWKATA_AI_FALLBACK_MODEL="gemini-2.0-flash"
 ```
 
-Any provider with an OpenAI-compatible endpoint works — just point `*_BASE_URL` / `*_MODEL` / `*_API_KEY` at it. Only the API keys are strictly required; base-url and model fall back to the defaults above if unset.
+The values above are just the shipped defaults. Swap in any OpenAI-compatible provider by changing the base-url/model/key — e.g. OpenAI, NVIDIA, Groq, Together, a local Ollama or LM Studio server, or Gemini's OpenAI-compatible endpoint. Only the API keys are strictly required; base-url and model fall back to the defaults above if unset.
 
 ### 2. Start everything with one command
 
@@ -175,7 +175,7 @@ Key settings in `src/main/resources/application.yaml`:
 | DB URL | `jdbc:postgresql://localhost:5436/interviewkata` |
 | Sandbox timeout | `5000 ms` |
 | SM-2 graduating interval | `21 days` |
-| AI provider (primary / fallback) | NVIDIA `openai/gpt-oss-120b` (OpenAI-compat) / Google Gemini |
+| AI providers | Pluggable — any OpenAI-compatible primary + fallback (defaults: NVIDIA `openai/gpt-oss-120b` / Google Gemini) |
 | AI provider toggle | `INTERVIEWKATA_AI_PROVIDER=openai` (default) or `anthropic` |
 
 ---
