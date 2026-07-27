@@ -39,6 +39,7 @@ Every AI surface renders **markdown**, uses **Java** for code examples, and is h
 - **Java 21**
 - **Node 18+**
 - **Docker** (via [colima](https://github.com/abiosoft/colima) or Docker Desktop) for PostgreSQL
+- Run `npm ci` (or `npm install`) in `frontend` once before first `make dev`
 
 ### 1. Configure AI (env-driven)
 
